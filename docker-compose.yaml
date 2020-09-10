@@ -1,0 +1,23 @@
+version: '3'
+services:
+  server:
+    restart: always
+    container_name: server
+    build:
+      context: ./server
+      dockerfile: $PWD/server/Dockerfile
+    ports:
+      - "8080:8080"
+
+  client:
+    container_name: client
+    build:
+      context: ./client
+      dockerfile: $PWD/client/Dockerfile
+    volumes:
+      - ./client:/app
+    ports:
+      - 3000:3000
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    stdin_open: true
