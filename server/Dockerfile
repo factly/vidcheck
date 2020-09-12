@@ -13,9 +13,9 @@
 #ENTRYPOINT air -d
 #
 
-FROM golang:1.15.0-alpine3.12
+FROM golang:1.15.0
 WORKDIR /usr/src/app
-COPY .
+COPY go.mod go.mod
 RUN go mod download
 RUN go get -u github.com/cosmtrek/air
 COPY . .

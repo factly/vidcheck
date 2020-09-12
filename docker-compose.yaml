@@ -1,4 +1,5 @@
-version: '3'
+version: '3.7'
+
 services:
   server:
     restart: always
@@ -6,6 +7,8 @@ services:
     build:
       context: ./server
       dockerfile: $PWD/server/Dockerfile
+    volumes:
+      - ./server:/usr/src/app
     ports:
       - "8080:8080"
 
@@ -21,3 +24,17 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true
     stdin_open: true
+
+  db:
+    image: postgres:12.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=vidcheck
+
+volumes:
+  postgres_data:
