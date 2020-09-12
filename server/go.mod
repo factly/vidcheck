@@ -8,5 +8,6 @@ require (
 	github.com/go-chi/cors v1.1.1
 	github.com/joho/godotenv v1.3.0
 	github.com/swaggo/swag v1.6.5
+	gorm.io/driver/postgres v1.0.0
 	gorm.io/gorm v1.20.1 // indirect gorm.io/gorm
 )
