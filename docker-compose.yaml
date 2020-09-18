@@ -3,7 +3,7 @@ version: '3.7'
 services:
   server:
     restart: always
-    container_name: server
+    container_name: vid_check_server
     build:
       context: ./server
       dockerfile: $PWD/server/Dockerfile
@@ -11,19 +11,22 @@ services:
       - ./server:/usr/src/app
     ports:
       - "8080:8080"
+    depends_on:
+      - db
 
-  client:
-    container_name: client
-    build:
-      context: ./client
-      dockerfile: $PWD/client/Dockerfile
-    volumes:
-      - ./client:/app
-    ports:
-      - 3000:3000
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-    stdin_open: true
+#  client:
+#    container_name: vid_check_client
+#    build:
+#      context: ./client
+#      dockerfile: $PWD/client/Dockerfile
+#    volumes:
+#      - ./client:/app
+#      - /app/node_modules/
+#    ports:
+#      - 3000:3000
+#    environment:
+#      - CHOKIDAR_USEPOLLING=true
+#    stdin_open: true
 
   db:
     image: postgres:12.0-alpine
