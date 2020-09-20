@@ -36,7 +36,6 @@ function CreateUpdateVideoAnalysis() {
         const minute = values['endTime'].split(':')[0];
         const second = values['endTime'].split(':')[1];
         values['endTimeFraction'] = (parseInt(minute, 10) * 60 + parseInt(second, 10)) / totalDuration;
-        console.log(values)
         if (values['endTimeFraction'] > 1) {
             alert('invalid end time')
             return
@@ -46,15 +45,14 @@ function CreateUpdateVideoAnalysis() {
                 return a.endTimeFraction - b.endTimeFraction;
             });
         });
-        setfactCheckReview(factCheckReview => {
-            return factCheckReview.map((element, index, array) => {
+        setfactCheckReview(factCheckReview =>
+            factCheckReview.map((element, index, array) => {
+                    element['startTime'] = index > 0 ? factCheckReview[index - 1]['endTime'] : '00:00';
                     element['widthPercentage'] = element['endTimeFraction'] * 100 - (index > 0 ? factCheckReview[index - 1]['widthPercentage'] : 0);
                     return element
                 }
             )
-        })
-        // onReset();
-        console.log(factCheckReview)
+        );
     };
 
     const onReset = () => {
@@ -73,6 +71,22 @@ function CreateUpdateVideoAnalysis() {
             player.current.seekTo(loopDetails.startFraction, 'fraction');
             setPlaying(false)
         }
+        let index;
+        let currentFormStartTime;
+        for (index = 0; index < factCheckReview.length; ++index) {
+            if(currentPlayed<factCheckReview[index].endTimeFraction){
+                currentFormStartTime = index>0 ? factCheckReview[index-1].endTime: '00:00'
+                break;
+            }
+        }
+        if (typeof currentFormStartTime == 'undefined') {
+            if (factCheckReview.length === 0){
+                currentFormStartTime = '00:00'
+            } else {
+                currentFormStartTime = factCheckReview[factCheckReview.length-1].endTime;
+            }
+        }
+        form.setFieldsValue({...form.getFieldsValue(), startTime: currentFormStartTime})
         setPlayed(currentPlayed)
     }
 
@@ -149,7 +163,7 @@ function CreateUpdateVideoAnalysis() {
                                     <Input/>
                                 </Form.Item>
                                 <Form.Item name="startTime" label="Start time">
-                                    <Input disabled/>
+                                    <Input />
                                 </Form.Item>
                                 <Form.Item name="endTime" label="End time" rules={[{
                                     required: true,
@@ -207,10 +221,6 @@ function CreateUpdateVideoAnalysis() {
                             <progress max={1} value={played}/>
                         </td>
                     </tr>
-                    </tbody>
-                </table>
-                <table>
-                    <tbody>
                     <tr>
                         <th>duration</th>
                         <td><Duration seconds={totalDuration}/></td>
@@ -238,7 +248,6 @@ function CreateUpdateVideoAnalysis() {
                 )
                 }
             </VideoLengthBar>
-
         </Player>)
 }
 
