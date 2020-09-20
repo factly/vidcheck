@@ -1,9 +1,16 @@
 import React, {useRef, useState} from 'react'
 import ReactPlayer from 'react-player'
-import {Player, ReactPlayerDiv, VideoUrlInput} from "./CreateUpdateVideoAnalysis.styled";
+import {
+    Player,
+    ReactPlayerDiv,
+    VideoLengthBar,
+    VideoLengthPart,
+    VideoUrlInput
+} from "./CreateUpdateVideoAnalysis.styled";
 import Duration from "./Duration";
-import {Button, Form, Input, Select} from "antd";
-const { Option } = Select;
+import {Button, Form, Input, Select, Tooltip} from "antd";
+
+const {Option} = Select;
 
 
 // Render a YouTube video player
@@ -12,29 +19,42 @@ function CreateUpdateVideoAnalysis() {
     const [played, setPlayed] = useState(0);
     const [videoUrl, setVideoUrl] = useState('https://www.youtube.com/watch?v=ZBU_Abt4-eQ')
     const [totalDuration, setTotalDuration] = useState(0)
-    const [loopDetails, setLoopDetails] = useState({loopEnabled:false, startFraction:0, endFraction: 1})
-    const [factCheckReview, setfactCheckReview] = useState([])
+    const [loopDetails, setLoopDetails] = useState({loopEnabled: false, startFraction: 0, endFraction: 1})
+    const [factCheckReview, setfactCheckReview] = useState([]);
     const player = useRef(null);
     const [form] = Form.useForm();
 
     const layout = {
-        labelCol: { span: 8 },
-        wrapperCol: { span: 16 },
+        labelCol: {span: 8},
+        wrapperCol: {span: 16},
     };
     const tailLayout = {
-        wrapperCol: { offset: 8, span: 16 },
+        wrapperCol: {offset: 8, span: 16},
     };
 
     const onFinish = values => {
         const minute = values['endTime'].split(':')[0];
         const second = values['endTime'].split(':')[1];
-        values['endTimeFraction'] = (minute * 60 + second)/ totalDuration;
+        values['endTimeFraction'] = (parseInt(minute, 10) * 60 + parseInt(second, 10)) / totalDuration;
+        console.log(values)
+        if (values['endTimeFraction'] > 1) {
+            alert('invalid end time')
+            return
+        }
         setfactCheckReview(factCheckReview => {
             return [...factCheckReview, values].sort((a, b) => {
                 return a.endTimeFraction - b.endTimeFraction;
+            });
         });
-        });
-        console.log(factCheckReview);
+        setfactCheckReview(factCheckReview => {
+            return factCheckReview.map((element, index, array) => {
+                    element['widthPercentage'] = element['endTimeFraction'] * 100 - (index > 0 ? factCheckReview[index - 1]['widthPercentage'] : 0);
+                    return element
+                }
+            )
+        })
+        // onReset();
+        console.log(factCheckReview)
     };
 
     const onReset = () => {
@@ -48,8 +68,8 @@ function CreateUpdateVideoAnalysis() {
 
     function handleProgress() {
         const currentPlayedTime = player.current.getCurrentTime()
-        const currentPlayed = currentPlayedTime/totalDuration;
-        if(loopDetails.loopEnabled && (currentPlayed<loopDetails.startFraction || currentPlayed>loopDetails.endFraction)){
+        const currentPlayed = currentPlayedTime / totalDuration;
+        if (loopDetails.loopEnabled && (currentPlayed < loopDetails.startFraction || currentPlayed > loopDetails.endFraction)) {
             player.current.seekTo(loopDetails.startFraction, 'fraction');
             setPlaying(false)
         }
@@ -57,10 +77,10 @@ function CreateUpdateVideoAnalysis() {
     }
 
     const playOnLoop = () => {
-        if(loopDetails.loopEnabled){
+        if (loopDetails.loopEnabled) {
             setLoopDetails({loopEnabled: false})
         } else {
-            setLoopDetails({loopEnabled: true, startFraction:0.2, endFraction: 0.6})
+            setLoopDetails({loopEnabled: true, startFraction: 0.2, endFraction: 0.3})
         }
     };
 
@@ -71,10 +91,23 @@ function CreateUpdateVideoAnalysis() {
 
     const fillCurrentTime = () => {
         const currentPlayedTime = player.current.getCurrentTime();
-        const minute = Math.floor(currentPlayedTime/60);
-        const seconds = Math.floor(currentPlayedTime%60);
-        form.setFieldsValue({...form.getFieldsValue(), endTime: `${minute}:${seconds>9?seconds:'0'+seconds}`})
+        const minute = Math.floor(currentPlayedTime / 60);
+        const seconds = Math.floor(currentPlayedTime % 60);
+        form.setFieldsValue({...form.getFieldsValue(), endTime: `${minute}:${seconds > 9 ? seconds : '0' + seconds}`})
     };
+
+    const ratingColor = {
+        'true': '#19b346',
+        'partial-true': '#8bb38d',
+        'neutral': '#b3b3b3',
+        'partial-false': '#b36d7e',
+        'false': '#b30a25'
+
+    };
+
+    const timeBarClick = (a) => {
+        console.log(a)
+    }
 
     return (
         <Player>
@@ -96,11 +129,11 @@ function CreateUpdateVideoAnalysis() {
                     <tr>
                         <th>URL</th>
                         <td>
-                        <VideoUrlInput
-                            type="text"
-                            value={videoUrl}
-                            onChange={updateVideoUrl}
-                        />
+                            <VideoUrlInput
+                                type="text"
+                                value={videoUrl}
+                                onChange={updateVideoUrl}
+                            />
                         </td>
                     </tr>
                     <tr>
@@ -109,11 +142,11 @@ function CreateUpdateVideoAnalysis() {
                         </th>
                         <td>
                             <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
-                                <Form.Item name="claimed" label="Claimed" rules={[{ required: true }]}>
-                                    <Input />
+                                <Form.Item name="claimed" label="Claimed" rules={[{required: false}]}>
+                                    <Input/>
                                 </Form.Item>
-                                <Form.Item name="factCheckDetail" label="Fact check" rules={[{ required: true }]}>
-                                    <Input />
+                                <Form.Item name="factCheckDetail" label="Fact check" rules={[{required: false}]}>
+                                    <Input/>
                                 </Form.Item>
                                 <Form.Item name="startTime" label="Start time">
                                     <Input disabled/>
@@ -123,13 +156,13 @@ function CreateUpdateVideoAnalysis() {
                                     pattern: new RegExp(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/),
                                     message: "Wrong format! (mm:ss)"
                                 }]}>
-                                    <Input />
+                                    <Input/>
                                 </Form.Item>
                                 <Button type="link" onClick={fillCurrentTime}>
                                     Current time
                                 </Button>
 
-                                <Form.Item name="rating" label="Rating" rules={[{ required: true }]}>
+                                <Form.Item name="rating" label="Rating" rules={[{required: true}]}>
                                     <Select
                                         placeholder="Select a rating of the claim"
                                         allowClear
@@ -180,7 +213,7 @@ function CreateUpdateVideoAnalysis() {
                     <tbody>
                     <tr>
                         <th>duration</th>
-                        <td><Duration seconds={totalDuration} /></td>
+                        <td><Duration seconds={totalDuration}/></td>
                     </tr>
                     <tr>
                         <th>elapsed</th>
@@ -193,6 +226,19 @@ function CreateUpdateVideoAnalysis() {
                     </tbody>
                 </table>
             </ReactPlayerDiv>
+            <VideoLengthBar>
+                {factCheckReview.map((review) =>
+                    <Tooltip title={review.endTime}>
+                        <VideoLengthPart width={`${review.widthPercentage}%`}
+                                         backgroundColor={ratingColor[review.rating]}
+                                         onClick={() => timeBarClick(review)}>
+                            <p>{review.rating}</p>
+                        </VideoLengthPart>
+                    </Tooltip>
+                )
+                }
+            </VideoLengthBar>
+
         </Player>)
 }
 

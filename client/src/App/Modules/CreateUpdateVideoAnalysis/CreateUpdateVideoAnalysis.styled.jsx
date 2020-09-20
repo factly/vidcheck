@@ -15,3 +15,19 @@ position: absolute;
 export const VideoUrlInput = styled(Input)`
     min_width: 200em 
 `;
+
+export const VideoLengthBar = styled.div`
+    width: 100%;
+    height: 30px;
+    border-radius: 10px;
+    background-color: #b3b3b3;
+    color: white;
+    text-align: center;
+    `;
+
+export const VideoLengthPart = styled.div`
+    width: ${props => props.width};
+    height: 100%;
+    background-color: ${props => props.backgroundColor};
+    float: left;
+    `;
