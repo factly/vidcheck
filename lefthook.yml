@@ -1,0 +1,6 @@
+pre-commit:
+  commands:
+    frontend-style:
+      root: "client/"
+      files: git diff --name-only HEAD @{push}
+      run: yarn stylelint {files}

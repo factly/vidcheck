@@ -1,7 +1,10 @@
 import React, {useRef, useState} from 'react'
 import ReactPlayer from 'react-player'
-import {Player, ReactPlayerDiv} from "./CreateUpdateVideoAnalysis.styled";
+import {Player, ReactPlayerDiv, VideoUrlInput} from "./CreateUpdateVideoAnalysis.styled";
 import Duration from "./Duration";
+import {Button, Form, Input, Select} from "antd";
+const { Option } = Select;
+
 
 // Render a YouTube video player
 function CreateUpdateVideoAnalysis() {
@@ -9,40 +12,146 @@ function CreateUpdateVideoAnalysis() {
     const [played, setPlayed] = useState(0);
     const [videoUrl, setVideoUrl] = useState('https://www.youtube.com/watch?v=ZBU_Abt4-eQ')
     const [totalDuration, setTotalDuration] = useState(0)
+    const [loopDetails, setLoopDetails] = useState({loopEnabled:false, startFraction:0, endFraction: 1})
+    const [factCheckReview, setfactCheckReview] = useState([])
     const player = useRef(null);
+    const [form] = Form.useForm();
+
+    const layout = {
+        labelCol: { span: 8 },
+        wrapperCol: { span: 16 },
+    };
+    const tailLayout = {
+        wrapperCol: { offset: 8, span: 16 },
+    };
+
+    const onFinish = values => {
+        const minute = values['endTime'].split(':')[0];
+        const second = values['endTime'].split(':')[1];
+        values['endTimeFraction'] = (minute * 60 + second)/ totalDuration;
+        setfactCheckReview(factCheckReview => {
+            return [...factCheckReview, values].sort((a, b) => {
+                return a.endTimeFraction - b.endTimeFraction;
+        });
+        });
+        console.log(factCheckReview);
+    };
+
+    const onReset = () => {
+        form.resetFields();
+    };
 
     function handleSeekChange(e) {
-        console.log(played)
         setPlayed(e.target.value)
-        const url = new URL(videoUrl)
-        let urlParam = new URLSearchParams(url.search)
-        urlParam.delete('t')
-        urlParam.set('t', totalDuration * played)
-        const currentPlayedTime = player.current.seekTo(played, 'fraction');
-        const finalURL = url.origin+ url.pathname+ '?'+ urlParam.toString();
+        player.current.seekTo(played, 'fraction');
     }
 
     function handleProgress() {
         const currentPlayedTime = player.current.getCurrentTime()
-        setPlayed(currentPlayedTime/totalDuration)
+        const currentPlayed = currentPlayedTime/totalDuration;
+        if(loopDetails.loopEnabled && (currentPlayed<loopDetails.startFraction || currentPlayed>loopDetails.endFraction)){
+            player.current.seekTo(loopDetails.startFraction, 'fraction');
+            setPlaying(false)
+        }
+        setPlayed(currentPlayed)
     }
 
+    const playOnLoop = () => {
+        if(loopDetails.loopEnabled){
+            setLoopDetails({loopEnabled: false})
+        } else {
+            setLoopDetails({loopEnabled: true, startFraction:0.2, endFraction: 0.6})
+        }
+    };
+
+    const updateVideoUrl = (e) => {
+        const newUrl = e.target.value;
+        setVideoUrl(newUrl)
+    };
+
+    const fillCurrentTime = () => {
+        const currentPlayedTime = player.current.getCurrentTime();
+        const minute = Math.floor(currentPlayedTime/60);
+        const seconds = Math.floor(currentPlayedTime%60);
+        form.setFieldsValue({...form.getFieldsValue(), endTime: `${minute}:${seconds>9?seconds:'0'+seconds}`})
+    };
 
     return (
         <Player>
             <ReactPlayerDiv>
                 <ReactPlayer
                     url={videoUrl}
-                    width='100%'
-                    height='100%'
                     playing={playing}
+                    controls={true}
                     ref={player}
                     volume={0}
                     onProgress={handleProgress}
                     onDuration={setTotalDuration}
                 />
+                <Button type="primary" onClick={playOnLoop}>
+                    Loop
+                </Button>
                 <table>
                     <tbody>
+                    <tr>
+                        <th>URL</th>
+                        <td>
+                        <VideoUrlInput
+                            type="text"
+                            value={videoUrl}
+                            onChange={updateVideoUrl}
+                        />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Fact Check
+                        </th>
+                        <td>
+                            <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
+                                <Form.Item name="claimed" label="Claimed" rules={[{ required: true }]}>
+                                    <Input />
+                                </Form.Item>
+                                <Form.Item name="factCheckDetail" label="Fact check" rules={[{ required: true }]}>
+                                    <Input />
+                                </Form.Item>
+                                <Form.Item name="startTime" label="Start time">
+                                    <Input disabled/>
+                                </Form.Item>
+                                <Form.Item name="endTime" label="End time" rules={[{
+                                    required: true,
+                                    pattern: new RegExp(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/),
+                                    message: "Wrong format! (mm:ss)"
+                                }]}>
+                                    <Input />
+                                </Form.Item>
+                                <Button type="link" onClick={fillCurrentTime}>
+                                    Current time
+                                </Button>
+
+                                <Form.Item name="rating" label="Rating" rules={[{ required: true }]}>
+                                    <Select
+                                        placeholder="Select a rating of the claim"
+                                        allowClear
+                                    >
+                                        <Option value="true">True</Option>
+                                        <Option value="partial-true">Partial True</Option>
+                                        <Option value="neutral">Neutral</Option>
+                                        <Option value="partial-false">Partial False</Option>
+                                        <Option value="false">False</Option>
+                                    </Select>
+                                </Form.Item>
+                                <Form.Item {...tailLayout}>
+                                    <Button type="primary" htmlType="submit">
+                                        Submit
+                                    </Button>
+                                    <Button htmlType="button" onClick={onReset}>
+                                        Reset
+                                    </Button>
+                                </Form.Item>
+                            </Form>
+                        </td>
+                    </tr>
                     <tr>
                         <th>Controls</th>
                         <td>
@@ -69,12 +178,6 @@ function CreateUpdateVideoAnalysis() {
                 </table>
                 <table>
                     <tbody>
-                    {/*<tr>*/}
-                    {/*    <th>url</th>*/}
-                    {/*    <td className={!url ? 'faded' : ''}>*/}
-                    {/*        {(url instanceof Array ? 'Multiple' : url) || 'null'}*/}
-                    {/*    </td>*/}
-                    {/*</tr>*/}
                     <tr>
                         <th>duration</th>
                         <td><Duration seconds={totalDuration} /></td>
