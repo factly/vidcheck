@@ -1,14 +1,19 @@
 import React, {useRef, useState} from 'react'
 import ReactPlayer from 'react-player'
 import {
-    Player,
-    ReactPlayerDiv,
+    FactCheckReviewFormWrapper,
+    FactCheckReviewListWrapper,
+    FactCheckReviewWrapper,
+    InfoHeaderWrapper,
+    InfoWrapper,
+    PageWrapper,
+    VideoInfoParentWrapper,
+    VideoInfoWrapper,
     VideoLengthBar,
     VideoLengthPart,
-    VideoUrlInput
 } from "./CreateUpdateVideoAnalysis.styled";
 import Duration from "./Duration";
-import {Button, Form, Input, Select, Tooltip} from "antd";
+import {Button, Form, Input, Select, TextArea, Timeline, Tooltip} from "antd";
 
 const {Option} = Select;
 
@@ -24,10 +29,7 @@ function CreateUpdateVideoAnalysis() {
     const player = useRef(null);
     const [form] = Form.useForm();
 
-    const layout = {
-        labelCol: {span: 8},
-        wrapperCol: {span: 16},
-    };
+    const layout = null;
     const tailLayout = {
         wrapperCol: {offset: 8, span: 16},
     };
@@ -74,16 +76,16 @@ function CreateUpdateVideoAnalysis() {
         let index;
         let currentFormStartTime;
         for (index = 0; index < factCheckReview.length; ++index) {
-            if(currentPlayed<factCheckReview[index].endTimeFraction){
-                currentFormStartTime = index>0 ? factCheckReview[index-1].endTime: '00:00'
+            if (currentPlayed < factCheckReview[index].endTimeFraction) {
+                currentFormStartTime = index > 0 ? factCheckReview[index - 1].endTime : '00:00'
                 break;
             }
         }
         if (typeof currentFormStartTime == 'undefined') {
-            if (factCheckReview.length === 0){
+            if (factCheckReview.length === 0) {
                 currentFormStartTime = '00:00'
             } else {
-                currentFormStartTime = factCheckReview[factCheckReview.length-1].endTime;
+                currentFormStartTime = factCheckReview[factCheckReview.length - 1].endTime;
             }
         }
         form.setFieldsValue({...form.getFieldsValue(), startTime: currentFormStartTime})
@@ -124,8 +126,8 @@ function CreateUpdateVideoAnalysis() {
     }
 
     return (
-        <Player>
-            <ReactPlayerDiv>
+        <PageWrapper>
+            <VideoInfoParentWrapper>
                 <ReactPlayer
                     url={videoUrl}
                     playing={playing}
@@ -135,107 +137,48 @@ function CreateUpdateVideoAnalysis() {
                     onProgress={handleProgress}
                     onDuration={setTotalDuration}
                 />
-                <Button type="primary" onClick={playOnLoop}>
-                    Loop
-                </Button>
-                <table>
-                    <tbody>
-                    <tr>
-                        <th>URL</th>
-                        <td>
-                            <VideoUrlInput
-                                type="text"
-                                value={videoUrl}
-                                onChange={updateVideoUrl}
-                            />
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            Fact Check
-                        </th>
-                        <td>
-                            <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
-                                <Form.Item name="claimed" label="Claimed" rules={[{required: false}]}>
-                                    <Input/>
-                                </Form.Item>
-                                <Form.Item name="factCheckDetail" label="Fact check" rules={[{required: false}]}>
-                                    <Input/>
-                                </Form.Item>
-                                <Form.Item name="startTime" label="Start time">
-                                    <Input />
-                                </Form.Item>
-                                <Form.Item name="endTime" label="End time" rules={[{
-                                    required: true,
-                                    pattern: new RegExp(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/),
-                                    message: "Wrong format! (mm:ss)"
-                                }]}>
-                                    <Input/>
-                                </Form.Item>
-                                <Button type="link" onClick={fillCurrentTime}>
-                                    Current time
-                                </Button>
-
-                                <Form.Item name="rating" label="Rating" rules={[{required: true}]}>
-                                    <Select
-                                        placeholder="Select a rating of the claim"
-                                        allowClear
-                                    >
-                                        <Option value="true">True</Option>
-                                        <Option value="partial-true">Partial True</Option>
-                                        <Option value="neutral">Neutral</Option>
-                                        <Option value="partial-false">Partial False</Option>
-                                        <Option value="false">False</Option>
-                                    </Select>
-                                </Form.Item>
-                                <Form.Item {...tailLayout}>
-                                    <Button type="primary" htmlType="submit">
-                                        Submit
-                                    </Button>
-                                    <Button htmlType="button" onClick={onReset}>
-                                        Reset
-                                    </Button>
-                                </Form.Item>
-                            </Form>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Controls</th>
-                        <td>
-                            <button onClick={() => setPlaying(!playing)}>Play/Pause</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Seek</th>
-                        <td>
-                            <input
-                                type='range' min={0} max={0.999999} step='any'
-                                value={played}
-                                onChange={handleSeekChange}
-                            />
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Played</th>
-                        <td>
-                            <progress max={1} value={played}/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>duration</th>
-                        <td><Duration seconds={totalDuration}/></td>
-                    </tr>
-                    <tr>
-                        <th>elapsed</th>
-                        <td><Duration seconds={totalDuration * played}/></td>
-                    </tr>
-                    <tr>
-                        <th>remaining</th>
-                        <td><Duration seconds={totalDuration * (1 - played)}/></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </ReactPlayerDiv>
+                <VideoInfoWrapper>
+                    <InfoWrapper>
+                        <InfoHeaderWrapper>Video URL</InfoHeaderWrapper>
+                        <Input
+                            type="text"
+                            value={videoUrl}
+                            onChange={updateVideoUrl}
+                        />
+                    </InfoWrapper>
+                    <InfoWrapper>
+                        <InfoHeaderWrapper>Actions</InfoHeaderWrapper>
+                        <button onClick={() => setPlaying(!playing)}>Play/Pause</button>
+                        <Button type="primary" onClick={playOnLoop}>
+                            Loop
+                        </Button>
+                    </InfoWrapper>
+                    <InfoWrapper>
+                        <InfoHeaderWrapper>Played</InfoHeaderWrapper>
+                        <progress max={1} value={played}/>
+                    </InfoWrapper>
+                    <InfoWrapper>
+                        <InfoHeaderWrapper>Seek</InfoHeaderWrapper>
+                        <input
+                            type='range' min={0} max={0.999999} step='any'
+                            value={played}
+                            onChange={handleSeekChange}
+                        />
+                    </InfoWrapper>
+                    <InfoWrapper>
+                        <InfoHeaderWrapper>Total Time</InfoHeaderWrapper>
+                        <Duration seconds={totalDuration}/>
+                    </InfoWrapper>
+                    <InfoWrapper>
+                        <InfoHeaderWrapper>Elapsed</InfoHeaderWrapper>
+                        <Duration seconds={totalDuration * played}/>
+                    </InfoWrapper>
+                    <InfoWrapper>
+                        <InfoHeaderWrapper>Remaining</InfoHeaderWrapper>
+                        <Duration seconds={totalDuration * (1 - played)}/>
+                    </InfoWrapper>
+                </VideoInfoWrapper>
+            </VideoInfoParentWrapper>
             <VideoLengthBar>
                 {factCheckReview.map((review) =>
                     <Tooltip title={review.endTime}>
@@ -248,7 +191,64 @@ function CreateUpdateVideoAnalysis() {
                 )
                 }
             </VideoLengthBar>
-        </Player>)
+            <FactCheckReviewWrapper>
+                <FactCheckReviewListWrapper>
+                    <Timeline mode={'left'}>
+                        <Timeline.Item label="2015-09-01">Create a services</Timeline.Item>
+                        <Timeline.Item label="2015-09-01 09:12:11">Solve initial network problems</Timeline.Item>
+                        <Timeline.Item>Technical testing</Timeline.Item>
+                        <Timeline.Item label="2015-09-01 09:12:11">Network problems being solved</Timeline.Item>
+                    </Timeline>
+                </FactCheckReviewListWrapper>
+                <FactCheckReviewFormWrapper>
+                    <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
+
+                        <Form.Item name="startTime" label="Start time">
+                            <Input disabled/>
+                        </Form.Item>
+                        <Form.Item name="endTime" label="End time" rules={[{
+                            required: true,
+                            pattern: new RegExp(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/),
+                            message: "Wrong format! (mm:ss)"
+                        }]}>
+                            <Input/>
+                        </Form.Item>
+                        <Button type="link" onClick={fillCurrentTime}>
+                            Current time
+                        </Button>
+                        <Form.Item name="rating" label="Rating" rules={[{required: true}]}>
+                            <Select
+                                placeholder="Select a rating of the claim"
+                                allowClear
+                            >
+                                <Option value="true">True</Option>
+                                <Option value="partial-true">Partial True</Option>
+                                <Option value="neutral">Neutral</Option>
+                                <Option value="partial-false">Partial False</Option>
+                                <Option value="false">False</Option>
+                            </Select>
+                        </Form.Item>
+
+
+                        <Form.Item name="claimed" label="Claimed" rules={[{required: false}]}>
+                            <Input.TextArea/>
+                        </Form.Item>
+                        <Form.Item name="factCheckDetail" label="Fact check" rules={[{required: false}]}>
+                            <Input.TextArea/>
+                        </Form.Item>
+                        <Form.Item {...tailLayout}>
+                            <Button type="primary" htmlType="submit">
+                                Submit
+                            </Button>
+                            <Button htmlType="button" onClick={onReset}>
+                                Reset
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </FactCheckReviewFormWrapper>
+            </FactCheckReviewWrapper>
+        </PageWrapper>
+    )
 }
 
 export default CreateUpdateVideoAnalysis;
