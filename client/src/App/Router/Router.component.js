@@ -1,7 +1,9 @@
-import Home from "../Modules/Home";
+import Dashboard from "../Modules/Dashboard";
+import CreateUpdateVideoAnalysis from "../Modules/CreateUpdateVideoAnalysis";
+
 
 class Route {
-    constructor({ path, component, title, onNavigation = false, exact = true }) {
+    constructor({path, component, title, onNavigation = false, exact = true}) {
         this.path = path;
         this.component = component;
         this.title = title;
@@ -17,10 +19,15 @@ const routes = [
     new Route(
         {
             path: '/',
-            title: 'Search Factcheck Articles',
-            component: Home
-        }
-    )
+            title: 'DashBoard',
+            component: Dashboard
+        }),
+    new Route(
+        {
+            path: '/create',
+            title: 'Create',
+            component: CreateUpdateVideoAnalysis
+        }),
 ];
 
 export default routes;
