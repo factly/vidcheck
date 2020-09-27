@@ -30,20 +30,26 @@ export const InfoHeaderWrapper = styled.span`
     min-width: 30%;    
 `;
 
-export const VideoLengthBar = styled.div`
-    padding: 20px;
-    width: 60%;
-    height: 30px;
-    border-radius: 10px;
-    background-color: #b3b3b3;
+export const VideoAnalysisTimelineBarWrapper = styled.div`
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
+`
+
+export const VideoLengthBar = styled.div`
+    width: 65%;
+    height: 30px;
+    background-color: #b3b3b3;
+    color: white;
+    text-align: center;
+    display: flex;
+    justify-content: center;
     `;
 
 export const VideoLengthPart = styled.div`
     width: ${props => props.width};
     height: 100%;
     background-color: ${props => props.backgroundColor};
+    float: left;
     `;
 
 export const FactCheckReviewWrapper = styled.div`
@@ -54,8 +60,8 @@ export const FactCheckReviewWrapper = styled.div`
 `;
 
 export const FactCheckReviewListWrapper = styled.div`
-padding: 20px; 
-    min-width: 30%;
+    padding: 20px; 
+    min-width: 40%;
 `;
 
 

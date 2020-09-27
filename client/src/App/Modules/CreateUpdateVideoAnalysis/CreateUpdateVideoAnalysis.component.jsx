@@ -6,26 +6,68 @@ import {
     FactCheckReviewWrapper,
     InfoHeaderWrapper,
     InfoWrapper,
-    PageWrapper,
+    PageWrapper, VideoAnalysisTimelineBarWrapper,
     VideoInfoParentWrapper,
     VideoInfoWrapper,
     VideoLengthBar,
     VideoLengthPart,
 } from "./CreateUpdateVideoAnalysis.styled";
 import Duration from "./Duration";
-import {Button, Form, Input, Select, TextArea, Timeline, Tooltip} from "antd";
+import {Button, Form, Input, Select, Timeline, Tooltip} from "antd";
+import { DeleteOutlined } from '@ant-design/icons';
 
 const {Option} = Select;
 
 
 // Render a YouTube video player
 function CreateUpdateVideoAnalysis() {
+    const defaultFactCheck = [{
+        startTime: "00:00",
+        endTime: "0:03",
+        rating: "true",
+        claimed: "aa",
+        factCheckDetail: "aa",
+        endTimeFraction: 0.013157894736842105,
+        widthPercentage: 1.3157894736842104
+    }, {
+        startTime: "0:03",
+        endTime: "0:11",
+        rating: "neutral",
+        claimed: "ssdd",
+        factCheckDetail: "ss",
+        endTimeFraction: 0.04824561403508772,
+        widthPercentage: 3.5087719298245608
+    }, {
+        startTime: "0:11",
+        endTime: "1:55",
+        rating: "partial-false",
+        claimed: "ssd",
+        factCheckDetail: "aa",
+        endTimeFraction: 0.5043859649122807,
+        widthPercentage: 45.614035087719294
+    }, {
+        startTime: "1:55",
+        endTime: "3:15",
+        rating: "partial-true",
+        claimed: "sss",
+        factCheckDetail: "aa",
+        endTimeFraction: 0.8552631578947368,
+        widthPercentage: 35.08771929824562
+    }, {
+        startTime: "3:15",
+        endTime: "3:47",
+        rating: "false",
+        claimed: "ssds",
+        factCheckDetail: "aa",
+        endTimeFraction: 0.9956140350877193,
+        widthPercentage: 14.035087719298247
+    }]
     const [playing, setPlaying] = useState(true);
     const [played, setPlayed] = useState(0);
     const [videoUrl, setVideoUrl] = useState('https://www.youtube.com/watch?v=ZBU_Abt4-eQ')
     const [totalDuration, setTotalDuration] = useState(0)
     const [loopDetails, setLoopDetails] = useState({loopEnabled: false, startFraction: 0, endFraction: 1})
-    const [factCheckReview, setfactCheckReview] = useState([]);
+    const [factCheckReview, setfactCheckReview] = useState(defaultFactCheck);
     const player = useRef(null);
     const [form] = Form.useForm();
 
@@ -47,15 +89,34 @@ function CreateUpdateVideoAnalysis() {
                 return a.endTimeFraction - b.endTimeFraction;
             });
         });
-        setfactCheckReview(factCheckReview =>
-            factCheckReview.map((element, index, array) => {
-                    element['startTime'] = index > 0 ? factCheckReview[index - 1]['endTime'] : '00:00';
-                    element['widthPercentage'] = element['endTimeFraction'] * 100 - (index > 0 ? factCheckReview[index - 1]['widthPercentage'] : 0);
-                    return element
-                }
-            )
+
+        setfactCheckReview(factCheckReview => {
+                let currentWidthSum = 0
+                return factCheckReview.map((element, index, array) => {
+                        element['startTime'] = index > 0 ? factCheckReview[index - 1]['endTime'] : '00:00';
+                        element['widthPercentage'] = element['endTimeFraction'] * 100 - currentWidthSum;
+                        currentWidthSum += element['widthPercentage']
+                        return element
+                    }
+                )
+            }
         );
+        onReset();
     };
+
+    const onDeleteFactCheckReview = (removeIndex) => {
+        setfactCheckReview(factCheckReview => {
+                let currentWidthSum = 0
+                return factCheckReview.filter((element, index)=> index!==removeIndex).map((element, index, array) => {
+                        element['startTime'] = index > 0 ? factCheckReview[index - 1]['endTime'] : '00:00';
+                        element['widthPercentage'] = element['endTimeFraction'] * 100 - currentWidthSum;
+                        currentWidthSum += element['widthPercentage']
+                        return element
+                    }
+                )
+            }
+        );
+    }
 
     const onReset = () => {
         form.resetFields();
@@ -179,43 +240,57 @@ function CreateUpdateVideoAnalysis() {
                     </InfoWrapper>
                 </VideoInfoWrapper>
             </VideoInfoParentWrapper>
-            <VideoLengthBar>
-                {factCheckReview.map((review) =>
-                    <Tooltip title={review.endTime}>
-                        <VideoLengthPart width={`${review.widthPercentage}%`}
-                                         backgroundColor={ratingColor[review.rating]}
-                                         onClick={() => timeBarClick(review)}>
-                            <p>{review.rating}</p>
-                        </VideoLengthPart>
-                    </Tooltip>
-                )
-                }
-            </VideoLengthBar>
+            <VideoAnalysisTimelineBarWrapper>
+                <VideoLengthBar>
+                    {factCheckReview.map((review, index) =>
+                        <Tooltip title={review.endTime} key={index}>
+                            <VideoLengthPart width={`${review.widthPercentage}%`}
+                                             backgroundColor={ratingColor[review.rating]}
+                                             onClick={() => timeBarClick(review)}>
+                                <p>{review.rating}</p>
+                            </VideoLengthPart>
+                        </Tooltip>
+                    )
+                    }
+                </VideoLengthBar>
+            </VideoAnalysisTimelineBarWrapper>
             <FactCheckReviewWrapper>
                 <FactCheckReviewListWrapper>
                     <Timeline mode={'left'}>
-                        <Timeline.Item label="2015-09-01">Create a services</Timeline.Item>
-                        <Timeline.Item label="2015-09-01 09:12:11">Solve initial network problems</Timeline.Item>
-                        <Timeline.Item>Technical testing</Timeline.Item>
-                        <Timeline.Item label="2015-09-01 09:12:11">Network problems being solved</Timeline.Item>
+                        {
+                            factCheckReview && factCheckReview.map((factcheckElem, index) =>
+                                <Timeline.Item label={`${factcheckElem.startTime} - ${factcheckElem.endTime}`}
+                                               key={index}>
+                                    <Button type="primary" shape="circle" icon={<DeleteOutlined />} onClick={()=>onDeleteFactCheckReview(index)}/>
+                                    {`${factcheckElem.rating} - ${factcheckElem.claimed.substring(0, 40)}`}
+
+                                </Timeline.Item>
+                            )
+                        }
                     </Timeline>
                 </FactCheckReviewListWrapper>
                 <FactCheckReviewFormWrapper>
                     <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
+                        <Form.Item style={{marginBottom: 0}}>
+                            <Form.Item name="startTime" label="Start time"
+                                       style={{display: 'inline-block', width: 'calc(50% - 20px)'}}>
+                                <Input disabled/>
+                            </Form.Item>
+                            <Form.Item name="endTime" label="End time" rules={[{
+                                required: true,
+                                pattern: new RegExp(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/),
+                                message: "Wrong format! (mm:ss)"
+                            }]} style={{display: 'inline-block', width: 'calc(50% - 20px)'}}>
+                                <Input/>
+                            </Form.Item>
+                            <span style={{display: 'inline-block', width: '24px', textAlign: 'center'}}>
+                                <Button type="link" onClick={fillCurrentTime}>
+                                    now
+                                </Button>
+                            </span>
 
-                        <Form.Item name="startTime" label="Start time">
-                            <Input disabled/>
+
                         </Form.Item>
-                        <Form.Item name="endTime" label="End time" rules={[{
-                            required: true,
-                            pattern: new RegExp(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/),
-                            message: "Wrong format! (mm:ss)"
-                        }]}>
-                            <Input/>
-                        </Form.Item>
-                        <Button type="link" onClick={fillCurrentTime}>
-                            Current time
-                        </Button>
                         <Form.Item name="rating" label="Rating" rules={[{required: true}]}>
                             <Select
                                 placeholder="Select a rating of the claim"
