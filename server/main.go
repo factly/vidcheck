@@ -2,15 +2,36 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/http"
+	"os"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"github.com/factly/vidcheck/action"
+	"github.com/factly/vidcheck/config"
 	"github.com/factly/vidcheck/model"
 )
 
 func main() {
+    config.SetupVars()
+	port, ok := os.LookupEnv("PORT")
+	if !ok {
+		port = "7720"
+	}
+	port = ":" + port
+	// db setup
+	model.SetupDB(config.DSN)
 	setupModel()
 	fmt.Println("DB Migration Done...")
+
+	// register routes
+	r := action.RegisterRoutes()
+	fmt.Println("swagger-ui http://localhost:7720/swagger/index.html")
+	err := http.ListenAndServe(port, r)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func setupModel() {
