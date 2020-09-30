@@ -1,20 +1,13 @@
 import React, {useRef, useState} from 'react'
 import ReactPlayer from 'react-player'
-import {
-    FactCheckReviewFormWrapper,
-    FactCheckReviewListWrapper,
-    FactCheckReviewWrapper,
-    PageWrapper, VideoAnalysisTimelineBarWrapper,
-    VideoInfoParentWrapper,
-    VideoLengthBar,
-    VideoLengthPart,
-} from "./CreateUpdateVideoAnalysis.styled";
+import {FactCheckReviewWrapper, PageWrapper, VideoInfoParentWrapper,} from "./CreateUpdateVideoAnalysis.styled";
 import InfoDetails from "./components/InfoDetails/InfoDetails.component";
-import {Button, Form, Input, Select, Timeline, Tooltip} from "antd";
-import { DeleteOutlined } from '@ant-design/icons';
 import AnalysisForm from "./components/AnalysisForm/AnalysisForm.component";
+import {
+    HorizontalTimelineBar,
+    VerticalTimelineBar
+} from "./components/AnalysisTimelineBar/AnalysisTimelineBar.components";
 
-const {Option} = Select;
 // req = {
 //     'video': {
 //         url: '',
@@ -86,14 +79,12 @@ function CreateUpdateVideoAnalysis() {
     const [loopDetails, setLoopDetails] = useState({loopEnabled: false, startFraction: 0, endFraction: 1})
     const [factCheckReview, setfactCheckReview] = useState(defaultFactCheck);
     const player = useRef(null);
-    const [form] = Form.useForm();
-
 
 
     const onDeleteFactCheckReview = (removeIndex) => {
         setfactCheckReview(factCheckReview => {
                 let currentWidthSum = 0
-                return factCheckReview.filter((element, index)=> index!==removeIndex).map((element, index, array) => {
+                return factCheckReview.filter((element, index) => index !== removeIndex).map((element, index, array) => {
                         element['startTime'] = index > 0 ? factCheckReview[index - 1]['endTime'] : '00:00';
                         element['widthPercentage'] = element['endTimeFraction'] * 100 - currentWidthSum;
                         currentWidthSum += element['widthPercentage']
@@ -133,7 +124,6 @@ function CreateUpdateVideoAnalysis() {
             }
         }
         setCurrentStartTime(currentFormStartTime);
-        // form.setFieldsValue({...form.getFieldsValue(), startTime: currentFormStartTime})
         setPlayed(currentPlayed)
     }
 
@@ -149,26 +139,6 @@ function CreateUpdateVideoAnalysis() {
         const newUrl = e.target.value;
         setVideoUrl(newUrl)
     };
-
-    const fillCurrentTime = () => {
-        const currentPlayedTime = player.current.getCurrentTime();
-        const minute = Math.floor(currentPlayedTime / 60);
-        const seconds = Math.floor(currentPlayedTime % 60);
-        form.setFieldsValue({...form.getFieldsValue(), endTime: `${minute}:${seconds > 9 ? seconds : '0' + seconds}`})
-    };
-
-    const ratingColor = {
-        'true': '#19b346',
-        'partial-true': '#8bb38d',
-        'neutral': '#b3b3b3',
-        'partial-false': '#b36d7e',
-        'false': '#b30a25'
-
-    };
-
-    const timeBarClick = (a) => {
-        console.log(a)
-    }
 
     return (
         <PageWrapper>
@@ -191,40 +161,17 @@ function CreateUpdateVideoAnalysis() {
                              totalDuration={totalDuration}
                 />
             </VideoInfoParentWrapper>
-            <VideoAnalysisTimelineBarWrapper>
-                <VideoLengthBar>
-                    {factCheckReview.map((review, index) =>
-                        <Tooltip title={review.endTime} key={index}>
-                            <VideoLengthPart width={`${review.widthPercentage}%`}
-                                             backgroundColor={ratingColor[review.rating]}
-                                             onClick={() => timeBarClick(review)}>
-                                <p>{review.rating}</p>
-                            </VideoLengthPart>
-                        </Tooltip>
-                    )
-                    }
-                </VideoLengthBar>
-            </VideoAnalysisTimelineBarWrapper>
-            <FactCheckReviewWrapper>
-                <FactCheckReviewListWrapper>
-                    <Timeline mode={'left'}>
-                        {
-                            factCheckReview && factCheckReview.map((factcheckElem, index) =>
-                                <Timeline.Item label={`${factcheckElem.startTime} - ${factcheckElem.endTime}`}
-                                               key={index}>
-                                    <Button type="primary" shape="circle" icon={<DeleteOutlined />} onClick={()=>onDeleteFactCheckReview(index)}/>
-                                    {`${factcheckElem.rating} - ${factcheckElem.claimed.substring(0, 40)}`}
+            <HorizontalTimelineBar factCheckReview={factCheckReview}/>
 
-                                </Timeline.Item>
-                            )
-                        }
-                    </Timeline>
-                </FactCheckReviewListWrapper>
+            <FactCheckReviewWrapper>
+                <VerticalTimelineBar factCheckReview={factCheckReview}
+                                     onDeleteFactCheckReview={onDeleteFactCheckReview}/>
                 <AnalysisForm factCheckReview={factCheckReview}
                               setfactCheckReview={setfactCheckReview}
                               totalDuration={totalDuration}
                               currentStartTime={currentStartTime}
-                              fillCurrentTime={fillCurrentTime}/>
+                              player={player}
+                />
             </FactCheckReviewWrapper>
         </PageWrapper>
     )

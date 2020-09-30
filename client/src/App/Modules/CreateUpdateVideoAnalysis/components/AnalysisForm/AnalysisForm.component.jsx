@@ -6,7 +6,7 @@ import {FactCheckReviewFormWrapper} from "./AnalysisForm.styled";
 
 const {Option} = Select;
 
-function AnalysisForm({factCheckReview, setfactCheckReview, totalDuration, fillCurrentTime, currentStartTime}) {
+function AnalysisForm({factCheckReview, setfactCheckReview, totalDuration, player, currentStartTime}) {
     const [form] = Form.useForm();
     const layout = null;
     const tailLayout = {
@@ -48,6 +48,14 @@ function AnalysisForm({factCheckReview, setfactCheckReview, totalDuration, fillC
     const onReset = () => {
         form.resetFields();
     };
+
+    const fillCurrentTime = () => {
+        const currentPlayedTime = player.current.getCurrentTime();
+        const minute = Math.floor(currentPlayedTime / 60);
+        const seconds = Math.floor(currentPlayedTime % 60);
+        form.setFieldsValue({...form.getFieldsValue(), endTime: `${minute}:${seconds > 9 ? seconds : '0' + seconds}`})
+    };
+
 
 
     return (
@@ -110,7 +118,7 @@ AnalysisForm.protoTypes = {
     factCheckReview: PropTypes.array.isRequired,
     setfactCheckReview: PropTypes.func.isRequired,
     totalDuration: PropTypes.number.isRequired,
-    fillCurrentTime: PropTypes.func.isRequired,
-    currentStartTime: PropTypes.string.isRequired
+    currentStartTime: PropTypes.string.isRequired,
+    player: PropTypes.object.isRequired,
 }
 export default AnalysisForm;
