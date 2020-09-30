@@ -4,20 +4,36 @@ import {
     FactCheckReviewFormWrapper,
     FactCheckReviewListWrapper,
     FactCheckReviewWrapper,
-    InfoHeaderWrapper,
-    InfoWrapper,
     PageWrapper, VideoAnalysisTimelineBarWrapper,
     VideoInfoParentWrapper,
-    VideoInfoWrapper,
     VideoLengthBar,
     VideoLengthPart,
 } from "./CreateUpdateVideoAnalysis.styled";
-import Duration from "./Duration";
+import InfoDetails from "./components/InfoDetails/InfoDetails.component";
 import {Button, Form, Input, Select, Timeline, Tooltip} from "antd";
 import { DeleteOutlined } from '@ant-design/icons';
+import AnalysisForm from "./components/AnalysisForm/AnalysisForm.component";
 
 const {Option} = Select;
-
+// req = {
+//     'video': {
+//         url: '',
+//         videoType: '',
+//         summary: '',
+//         title: '',
+//         status: '',
+//     }
+//     analysis : [
+//     {
+//        startTime: int,
+//        endTime: int,
+//        rating: str
+//        claimed: str
+//        factCheckDetail: str,
+//        endTimeFraction: str,
+//     }
+//     ]
+// }
 
 // Render a YouTube video player
 function CreateUpdateVideoAnalysis() {
@@ -61,9 +77,10 @@ function CreateUpdateVideoAnalysis() {
         factCheckDetail: "aa",
         endTimeFraction: 0.9956140350877193,
         widthPercentage: 14.035087719298247
-    }]
+    }];
     const [playing, setPlaying] = useState(true);
     const [played, setPlayed] = useState(0);
+    const [currentStartTime, setCurrentStartTime] = useState('');
     const [videoUrl, setVideoUrl] = useState('https://www.youtube.com/watch?v=ZBU_Abt4-eQ')
     const [totalDuration, setTotalDuration] = useState(0)
     const [loopDetails, setLoopDetails] = useState({loopEnabled: false, startFraction: 0, endFraction: 1})
@@ -71,38 +88,7 @@ function CreateUpdateVideoAnalysis() {
     const player = useRef(null);
     const [form] = Form.useForm();
 
-    const layout = null;
-    const tailLayout = {
-        wrapperCol: {offset: 8, span: 16},
-    };
 
-    const onFinish = values => {
-        const minute = values['endTime'].split(':')[0];
-        const second = values['endTime'].split(':')[1];
-        values['endTimeFraction'] = (parseInt(minute, 10) * 60 + parseInt(second, 10)) / totalDuration;
-        if (values['endTimeFraction'] > 1) {
-            alert('invalid end time')
-            return
-        }
-        setfactCheckReview(factCheckReview => {
-            return [...factCheckReview, values].sort((a, b) => {
-                return a.endTimeFraction - b.endTimeFraction;
-            });
-        });
-
-        setfactCheckReview(factCheckReview => {
-                let currentWidthSum = 0
-                return factCheckReview.map((element, index, array) => {
-                        element['startTime'] = index > 0 ? factCheckReview[index - 1]['endTime'] : '00:00';
-                        element['widthPercentage'] = element['endTimeFraction'] * 100 - currentWidthSum;
-                        currentWidthSum += element['widthPercentage']
-                        return element
-                    }
-                )
-            }
-        );
-        onReset();
-    };
 
     const onDeleteFactCheckReview = (removeIndex) => {
         setfactCheckReview(factCheckReview => {
@@ -118,9 +104,6 @@ function CreateUpdateVideoAnalysis() {
         );
     }
 
-    const onReset = () => {
-        form.resetFields();
-    };
 
     function handleSeekChange(e) {
         setPlayed(e.target.value)
@@ -149,7 +132,8 @@ function CreateUpdateVideoAnalysis() {
                 currentFormStartTime = factCheckReview[factCheckReview.length - 1].endTime;
             }
         }
-        form.setFieldsValue({...form.getFieldsValue(), startTime: currentFormStartTime})
+        setCurrentStartTime(currentFormStartTime);
+        // form.setFieldsValue({...form.getFieldsValue(), startTime: currentFormStartTime})
         setPlayed(currentPlayed)
     }
 
@@ -198,47 +182,14 @@ function CreateUpdateVideoAnalysis() {
                     onProgress={handleProgress}
                     onDuration={setTotalDuration}
                 />
-                <VideoInfoWrapper>
-                    <InfoWrapper>
-                        <InfoHeaderWrapper>Video URL</InfoHeaderWrapper>
-                        <Input
-                            type="text"
-                            value={videoUrl}
-                            onChange={updateVideoUrl}
-                        />
-                    </InfoWrapper>
-                    <InfoWrapper>
-                        <InfoHeaderWrapper>Actions</InfoHeaderWrapper>
-                        <button onClick={() => setPlaying(!playing)}>Play/Pause</button>
-                        <Button type="primary" onClick={playOnLoop}>
-                            Loop
-                        </Button>
-                    </InfoWrapper>
-                    <InfoWrapper>
-                        <InfoHeaderWrapper>Played</InfoHeaderWrapper>
-                        <progress max={1} value={played}/>
-                    </InfoWrapper>
-                    <InfoWrapper>
-                        <InfoHeaderWrapper>Seek</InfoHeaderWrapper>
-                        <input
-                            type='range' min={0} max={0.999999} step='any'
-                            value={played}
-                            onChange={handleSeekChange}
-                        />
-                    </InfoWrapper>
-                    <InfoWrapper>
-                        <InfoHeaderWrapper>Total Time</InfoHeaderWrapper>
-                        <Duration seconds={totalDuration}/>
-                    </InfoWrapper>
-                    <InfoWrapper>
-                        <InfoHeaderWrapper>Elapsed</InfoHeaderWrapper>
-                        <Duration seconds={totalDuration * played}/>
-                    </InfoWrapper>
-                    <InfoWrapper>
-                        <InfoHeaderWrapper>Remaining</InfoHeaderWrapper>
-                        <Duration seconds={totalDuration * (1 - played)}/>
-                    </InfoWrapper>
-                </VideoInfoWrapper>
+                <InfoDetails videoUrl={videoUrl}
+                             updateVideoUrl={updateVideoUrl}
+                             played={played}
+                             setPlaying={setPlaying}
+                             playing={playing}
+                             handleSeekChange={handleSeekChange}
+                             totalDuration={totalDuration}
+                />
             </VideoInfoParentWrapper>
             <VideoAnalysisTimelineBarWrapper>
                 <VideoLengthBar>
@@ -269,58 +220,11 @@ function CreateUpdateVideoAnalysis() {
                         }
                     </Timeline>
                 </FactCheckReviewListWrapper>
-                <FactCheckReviewFormWrapper>
-                    <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
-                        <Form.Item style={{marginBottom: 0}}>
-                            <Form.Item name="startTime" label="Start time"
-                                       style={{display: 'inline-block', width: 'calc(50% - 20px)'}}>
-                                <Input disabled/>
-                            </Form.Item>
-                            <Form.Item name="endTime" label="End time" rules={[{
-                                required: true,
-                                pattern: new RegExp(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/),
-                                message: "Wrong format! (mm:ss)"
-                            }]} style={{display: 'inline-block', width: 'calc(50% - 20px)'}}>
-                                <Input/>
-                            </Form.Item>
-                            <span style={{display: 'inline-block', width: '24px', textAlign: 'center'}}>
-                                <Button type="link" onClick={fillCurrentTime}>
-                                    now
-                                </Button>
-                            </span>
-
-
-                        </Form.Item>
-                        <Form.Item name="rating" label="Rating" rules={[{required: true}]}>
-                            <Select
-                                placeholder="Select a rating of the claim"
-                                allowClear
-                            >
-                                <Option value="true">True</Option>
-                                <Option value="partial-true">Partial True</Option>
-                                <Option value="neutral">Neutral</Option>
-                                <Option value="partial-false">Partial False</Option>
-                                <Option value="false">False</Option>
-                            </Select>
-                        </Form.Item>
-
-
-                        <Form.Item name="claimed" label="Claimed" rules={[{required: false}]}>
-                            <Input.TextArea/>
-                        </Form.Item>
-                        <Form.Item name="factCheckDetail" label="Fact check" rules={[{required: false}]}>
-                            <Input.TextArea/>
-                        </Form.Item>
-                        <Form.Item {...tailLayout}>
-                            <Button type="primary" htmlType="submit">
-                                Submit
-                            </Button>
-                            <Button htmlType="button" onClick={onReset}>
-                                Reset
-                            </Button>
-                        </Form.Item>
-                    </Form>
-                </FactCheckReviewFormWrapper>
+                <AnalysisForm factCheckReview={factCheckReview}
+                              setfactCheckReview={setfactCheckReview}
+                              totalDuration={totalDuration}
+                              currentStartTime={currentStartTime}
+                              fillCurrentTime={fillCurrentTime}/>
             </FactCheckReviewWrapper>
         </PageWrapper>
     )
