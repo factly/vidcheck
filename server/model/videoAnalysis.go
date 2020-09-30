@@ -2,14 +2,14 @@ package model
 
 type VideoAnalysis struct {
 	Base
-	VideoID 		int		`gorm:"not null"`
+	VideoID 		uint		`gorm:"not null"`
 	Video   		Video
-	UserID  		int
+	UserID  		uint
 	User    		User
-	Status          string
 	RatingValue     int     `gorm:"not null"`
-	Description     string
-	Note			string
+	Claim           string
+	Fact            string
 	EndTime         int
     StartTime       int
+    EntTimeFraction float64
 }

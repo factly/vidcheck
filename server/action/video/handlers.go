@@ -2,10 +2,18 @@ package video
 
 import (
 	"net/http"
+	"encoding/json"
+	"errors"
+	"strconv"
 
-	"github.com/factly/vidcheck/server/model"
+    "github.com/go-chi/chi"
+
+	"github.com/factly/vidcheck/model"
 	"github.com/factly/x/paginationx"
+	"github.com/factly/x/errorx"
+	"github.com/factly/x/loggerx"
 	"github.com/factly/x/renderx"
+	"github.com/factly/x/validationx"
 )
 
 // list response
@@ -30,56 +38,6 @@ func list(w http.ResponseWriter, r *http.Request) {
 	offset, limit := paginationx.Parse(r.URL.Query())
 	model.DB.Model(&model.Video{}).Count(&result.Total).Offset(offset).Limit(limit).Find(&result.Nodes)
 	renderx.JSON(w, http.StatusOK, result)
-}
-
-
-// create - Create video
-// @Summary Create video
-// @Description Create video
-// @Tags Product
-// @ID add-video
-// @Consume json
-// @Produce  json
-// @Param Product body video true "Product object"
-// @Success 201 {object} model.Product
-// @Failure 400 {array} string
-// @Router /videos [post]
-func create(w http.ResponseWriter, r *http.Request) {
-
-	video := &video{}
-	err := json.NewDecoder(r.Body).Decode(&video)
-	if err != nil {
-		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.DecodeError()))
-		return
-	}
-
-	validationError := validationx.Check(product)
-	if validationError != nil {
-		loggerx.Error(errors.New("validation error"))
-		errorx.Render(w, validationError)
-		return
-	}
-
-	result := model.Video{}
-	result = model.Video{
-		Url:               product.Url,
-		Title:             product.Title,
-		TotalTime:         product.TotalTime,
-		Description:       product.Description,
-		VideoType:         product.VideoType,
-	}
-
-	tx := model.DB.Begin()
-	err = tx.Model(&model.Video{}).Create(&result).Error
-	if err != nil {
-		tx.Rollback()
-		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.DBError()))
-		return
-	}
-	tx.Commit()
-	renderx.JSON(w, http.StatusCreated, result)
 }
 
 
@@ -134,8 +92,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	video := &video{}
-
+	video := &Video{}
 	err = json.NewDecoder(r.Body).Decode(&video)
 	if err != nil {
 		loggerx.Error(err)
@@ -163,11 +120,9 @@ func update(w http.ResponseWriter, r *http.Request) {
 	model.DB.Model(&result).Updates(model.Video{
 		Url:            video.Status,
 		Title:          video.Title,
-		TotalTime:      video.TotalTime,
-		Description:    video.Description,
+		Summary:        video.Summary,
 		VideoType:      video.VideoType,
 	}).First(&result)
-
 	renderx.JSON(w, http.StatusOK, result)
 }
 

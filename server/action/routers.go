@@ -4,6 +4,7 @@ import (
 	"net/http"
 
     "github.com/factly/vidcheck/action/videoAnalysis"
+    "github.com/factly/vidcheck/action/video"
 	"github.com/factly/x/loggerx"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -33,10 +34,7 @@ func RegisterRoutes() http.Handler {
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 
-	/* disable swagger in production */
-// 	r.Get("/swagger/*", httpSwagger.WrapHandler)
-
-	r.Mount("/analyse", videoAnalysis.Router())
+	r.Mount("api/v1/analyse", videoAnalysis.Router())
+	r.Mount("api/v1/video", video.Router())
 	return r
 }
-

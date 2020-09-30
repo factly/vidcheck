@@ -4,19 +4,26 @@ import (
 	"github.com/go-chi/chi"
 )
 
-// VideoAnalysis request body
-type videoAnalysis struct {
-    ID          uint    `json: "id"`
-	Status      string  `json: "status"`
-	VideoID     int     `json: "video_id" validate:"required"`
-	UserID      int     `json: "user_id" validate:"required"`
-	RatingValue int     `json: "rating_value" validate: "required"`
-	Description string  `json: "description"`
-	StartTime   int     `json: "start_time"`
-	EndTime     int     `json: "end_time" validate: "required"`
-	Note        string  `json: "note"`
+type video struct {
+    Url         string    `json:"url" validate:"required"`
+    Title       string    `json:"title" validate:"required"`
+    Summary     string    `json:"summary"`
+    VideoType   string    `json:"video_type" validate:"required"`
 }
 
+type videoAnalysis struct {
+    RatingValue     int     `json:"rating_value" validate:"required"`
+    Claim           string  `json:"claim"`
+    Fact            string  `json:"fact"`
+    StartTime       int     `json:"start_time"`
+    EndTime         int     `json:"end_time" validate:"required"`
+    EntTimeFraction float64 `json:"end_time_fraction" validate:"required"`
+}
+
+type videoAnalysisApiData struct {
+    Video video                 `json:"video" validate:"required"`
+    Analysis []videoAnalysis    `json:"analysis" validate:"required"`
+}
 
 // Router - Group of videoAnalysis router
 func Router() chi.Router {

@@ -50,52 +50,66 @@ func list(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {array} string
 // @Router /video/{}/videoanalysis [post]
 func create(w http.ResponseWriter, r *http.Request) {
-
-	videoAnalysis := &videoAnalysis{}
-	err := json.NewDecoder(r.Body).Decode(&videoAnalysis)
+	videoAnalysisData := &videoAnalysisApiData{}
+	err := json.NewDecoder(r.Body).Decode(&videoAnalysisData)
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DecodeError()))
 		return
 	}
 
-	validationError := validationx.Check(videoAnalysis)
+	validationError := validationx.Check(videoAnalysisData)
 	if validationError != nil {
 		loggerx.Error(errors.New("validation error"))
 		errorx.Render(w, validationError)
 		return
 	}
 
-	result := model.VideoAnalysis{}
-	result = model.VideoAnalysis{
-        Status      :videoAnalysis.Status,
-        VideoID     :videoAnalysis.VideoID,
-        UserID      :videoAnalysis.UserID,
-        RatingValue :videoAnalysis.RatingValue,
-        Description :videoAnalysis.Description,
-        Note        :videoAnalysis.Note,
-        StartTime   :videoAnalysis.StartTime,
-        EndTime     :videoAnalysis.EndTime,
-	}
-
 	tx := model.DB.Begin()
-	err = tx.Model(&model.VideoAnalysis{}).Create(&result).Error
-
-	if err != nil {
-		tx.Rollback()
-		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.DBError()))
-		return
+	videoObj := model.Video{}
+	videoObj = model.Video{
+	    Url:           videoAnalysisData.Video.Url,
+		Title:         videoAnalysisData.Video.Title,
+		Summary:       videoAnalysisData.Video.Summary,
+		VideoType:     videoAnalysisData.Video.VideoType,
 	}
+    tx.Model(&model.Video{}).Create(&videoObj)
+	analysisBlocks := []model.VideoAnalysis{}
 
-	if err != nil {
-		tx.Rollback()
-		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.DBError()))
-		return
-	}
+	for _, analysisBlock := range videoAnalysisData.Analysis {
+        analysisBlockObj := model.VideoAnalysis{}
+        analysisBlockObj = model.VideoAnalysis{
+            VideoID         : videoObj.ID,
+            RatingValue     : analysisBlock.RatingValue,
+            Claim           : analysisBlock.Claim,
+            Fact            : analysisBlock.Fact,
+            StartTime       : analysisBlock.StartTime,
+            EndTime         : analysisBlock.EndTime,
+            EntTimeFraction : analysisBlock.EntTimeFraction,
+        }
+        err = tx.Model(&model.VideoAnalysis{}).Create(&analysisBlockObj).Error
+        if err != nil {
+            tx.Rollback()
+            loggerx.Error(err)
+            errorx.Render(w, errorx.Parser(errorx.DBError()))
+            return
+        }
+        if err != nil {
+            tx.Rollback()
+            loggerx.Error(err)
+            errorx.Render(w, errorx.Parser(errorx.DBError()))
+            return
+        }
+        analysisBlocks = append(analysisBlocks, analysisBlockObj)
+    }
 	tx.Commit()
-	renderx.JSON(w, http.StatusCreated, result)
+
+//     type result struct {
+//         Video       model.Video
+//         Analysis    []interface{}
+//     }
+//     res := result{videoObj, analysisBlocks}
+	renderx.JSON(w, http.StatusCreated, videoObj)
 }
 
 // details - Get video_analysis by id
@@ -109,8 +123,8 @@ func create(w http.ResponseWriter, r *http.Request) {
 // @Router /video_analysis /{video_id} [get]
 func details(w http.ResponseWriter, r *http.Request) {
 
-	videoAnalysisIdId := chi.URLParam(r, "video_analysis_id")
-	id, err := strconv.Atoi(videoAnalysisIdId)
+	videoAnalysisId := chi.URLParam(r, "video_analysis_id")
+	id, err := strconv.Atoi(videoAnalysisId)
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InvalidID()))
@@ -177,12 +191,12 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	model.DB.Model(&result).Updates(model.VideoAnalysis{
-		Status:         videoAnalysis.Status,
-		RatingValue:    videoAnalysis.RatingValue,
-		Description:    videoAnalysis.Description,
-		Note:           videoAnalysis.Note,
-		EndTime:        videoAnalysis.EndTime,
-		StartTime:      videoAnalysis.StartTime,
+		RatingValue     : videoAnalysis.RatingValue,
+        Claim           : videoAnalysis.Claim,
+        Fact            : videoAnalysis.Fact,
+        StartTime       : videoAnalysis.StartTime,
+        EndTime         : videoAnalysis.EndTime,
+        EntTimeFraction : videoAnalysis.EntTimeFraction,
 	}).First(&result)
 
 	renderx.JSON(w, http.StatusOK, result)
