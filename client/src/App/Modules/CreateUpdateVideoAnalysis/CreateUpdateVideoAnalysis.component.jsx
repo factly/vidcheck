@@ -90,8 +90,9 @@ function CreateUpdateVideoAnalysis() {
     const onDeleteFactCheckReview = (removeIndex) => {
         setfactCheckReview(factCheckReview => {
                 let currentWidthSum = 0;
-                return factCheckReview.filter((element, index) => index !== removeIndex).map((element, index, array) => {
-                        element['startTime'] = index > 0 ? factCheckReview[index - 1]['endTime'] : '00:00';
+                let newdata = factCheckReview.filter((element, index) => index !== removeIndex)
+                return newdata.map((element, index) => {
+                        element['startTime'] = index > 0 ? newdata[index - 1]['endTime'] : '00:00';
                         element['widthPercentage'] = element['endTimeFraction'] * 100 - currentWidthSum;
                         currentWidthSum += element['widthPercentage'];
                         return element

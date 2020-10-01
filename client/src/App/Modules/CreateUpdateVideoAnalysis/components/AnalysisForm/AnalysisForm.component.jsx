@@ -20,26 +20,41 @@ function AnalysisForm({formData, factCheckReview, setfactCheckReview, totalDurat
         form.setFieldsValue({...form.getFieldsValue(), startTime: currentStartTime})
     }, [currentStartTime])
 
-    const onFinish = values => {
-        const minute = values['endTime'].split(':')[0];
-        const second = values['endTime'].split(':')[1];
-        values['endTimeFraction'] = (parseInt(minute, 10) * 60 + parseInt(second, 10)) / totalDuration;
-        if (values['endTimeFraction'] > 1) {
-            alert('invalid end time')
+    const getTimeFraction = (timeString) => {
+        const minute = timeString.split(':')[0];
+        const second = timeString.split(':')[1];
+        return (parseInt(minute, 10) * 60 + parseInt(second, 10)) / totalDuration;
+    }
+
+    const returnEndTimeFraction = (startTimeString, endTimeString) => {
+        const endTimeFraction = getTimeFraction(endTimeString);
+        if (endTimeFraction > 1) {
+            alert('invalid end time');
             return
         }
-        setfactCheckReview(factCheckReview => {
-            return [...factCheckReview, values].sort((a, b) => {
-                return a.endTimeFraction - b.endTimeFraction;
-            });
-        });
+        if (getTimeFraction(startTimeString) > endTimeFraction) {
+            alert(' start time greater than end time');
+            return
+        }
+        console.log(endTimeFraction)
+        return endTimeFraction
+    };
+    const onAddNewFactCheckReview = values => {
+        const endTimeFraction = returnEndTimeFraction(values['startTime'], values['endTime']);
+        if (!endTimeFraction){
+            return
+        }
+        values['endTimeFraction'] = endTimeFraction;
 
         setfactCheckReview(factCheckReview => {
-                let currentWidthSum = 0
-                return factCheckReview.map((element, index, array) => {
-                        element['startTime'] = index > 0 ? factCheckReview[index - 1]['endTime'] : '00:00';
+                let currentWidthSum = 0;
+                let newData = [...factCheckReview, values].sort((a, b) => {
+                    return a.endTimeFraction - b.endTimeFraction;
+                });
+                return newData.map((element, index) => {
+                        element['startTime'] = index > 0 ? newData[index - 1]['endTime'] : '00:00';
                         element['widthPercentage'] = element['endTimeFraction'] * 100 - currentWidthSum;
-                        currentWidthSum += element['widthPercentage']
+                        currentWidthSum += element['widthPercentage'];
                         return element
                     }
                 )
@@ -63,9 +78,9 @@ function AnalysisForm({formData, factCheckReview, setfactCheckReview, totalDurat
 
     return (
         <FactCheckReviewFormWrapper>
-            <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
+            <Form form={form} name="control-hooks" onFinish={onAddNewFactCheckReview}>
                 <Form.Item style={{marginBottom: 0}}>
-                    <Form.Item name="startTime" label="Start time"
+                    <Form.Item name="startTime" label="Start time(current time)"
                                style={{display: 'inline-block', width: 'calc(50% - 20px)'}}>
                         <Input disabled/>
                     </Form.Item>
