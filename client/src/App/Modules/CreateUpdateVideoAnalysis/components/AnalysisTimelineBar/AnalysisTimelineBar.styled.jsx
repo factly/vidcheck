@@ -1,18 +1,5 @@
 import styled from "styled-components";
 
-export const PageWrapper = styled.div`
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-content: space-around;
-`;
-
-export const VideoInfoParentWrapper = styled.div`
-    padding: 20px;
-    display: flex;
-    align-content: space-around;
-    justify-content: center;
-    `;
 
 export const VideoAnalysisTimelineBarWrapper = styled.div`
     display: flex;
@@ -36,24 +23,7 @@ export const VideoLengthPart = styled.div`
     float: left;
     `;
 
-export const FactCheckReviewWrapper = styled.div`
-    padding: 20px; 
-    display: flex;
-    align-content: space-around;
-    justify-content: center;
-`;
-
 export const FactCheckReviewListWrapper = styled.div`
     padding: 20px; 
     min-width: 40%;
-`;
-
-
-export const FactCheckReviewFormWrapper = styled.div`
-    padding: 20px; 
-    background: azure;
-    min-width: 30%;
-    display: flex;
-    align-content: space-around;
-    justify-content: center;
 `;

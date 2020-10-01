@@ -2,9 +2,9 @@ import React from 'react';
 import {Button, Timeline, Tooltip} from "antd";
 import PropTypes from 'prop-types'
 import {VideoAnalysisTimelineBarWrapper, VideoLengthBar, VideoLengthPart, FactCheckReviewListWrapper} from "./AnalysisTimelineBar.styled";
-import {DeleteOutlined} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
 
-function HorizontalTimelineBar({factCheckReview}) {
+function HorizontalTimelineBar({factCheckReview, setCurrentFormData}) {
     const ratingColor = {
         'true': '#19b346',
         'partial-true': '#8bb38d',
@@ -14,10 +14,6 @@ function HorizontalTimelineBar({factCheckReview}) {
 
     };
 
-    const timeBarClick = (a) => {
-        console.log(a)
-    }
-
     return (
         <VideoAnalysisTimelineBarWrapper>
             <VideoLengthBar>
@@ -25,7 +21,7 @@ function HorizontalTimelineBar({factCheckReview}) {
                     <Tooltip title={review.endTime} key={index}>
                         <VideoLengthPart width={`${review.widthPercentage}%`}
                                          backgroundColor={ratingColor[review.rating]}
-                                         onClick={() => timeBarClick(review)}>
+                                         onClick={() => setCurrentFormData(review)}>
                             <p>{review.rating}</p>
                         </VideoLengthPart>
                     </Tooltip>
@@ -36,11 +32,12 @@ function HorizontalTimelineBar({factCheckReview}) {
     )
 }
 HorizontalTimelineBar.propTypes = {
-    factCheckReview: PropTypes.array.isRequired
+    factCheckReview: PropTypes.array.isRequired,
+    setCurrentFormData: PropTypes.func.isRequired,
 }
 
 
-function VerticalTimelineBar({factCheckReview, onDeleteFactCheckReview}){
+function VerticalTimelineBar({factCheckReview, setCurrentFormData, onDeleteFactCheckReview}){
     return (
         <FactCheckReviewListWrapper>
             <Timeline mode={'left'}>
@@ -49,6 +46,7 @@ function VerticalTimelineBar({factCheckReview, onDeleteFactCheckReview}){
                         <Timeline.Item label={`${factcheckElem.startTime} - ${factcheckElem.endTime}`}
                                        key={index}>
                             <Button type="primary" shape="circle" icon={<DeleteOutlined />} onClick={()=>onDeleteFactCheckReview(index)}/>
+                            <Button type="primary" shape="circle" icon={<EditOutlined />} onClick={()=>setCurrentFormData(factcheckElem)}/>
                             {`${factcheckElem.rating} - ${factcheckElem.claimed.substring(0, 40)}`}
 
                         </Timeline.Item>
@@ -60,6 +58,7 @@ function VerticalTimelineBar({factCheckReview, onDeleteFactCheckReview}){
 }
 VerticalTimelineBar.propTypes = {
     factCheckReview: PropTypes.array.isRequired,
+    setCurrentFormData: PropTypes.func.isRequired,
     onDeleteFactCheckReview: PropTypes.func.isRequired
 }
 

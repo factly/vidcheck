@@ -7,6 +7,7 @@ import {
     HorizontalTimelineBar,
     VerticalTimelineBar
 } from "./components/AnalysisTimelineBar/AnalysisTimelineBar.components";
+import {Button} from "antd";
 
 // req = {
 //     'video': {
@@ -79,26 +80,50 @@ function CreateUpdateVideoAnalysis() {
     const [loopDetails, setLoopDetails] = useState({loopEnabled: false, startFraction: 0, endFraction: 1})
     const [factCheckReview, setfactCheckReview] = useState(defaultFactCheck);
     const player = useRef(null);
+    const [currentFormdata, setCurrentFormData] = useState({})
 
-
+    const updateFromState = (data) => {
+        setPlayed(data.endTimeFraction);
+        player.current.seekTo(data.endTimeFraction, 'fraction');
+        setCurrentFormData(data);
+    }
     const onDeleteFactCheckReview = (removeIndex) => {
         setfactCheckReview(factCheckReview => {
-                let currentWidthSum = 0
+                let currentWidthSum = 0;
                 return factCheckReview.filter((element, index) => index !== removeIndex).map((element, index, array) => {
                         element['startTime'] = index > 0 ? factCheckReview[index - 1]['endTime'] : '00:00';
                         element['widthPercentage'] = element['endTimeFraction'] * 100 - currentWidthSum;
-                        currentWidthSum += element['widthPercentage']
+                        currentWidthSum += element['widthPercentage'];
                         return element
                     }
                 )
             }
         );
+    };
+
+    const getHostname = (url) => {
+        // use URL constructor and return hostname
+        return new URL(url).hostname;
+    }
+
+    const submitFactcheck = () => {
+        const videoType = getHostname(videoUrl)
+        const data = {
+            video: {
+                url: videoUrl,
+                videoType,
+                summary: 'abc',
+                title: 'title 1'
+            },
+            analysis: factCheckReview
+        }
+        console.log(data)
     }
 
 
     function handleSeekChange(e) {
-        setPlayed(e.target.value)
-        player.current.seekTo(played, 'fraction');
+        setPlayed(e.target.value);
+        player.current.seekTo(e.target.value, 'fraction');
     }
 
     function handleProgress() {
@@ -161,18 +186,21 @@ function CreateUpdateVideoAnalysis() {
                              totalDuration={totalDuration}
                 />
             </VideoInfoParentWrapper>
-            <HorizontalTimelineBar factCheckReview={factCheckReview}/>
+            <HorizontalTimelineBar factCheckReview={factCheckReview} setCurrentFormData={updateFromState} />
 
             <FactCheckReviewWrapper>
                 <VerticalTimelineBar factCheckReview={factCheckReview}
+                                     setCurrentFormData={updateFromState}
                                      onDeleteFactCheckReview={onDeleteFactCheckReview}/>
                 <AnalysisForm factCheckReview={factCheckReview}
+                              formData={currentFormdata}
                               setfactCheckReview={setfactCheckReview}
                               totalDuration={totalDuration}
                               currentStartTime={currentStartTime}
                               player={player}
                 />
             </FactCheckReviewWrapper>
+            <Button type="primary" onClick={submitFactcheck}> Submit Fact Check</Button>
         </PageWrapper>
     )
 }

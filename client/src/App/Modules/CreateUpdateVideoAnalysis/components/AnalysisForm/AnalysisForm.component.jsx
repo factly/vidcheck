@@ -6,12 +6,15 @@ import {FactCheckReviewFormWrapper} from "./AnalysisForm.styled";
 
 const {Option} = Select;
 
-function AnalysisForm({factCheckReview, setfactCheckReview, totalDuration, player, currentStartTime}) {
+function AnalysisForm({formData, factCheckReview, setfactCheckReview, totalDuration, player, currentStartTime}) {
     const [form] = Form.useForm();
     const layout = null;
     const tailLayout = {
         wrapperCol: {offset: 8, span: 16},
     };
+    React.useEffect( ()=> {
+        form.setFieldsValue({...formData})
+    }, [formData])
 
     React.useEffect(()=>{
         form.setFieldsValue({...form.getFieldsValue(), startTime: currentStartTime})
@@ -103,7 +106,7 @@ function AnalysisForm({factCheckReview, setfactCheckReview, totalDuration, playe
                 </Form.Item>
                 <Form.Item {...tailLayout}>
                     <Button type="primary" htmlType="submit">
-                        Submit
+                        Add
                     </Button>
                     <Button htmlType="button" onClick={onReset}>
                         Reset
@@ -116,9 +119,10 @@ function AnalysisForm({factCheckReview, setfactCheckReview, totalDuration, playe
 
 AnalysisForm.protoTypes = {
     factCheckReview: PropTypes.array.isRequired,
+    formData: PropTypes.object.isRequired,
     setfactCheckReview: PropTypes.func.isRequired,
     totalDuration: PropTypes.number.isRequired,
     currentStartTime: PropTypes.string.isRequired,
     player: PropTypes.object.isRequired,
-}
+};
 export default AnalysisForm;
