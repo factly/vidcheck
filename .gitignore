@@ -1,11 +1,12 @@
 .env
-
+.idea
 # Binaries for programs and plugins
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
+*.log
 
 /server/tmp
 

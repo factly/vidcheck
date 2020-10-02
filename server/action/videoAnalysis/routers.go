@@ -29,8 +29,8 @@ type videoAnalysisApiData struct {
 func Router() chi.Router {
 	r := chi.NewRouter()
 
-    r.Get("/video/{video_id}/analysis", list)    // GET /video - return list of videos
-	r.Post("/video/{video_id}/analysis", create) // POST /video - create a new video and persist it
+    r.Get("/", list)    // GET /video - return list of videos
+	r.Post("/", create) // POST /video - create a new video and persist it
 
 	r.Route("/video/{video_id}/analysis/{video_analysis_id}", func(r chi.Router) {
 		r.Get("/", details)   // GET /videos/{video_id}/analysis/{video_analysis_id}
