@@ -25,8 +25,9 @@ func SetupDB(DSN interface{}) {
 	fmt.Println("connected to database ...")
 	DB.SingularTable(true)
 
-	// adding default prefix to table name
-	gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
-		return "dp_" + defaultTableName
-	}
+	// Migrating schema.
+	DB.AutoMigrate(&User{})
+	DB.AutoMigrate(&Video{})
+	DB.AutoMigrate(&VideoAnalysis{})
+	DB.AutoMigrate(&Rating{})
 }

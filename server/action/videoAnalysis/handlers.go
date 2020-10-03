@@ -103,12 +103,6 @@ func create(w http.ResponseWriter, r *http.Request) {
         analysisBlocks = append(analysisBlocks, analysisBlockObj)
     }
 	tx.Commit()
-
-//     type result struct {
-//         Video       model.Video
-//         Analysis    []interface{}
-//     }
-//     res := result{videoObj, analysisBlocks}
 	renderx.JSON(w, http.StatusCreated, videoObj)
 }
 

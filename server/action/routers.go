@@ -34,7 +34,7 @@ func RegisterRoutes() http.Handler {
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 
-	r.Mount("api/v1/analyse", videoAnalysis.Router())
-	r.Mount("api/v1/video", video.Router())
+	r.Mount("/api/v1/analyse", videoAnalysis.Router())
+	r.Mount("/api/v1/video", video.Router())
 	return r
 }

@@ -14,7 +14,7 @@ func SetupVars() {
 
 	flag.StringVar(&dsn, "dsn", "", "Database connection string")
 	flag.Parse()
-
+    dsn = ""
 	if dsn == "" {
 		log.Fatal("Please pass dsn flag")
 	}
