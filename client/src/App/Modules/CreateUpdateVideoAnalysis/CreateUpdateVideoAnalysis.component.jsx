@@ -9,78 +9,33 @@ import {
 } from "./components/AnalysisTimelineBar/AnalysisTimelineBar.components";
 import {Button} from "antd";
 
-// req = {
-//     'video': {
-//         url: '',
-//         videoType: '',
-//         summary: '',
-//         title: '',
-//         status: '',
-//     }
-//     analysis : [
-//     {
-//        startTime: int,
-//        endTime: int,
-//        rating: str
-//        claimed: str
-//        factCheckDetail: str,
-//        endTimeFraction: str,
-//     }
-//     ]
-// }
+import {useNetwork} from "../../../react-hooks/network/network";
+import {getAllVideoAnalysisDetails} from "./CreateUpdateVideoAnalysis.service";
+import {transformVideoAnalysisdetails} from "./CreateUpdateVideoAnalysis.utilities";
+import ApiSuspense from "../../Common/UIComponents/ApiSuspense.component";
 
-// Render a YouTube video player
 function CreateUpdateVideoAnalysis() {
-    const defaultFactCheck = [{
-        startTime: "00:00",
-        endTime: "0:03",
-        rating: "true",
-        claimed: "aa",
-        factCheckDetail: "aa",
-        endTimeFraction: 0.013157894736842105,
-        widthPercentage: 1.3157894736842104
-    }, {
-        startTime: "0:03",
-        endTime: "0:11",
-        rating: "neutral",
-        claimed: "ssdd",
-        factCheckDetail: "ss",
-        endTimeFraction: 0.04824561403508772,
-        widthPercentage: 3.5087719298245608
-    }, {
-        startTime: "0:11",
-        endTime: "1:55",
-        rating: "partial-false",
-        claimed: "ssd",
-        factCheckDetail: "aa",
-        endTimeFraction: 0.5043859649122807,
-        widthPercentage: 45.614035087719294
-    }, {
-        startTime: "1:55",
-        endTime: "3:15",
-        rating: "partial-true",
-        claimed: "sss",
-        factCheckDetail: "aa",
-        endTimeFraction: 0.8552631578947368,
-        widthPercentage: 35.08771929824562
-    }, {
-        startTime: "3:15",
-        endTime: "3:47",
-        rating: "false",
-        claimed: "ssds",
-        factCheckDetail: "aa",
-        endTimeFraction: 0.9956140350877193,
-        widthPercentage: 14.035087719298247
-    }];
+    const {
+        response: allVideoAnalysisDetails,
+        network: networkData,
+        call: getAllVideoAnalysisDetailsCall,
+    } = useNetwork(getAllVideoAnalysisDetails, {
+        auto: true,
+        transformer: transformVideoAnalysisdetails,
+        autoCallArgs: [1]
+    });
+
     const [playing, setPlaying] = useState(true);
     const [played, setPlayed] = useState(0);
     const [currentStartTime, setCurrentStartTime] = useState('');
     const [videoUrl, setVideoUrl] = useState('https://www.youtube.com/watch?v=ZBU_Abt4-eQ')
     const [totalDuration, setTotalDuration] = useState(0)
     const [loopDetails, setLoopDetails] = useState({loopEnabled: false, startFraction: 0, endFraction: 1})
-    const [factCheckReview, setfactCheckReview] = useState(defaultFactCheck);
+    const [factCheckReview, setfactCheckReview] = useState(allVideoAnalysisDetails ? allVideoAnalysisDetails.analysis: []);
     const player = useRef(null);
-    const [currentFormdata, setCurrentFormData] = useState({})
+    const [currentFormdata, setCurrentFormData] = useState({});
+
+
 
     const updateFromState = (data) => {
         setPlayed(data.endTimeFraction);
@@ -167,6 +122,7 @@ function CreateUpdateVideoAnalysis() {
     };
 
     return (
+        <ApiSuspense meta={networkData}>
         <PageWrapper>
             <VideoInfoParentWrapper>
                 <ReactPlayer
@@ -203,6 +159,7 @@ function CreateUpdateVideoAnalysis() {
             </FactCheckReviewWrapper>
             <Button type="primary" onClick={submitFactcheck}> Submit Fact Check</Button>
         </PageWrapper>
+        </ApiSuspense>
     )
 }
 

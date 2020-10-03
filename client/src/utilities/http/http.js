@@ -3,16 +3,21 @@
  *
  * @param {String} url the endpoint
  * @param {Object} params the query parameters
+ * @param {boolean} overwriteBaseUrl to overwrite the base url
  */
 
-export function get(url, params = {}) {
-    const urlWithParams = new URL(url, window.location.origin);
+export function get(url, params = {}, overwriteBaseUrl = false) {
+    const endpoint = overwriteBaseUrl
+        ? url
+        : process.env.REACT_APP_BASE_API_URL + url;
+    const urlWithParams = new URL(endpoint, window.location.origin);
+
     urlWithParams.search = new URLSearchParams(params);
 
-    return fetch(url, {
-        method: 'GET',
+    return fetch(urlWithParams.href, {
+        method: "GET",
         headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         },
     }).then((response) => {
         if (!response.ok) {
@@ -28,16 +33,21 @@ export function get(url, params = {}) {
  * @param {String} url the endpoint
  * @param {Object} body the POST body
  * @param {Object} params the query parameters
+ * @param {boolean} overwriteBaseUrl to overwrite the base url
  */
-export function post(url, body, params = {}) {
-    const urlWithParams = new URL(url, window.location.origin);
+export function post(url, body, params = {}, overwriteBaseUrl = false) {
+    const endpoint = overwriteBaseUrl
+        ? url
+        : process.env.REACT_APP_BASE_API_URL + url;
+    const urlWithParams = new URL(endpoint, window.location.origin);
+
     urlWithParams.search = new URLSearchParams(params);
 
-    return fetch(url, {
-        method: 'POST',
+    return fetch(urlWithParams.href, {
+        method: "POST",
         body: JSON.stringify(body),
         headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         },
     }).then((response) => response.json());
 }
@@ -48,16 +58,21 @@ export function post(url, body, params = {}) {
  * @param {String} url the endpoint
  * @param {Object} body the POST body
  * @param {Object} params the query parameters
+ * @param {boolean} overwriteBaseUrl to overwrite the base url
  */
-export function put(url, body, params = {}) {
-    const urlWithParams = new URL(url, window.location.origin);
+export function put(url, body, params = {}, overwriteBaseUrl = false) {
+    const endpoint = overwriteBaseUrl
+        ? url
+        : process.env.REACT_APP_BASE_API_URL + url;
+    const urlWithParams = new URL(endpoint, window.location.origin);
+
     urlWithParams.search = new URLSearchParams(params);
 
-    return fetch(url, {
-        method: 'PUT',
+    return fetch(urlWithParams.href, {
+        method: "PUT",
         body: JSON.stringify(body),
         headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         },
     }).then((response) => response.json());
 }
@@ -67,16 +82,21 @@ export function put(url, body, params = {}) {
  *
  * @param {String} url the endpoint
  * @param {Object} params the query parameters
+ * @param {boolean} overwriteBaseUrl to overwrite the base url
  */
 
-export function deleteAPI(url, params = {}) {
-    const urlWithParams = new URL(url, window.location.origin);
+export function deleteAPI(url, params = {}, overwriteBaseUrl = false) {
+    const endpoint = overwriteBaseUrl
+        ? url
+        : process.env.REACT_APP_BASE_API_URL + url;
+    const urlWithParams = new URL(endpoint, window.location.origin);
+
     urlWithParams.search = new URLSearchParams(params);
 
-    return fetch(url, {
-        method: 'DELETE',
+    return fetch(urlWithParams.href, {
+        method: "DELETE",
         headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         },
     }).then((response) => response.json());
 }
