@@ -101,4 +101,7 @@ psd
 thumb
 sketch
 
+### Kavach ###
+kavach/
+
 # End of https://www.toptal.com/developers/gitignore/api/code,intellij,go,react
