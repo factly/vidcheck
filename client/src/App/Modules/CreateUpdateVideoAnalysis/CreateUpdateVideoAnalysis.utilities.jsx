@@ -52,3 +52,15 @@ export function transformVideoAnalysisdetails(resp) {
     },
   };
 }
+
+export function recomputeAnalysisArray(data, removeId = -1) {
+  let currentWidthSum = 0;
+  let newData = data.filter((element, index) => index !== removeId);
+  return newData.map((element, index) => {
+    element["startTime"] = index > 0 ? newData[index - 1]["endTime"] : "00:00";
+    element["widthPercentage"] =
+      element["endTimeFraction"] * 100 - currentWidthSum;
+    currentWidthSum += element["widthPercentage"];
+    return element;
+  });
+}

@@ -19,7 +19,10 @@ import {
   createVideoAnalysisDetails,
   updateVideoAnalysisDetails,
 } from "./CreateUpdateVideoAnalysis.service";
-import { transformVideoAnalysisdetails } from "./CreateUpdateVideoAnalysis.utilities";
+import {
+  recomputeAnalysisArray,
+  transformVideoAnalysisdetails,
+} from "./CreateUpdateVideoAnalysis.utilities";
 import ApiSuspense from "../../Common/UIComponents/ApiSuspense.component";
 
 function CreateUpdateVideoAnalysis() {
@@ -71,20 +74,9 @@ function CreateUpdateVideoAnalysis() {
     setCurrentFormData(data);
   };
   const onDeleteFactCheckReview = (removeIndex) => {
-    setfactCheckReview((factCheckReview) => {
-      let currentWidthSum = 0;
-      let newdata = factCheckReview.filter(
-        (element, index) => index !== removeIndex
-      );
-      return newdata.map((element, index) => {
-        element["startTime"] =
-          index > 0 ? newdata[index - 1]["endTime"] : "00:00";
-        element["widthPercentage"] =
-          element["endTimeFraction"] * 100 - currentWidthSum;
-        currentWidthSum += element["widthPercentage"];
-        return element;
-      });
-    });
+    setfactCheckReview((factCheckReview) =>
+      recomputeAnalysisArray(factCheckReview, removeIndex)
+    );
   };
 
   const getHostname = (url) => {
