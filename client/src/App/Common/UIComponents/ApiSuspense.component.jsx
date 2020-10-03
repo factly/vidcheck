@@ -32,7 +32,7 @@ function ApiSuspense({ meta, children, AlertComponent, errorTitle }) {
       }
       return children;
     default:
-      return null;
+      return children;
   }
 }
 ApiSuspense.propTypes = {
