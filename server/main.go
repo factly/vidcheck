@@ -17,7 +17,7 @@ func main() {
 	}
 	port = ":" + port
 	// db setup
-	dsn := "user=root password=example dbname=vidcheck host=db port=5432 sslmode=disable TimeZone=Asia/Calcutta"
+	dsn := "postgres://postgres:postgres@postgres:5432/vidcheck?sslmode=disable"
 	model.SetupDB(dsn)
 	fmt.Println("DB Migration Done...")
 

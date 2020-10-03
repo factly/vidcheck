@@ -1,22 +1,15 @@
-#FROM golang:alpine AS build
-#RUN apk --no-cache add gcc g++ make git
-#WORKDIR /go/src/app
-#COPY . .
-#RUN GOOS=linux go build -ldflags="-s -w" -o ./bin/factcheck ./main.go
-#
-#FROM alpine:3.9
-#RUN apk --no-cache add ca-certificates
-#WORKDIR /usr/bin
-#COPY --from=build /go/src/app/bin /go/bin
-#EXPOSE 8080
-#RUN go get -u github.com/cosmtrek/air
-#ENTRYPOINT air -d
-#
+FROM golang:1.14.2-alpine3.11
 
-FROM golang:1.15.0
-WORKDIR /usr/src/app
-COPY go.mod go.mod
-RUN go mod download
-RUN go get -u github.com/cosmtrek/air
+WORKDIR /app
+
 COPY . .
-ENTRYPOINT air -d
+
+RUN go mod download
+
+RUN go get github.com/githubnemo/CompileDaemon
+
+# Following lines provides ability to add WAIT_HOSTS in docker-compose to wait for other hosts to start
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.7.3/wait /wait
+RUN chmod +x /wait
+
+ENTRYPOINT /wait && CompileDaemon -exclude-dir=.git -exclude-dir=docs --build="go build main.go" --command="./main"
