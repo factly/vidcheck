@@ -24,6 +24,8 @@ import {
   transformVideoAnalysisdetails,
 } from "./CreateUpdateVideoAnalysis.utilities";
 import ApiSuspense from "../../Common/UIComponents/ApiSuspense.component";
+import Summary from "./components/Summary/Summary.component";
+import SummaryForm from "./components/SummaryFrom/SummaryForm.component";
 
 function CreateUpdateVideoAnalysis() {
   const {
@@ -37,24 +39,21 @@ function CreateUpdateVideoAnalysis() {
   const {
     network: networkCreateVideoAnalysisMeta,
     call: createVideoAnalysisDetailsCall,
-  } = useNetwork(createVideoAnalysisDetails, {
-    transformer: transformVideoAnalysisdetails,
-  });
+  } = useNetwork(createVideoAnalysisDetails);
 
   const {
     network: networkUpdateVideoAnalysisMeta,
     call: updateVideoAnalysisDetailsCall,
-  } = useNetwork(updateVideoAnalysisDetails, {
-    transformer: transformVideoAnalysisdetails,
-  });
+  } = useNetwork(updateVideoAnalysisDetails);
 
   const [playing, setPlaying] = useState(true);
   const [played, setPlayed] = useState(0);
-  const [currentStartTime, setCurrentStartTime] = useState(
-    allVideoAnalysisDetails ? allVideoAnalysisDetails.video.url : ""
+  const [summaryData, setSummaryData] = useState(
+    allVideoAnalysisDetails ? allVideoAnalysisDetails.video : {}
   );
+  const [currentStartTime, setCurrentStartTime] = useState(null);
   const [videoUrl, setVideoUrl] = useState(
-    "https://www.youtube.com/watch?v=ZBU_Abt4-eQ"
+    allVideoAnalysisDetails ? allVideoAnalysisDetails.video.url : ""
   );
   const [totalDuration, setTotalDuration] = useState(0);
   const [loopDetails, setLoopDetails] = useState({
@@ -67,6 +66,7 @@ function CreateUpdateVideoAnalysis() {
   );
   const player = useRef(null);
   const [currentFormdata, setCurrentFormData] = useState({});
+  const [showSummaryForm, setShowSummaryForm] = useState(true);
 
   const updateFromState = (data) => {
     setPlayed(data.endTimeFraction);
@@ -90,12 +90,12 @@ function CreateUpdateVideoAnalysis() {
       video: {
         url: videoUrl,
         videoType,
-        summary: "abc",
-        title: "title 1",
+        summary: summaryData.summary,
+        title: summaryData.title,
       },
       analysis: factCheckReview,
     };
-    console.log(data);
+    createVideoAnalysisDetailsCall(data);
   };
 
   function handleSeekChange(e) {
@@ -152,6 +152,11 @@ function CreateUpdateVideoAnalysis() {
     setVideoUrl(newUrl);
   };
 
+  const updateSummaryData = (data) => {
+    setSummaryData(data);
+    setShowSummaryForm(false);
+  };
+
   return (
     <ApiSuspense meta={networkData || networkCreateVideoAnalysisMeta}>
       <PageWrapper>
@@ -181,22 +186,32 @@ function CreateUpdateVideoAnalysis() {
         />
 
         <FactCheckReviewWrapper>
+          {summaryData ? <Summary data={summaryData} /> : null}
+          <Button onClick={() => setShowSummaryForm(!showSummaryForm)}>
+            {summaryData ? "Edit Summary" : "Add Summary"}
+          </Button>
           <VerticalTimelineBar
             factCheckReview={factCheckReview}
             setCurrentFormData={updateFromState}
             onDeleteFactCheckReview={onDeleteFactCheckReview}
           />
-          <AnalysisForm
-            factCheckReview={factCheckReview}
-            formData={currentFormdata}
-            setfactCheckReview={setfactCheckReview}
-            totalDuration={totalDuration}
-            currentStartTime={currentStartTime}
-            player={player}
-          />
+          {showSummaryForm ? (
+            <SummaryForm
+              data={summaryData}
+              updateSummaryData={updateSummaryData}
+            />
+          ) : (
+            <AnalysisForm
+              factCheckReview={factCheckReview}
+              formData={currentFormdata}
+              setfactCheckReview={setfactCheckReview}
+              totalDuration={totalDuration}
+              currentStartTime={currentStartTime}
+              player={player}
+            />
+          )}
         </FactCheckReviewWrapper>
         <Button type="primary" onClick={submitFactcheck}>
-          {" "}
           Submit Fact Check
         </Button>
       </PageWrapper>
