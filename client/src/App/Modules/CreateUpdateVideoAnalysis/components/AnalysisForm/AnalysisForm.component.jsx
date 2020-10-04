@@ -20,14 +20,14 @@ function AnalysisForm({
   };
   React.useEffect(() => {
     form.setFieldsValue({ ...formData });
-  }, [formData]);
+  }, [form, formData]);
 
   React.useEffect(() => {
     form.setFieldsValue({
       ...form.getFieldsValue(),
       startTime: currentStartTime,
     });
-  }, [currentStartTime]);
+  }, [form, currentStartTime]);
 
   const getTimeFraction = (timeString) => {
     const minute = timeString.split(":")[0];

@@ -4,12 +4,12 @@ import { useNetwork } from "../../../react-hooks/network/network";
 import { getAllVideosAnalysed } from "./Dashboard.service";
 import { transformVideoAnalysisInfo } from "./Dashboard.utilities";
 import ApiSuspense from "../../Common/UIComponents/ApiSuspense.component";
+import { Button } from "antd";
 
 function Dashboard() {
   const {
     response: allVideoAnalysisDetails,
     network: networkMeta,
-    call: getAllVideoAnalysisDetailsCall,
   } = useNetwork(getAllVideosAnalysed, {
     auto: true,
     transformer: transformVideoAnalysisInfo,
@@ -18,7 +18,7 @@ function Dashboard() {
   const history = useHistory();
 
   const gotoVideoAnalysisDetails = (id) => {
-    history.push(`/edit/${id}`);
+    history.push(`edit/${id}`);
   };
 
   return (
@@ -35,6 +35,7 @@ function Dashboard() {
           </>
         );
       })}
+      <Button onClick={() => history.push(`create`)}>New Video Analysis</Button>
     </ApiSuspense>
   );
 }
