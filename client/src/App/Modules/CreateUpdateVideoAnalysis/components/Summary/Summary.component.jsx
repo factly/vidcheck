@@ -4,7 +4,8 @@ import PropTypes from "prop-types";
 function Summary({ data }) {
   return (
     <>
-      <div>Test</div>
+      <div>{data.title}</div>
+      <div>{data.summary}</div>
     </>
   );
 }

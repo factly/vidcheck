@@ -4,36 +4,39 @@ export function transformVideoAnalysisdetails(resp) {
   if (!resp || !resp.analysis) {
     return {};
   }
-  const a = {
-    video: {
-      url: resp.video.Url,
-      summary: resp.video.Summary,
-      title: resp.video.Title,
-    },
-    analysis: resp.analysis.map((analysisData) => {
-      return {
-        id: analysisData.id,
-        claim: analysisData.Claim,
-        factCheckDetail: analysisData.Fact,
-        endTimeFraction: analysisData.EndTimeFraction,
-        startTime: convertSecondsToTimeString(analysisData.StartTime),
-        endTime: convertSecondsToTimeString(analysisData.EndTime),
-        rating: ratingIntToStr(analysisData.RatingValue),
-      };
-    }),
+  const video = {
+    url: resp.video.Url,
+    summary: resp.video.Summary,
+    title: resp.video.Title,
   };
-  console.log(a);
-  return a;
+  const analysis = resp.analysis.map((analysisData) => {
+    return {
+      id: analysisData.id,
+      claimed: analysisData.Claim,
+      factCheckDetail: analysisData.Fact,
+      endTimeFraction: analysisData.EndTimeFraction,
+      startTime: convertSecondsToTimeString(analysisData.StartTime),
+      endTime: convertSecondsToTimeString(analysisData.EndTime),
+      rating: ratingIntToStr(analysisData.RatingValue),
+    };
+  });
+  return {
+    video: video,
+    analysis: recomputeAnalysisArray(analysis),
+  };
 }
 
 export function recomputeAnalysisArray(data, removeId = -1) {
+  let analysisData = data.sort((a, b) => {
+    return a.endTimeFraction - b.endTimeFraction;
+  });
+
   let currentWidthSum = 0;
-  let newData = data.filter((element, index) => index !== removeId);
+  let newData = analysisData.filter((element, index) => index !== removeId);
   return newData.map((element, index) => {
-    element["startTime"] = index > 0 ? newData[index - 1]["endTime"] : "00:00";
-    element["widthPercentage"] =
-      element["endTimeFraction"] * 100 - currentWidthSum;
-    currentWidthSum += element["widthPercentage"];
+    element.startTime = index > 0 ? newData[index - 1]["endTime"] : "00:00";
+    element.widthPercentage = element.endTimeFraction * 100 - currentWidthSum;
+    currentWidthSum += element.widthPercentage;
     return element;
   });
 }
@@ -47,12 +50,19 @@ export function transformToServerCompatibleDate(data) {
   };
 
   const analysis = data.analysis.map((analysisData) => {
-    return {
+    let analysis = {
+      claim: analysisData.claimed,
+      rating: analysisData.rating,
+      fact: analysisData.factCheckDetail,
       start_time: convertTimeStringToSeconds(analysisData.startTime),
       end_time: convertTimeStringToSeconds(analysisData.endTime),
       rating_value: ratingStrToInt(analysisData.rating),
       end_time_fraction: analysisData.endTimeFraction,
     };
+    if (analysisData.newEntry === true) {
+      analysis["id"] = analysisData.id;
+    }
+    return analysis;
   });
   return {
     video: videoData,

@@ -22,6 +22,7 @@ import {
   updateVideoAnalysisDetails,
 } from "./CreateUpdateVideoAnalysis.service";
 import {
+  convertTimeStringToSeconds,
   recomputeAnalysisArray,
   transformVideoAnalysisdetails,
 } from "./CreateUpdateVideoAnalysis.utilities";
@@ -86,7 +87,10 @@ function CreateUpdateVideoAnalysis() {
 
   const updateFormState = (data) => {
     setPlayed(data.endTimeFraction);
-    player.current.seekTo(data.endTimeFraction, "fraction");
+    player.current.seekTo(
+      convertTimeStringToSeconds(data.startTime),
+      "seconds"
+    );
     setCurrentFormData(data);
   };
   const onDeleteFactCheckReview = (removeIndex) => {
@@ -222,6 +226,9 @@ function CreateUpdateVideoAnalysis() {
                 setCurrentFormData={updateFormState}
                 onDeleteFactCheckReview={onDeleteFactCheckReview}
               />
+              <Button onClick={() => setCurrentFormData({})}>
+                Add new Analysis
+              </Button>
               {showSummaryForm ? (
                 <SummaryForm
                   data={summaryData}

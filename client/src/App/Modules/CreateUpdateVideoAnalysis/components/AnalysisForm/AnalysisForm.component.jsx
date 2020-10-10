@@ -23,10 +23,12 @@ function AnalysisForm({
     wrapperCol: { offset: 8, span: 16 },
   };
   React.useEffect(() => {
+    form.resetFields();
     form.setFieldsValue({ ...formData });
   }, [form, formData]);
 
   React.useEffect(() => {
+    console.log(currentStartTime);
     form.setFieldsValue({
       ...form.getFieldsValue(),
       startTime: currentStartTime,
@@ -59,9 +61,12 @@ function AnalysisForm({
     values["endTimeFraction"] = endTimeFraction;
 
     setfactCheckReview((factCheckReview) => {
-      let newData = [...factCheckReview, values].sort((a, b) => {
-        return a.endTimeFraction - b.endTimeFraction;
-      });
+      let newData = [...factCheckReview];
+      if (values.id) {
+        newData = newData.map((obj) => (values.id === obj.id ? values : obj));
+      } else {
+        newData = [...newData, values];
+      }
       return recomputeAnalysisArray(newData);
     });
     onReset();
@@ -128,19 +133,18 @@ function AnalysisForm({
           </Select>
         </Form.Item>
 
-        <Form.Item name="claimed" label="Claimed" rules={[{ required: false }]}>
+        <Form.Item name="claimed" label="Claimed">
           <Input.TextArea />
         </Form.Item>
-        <Form.Item
-          name="factCheckDetail"
-          label="Fact check"
-          rules={[{ required: false }]}
-        >
+        <Form.Item name="factCheckDetail" label="Fact check">
+          <Input.TextArea />
+        </Form.Item>
+        <Form.Item name="id" hidden={true}>
           <Input.TextArea />
         </Form.Item>
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit">
-            Add
+            {form.getFieldValue("id") ? "Update" : "Add"}
           </Button>
           <Button htmlType="button" onClick={onReset}>
             Reset
@@ -153,7 +157,7 @@ function AnalysisForm({
 
 AnalysisForm.protoTypes = {
   factCheckReview: PropTypes.array.isRequired,
-  formData: PropTypes.object.isRequired,
+  formData: PropTypes.object,
   setfactCheckReview: PropTypes.func.isRequired,
   totalDuration: PropTypes.number.isRequired,
   currentStartTime: PropTypes.string.isRequired,
