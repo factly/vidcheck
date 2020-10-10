@@ -2,7 +2,11 @@ import React from "react";
 import { Button, Form, Input, Select } from "antd";
 import PropTypes from "prop-types";
 import { FactCheckReviewFormWrapper } from "./AnalysisForm.styled";
-import { recomputeAnalysisArray } from "../../CreateUpdateVideoAnalysis.utilities";
+import {
+  recomputeAnalysisArray,
+  convertSecondsToTimeString,
+  convertTimeStringToSeconds,
+} from "../../CreateUpdateVideoAnalysis.utilities";
 
 const { Option } = Select;
 
@@ -29,19 +33,16 @@ function AnalysisForm({
     });
   }, [form, currentStartTime]);
 
-  const getTimeFraction = (timeString) => {
-    const minute = timeString.split(":")[0];
-    const second = timeString.split(":")[1];
-    return (parseInt(minute, 10) * 60 + parseInt(second, 10)) / totalDuration;
-  };
-
   const returnEndTimeFraction = (startTimeString, endTimeString) => {
-    const endTimeFraction = getTimeFraction(endTimeString);
+    const endTimeFraction =
+      convertTimeStringToSeconds(endTimeString) / totalDuration;
+    const startTimeFraction =
+      convertTimeStringToSeconds(startTimeString) / totalDuration;
     if (endTimeFraction > 1) {
       alert("invalid end time");
       return;
     }
-    if (getTimeFraction(startTimeString) > endTimeFraction) {
+    if (startTimeFraction > endTimeFraction) {
       alert(" start time greater than end time");
       return;
     }
@@ -72,11 +73,9 @@ function AnalysisForm({
 
   const fillCurrentTime = () => {
     const currentPlayedTime = player.current.getCurrentTime();
-    const minute = Math.floor(currentPlayedTime / 60);
-    const seconds = Math.floor(currentPlayedTime % 60);
     form.setFieldsValue({
       ...form.getFieldsValue(),
-      endTime: `${minute}:${seconds > 9 ? seconds : "0" + seconds}`,
+      endTime: convertSecondsToTimeString(currentPlayedTime),
     });
   };
 
@@ -121,11 +120,11 @@ function AnalysisForm({
         </Form.Item>
         <Form.Item name="rating" label="Rating" rules={[{ required: true }]}>
           <Select placeholder="Select a rating of the claim" allowClear>
-            <Option value="true">True</Option>
-            <Option value="partial-true">Partial True</Option>
-            <Option value="neutral">Neutral</Option>
-            <Option value="partial-false">Partial False</Option>
-            <Option value="false">False</Option>
+            <Option value="True">True</Option>
+            <Option value="Partial True">Partial True</Option>
+            <Option value="Neutral">Neutral</Option>
+            <Option value="Partial False">Partial False</Option>
+            <Option value="False">False</Option>
           </Select>
         </Form.Item>
 

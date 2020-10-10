@@ -67,7 +67,7 @@ function CreateUpdateVideoAnalysis() {
   // Get edit video id.
   let { id } = useParams();
 
-  let { history } = useHistory();
+  let history = useHistory();
 
   // Get video analysis details if edit page
   useEffect(() => {

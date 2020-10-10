@@ -85,7 +85,7 @@ func create(w http.ResponseWriter, r *http.Request) {
             Fact            : analysisBlock.Fact,
             StartTime       : analysisBlock.StartTime,
             EndTime         : analysisBlock.EndTime,
-            EntTimeFraction : analysisBlock.EntTimeFraction,
+            EndTimeFraction : analysisBlock.EndTimeFraction,
         }
         err = tx.Model(&model.VideoAnalysis{}).Create(&analysisBlockObj).Error
         if err != nil {
@@ -190,7 +190,7 @@ func update(w http.ResponseWriter, r *http.Request) {
         Fact            : videoAnalysis.Fact,
         StartTime       : videoAnalysis.StartTime,
         EndTime         : videoAnalysis.EndTime,
-        EntTimeFraction : videoAnalysis.EntTimeFraction,
+        EndTimeFraction : videoAnalysis.EndTimeFraction,
 	}).First(&result)
 
 	renderx.JSON(w, http.StatusOK, result)

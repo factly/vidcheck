@@ -20,7 +20,7 @@ type videoAnalysis struct {
     Fact            string  `json:"fact"`
     StartTime       int     `json:"start_time"`
     EndTime         int     `json:"end_time" validate:"required"`
-    EntTimeFraction float64 `json:"end_time_fraction" validate:"required"`
+    EndTimeFraction float64 `json:"end_time_fraction" validate:"required"`
 }
 
 type videoAnalysisApiData struct {

@@ -11,5 +11,5 @@ type VideoAnalysis struct {
 	Fact            string
 	EndTime         int
     StartTime       int
-    EntTimeFraction float64
+    EndTimeFraction float64
 }

@@ -1,3 +1,5 @@
+import { RATING_MAPPING } from "./CreateUpdateVideoAnalysis.constants";
+
 export function transformVideoAnalysisdetails(resp) {
   if (!resp || !resp.analysis) {
     return {};
@@ -11,13 +13,12 @@ export function transformVideoAnalysisdetails(resp) {
     analysis: resp.analysis.map((analysisData) => {
       return {
         id: analysisData.id,
-        claimed: analysisData.Claim,
+        claim: analysisData.Claim,
         factCheckDetail: analysisData.Fact,
-        endTimeFraction: analysisData.EntTimeFraction,
-        startTime: "00:00",
-        endTime: "0:03",
-        rating: "true",
-        widthPercentage: 1.3157894736842104,
+        endTimeFraction: analysisData.EndTimeFraction,
+        startTime: convertSecondsToTimeString(analysisData.StartTime),
+        endTime: convertSecondsToTimeString(analysisData.EndTime),
+        rating: ratingIntToStr(analysisData.RatingValue),
       };
     }),
   };
@@ -35,4 +36,50 @@ export function recomputeAnalysisArray(data, removeId = -1) {
     currentWidthSum += element["widthPercentage"];
     return element;
   });
+}
+
+export function transformToServerCompatibleDate(data) {
+  const videoData = {
+    url: data.video.url,
+    video_type: data.video.videoType,
+    summary: data.video.summary,
+    title: data.video.title,
+  };
+
+  const analysis = data.analysis.map((analysisData) => {
+    return {
+      start_time: convertTimeStringToSeconds(analysisData.startTime),
+      end_time: convertTimeStringToSeconds(analysisData.endTime),
+      rating_value: ratingStrToInt(analysisData.rating),
+      end_time_fraction: analysisData.endTimeFraction,
+    };
+  });
+  return {
+    video: videoData,
+    analysis: analysis,
+  };
+}
+
+export function convertTimeStringToSeconds(timeString) {
+  const minute = timeString.split(":")[0];
+  const second = timeString.split(":")[1];
+  return parseInt(minute, 10) * 60 + parseInt(second, 10);
+}
+
+export function convertSecondsToTimeString(totalSecond) {
+  const minutes = Math.floor(totalSecond / 60);
+  const seconds = Math.floor(totalSecond % 60);
+  return `${minutes}:${seconds > 9 ? seconds : "0" + seconds}`;
+}
+
+export function ratingStrToInt(ratingStr) {
+  return RATING_MAPPING[ratingStr];
+}
+
+export function ratingIntToStr(ratingInt) {
+  const reverseRatingIntToStrMap = Object.entries(RATING_MAPPING).reduce(
+    (obj, [key, value]) => ({ ...obj, [value]: key }),
+    {}
+  );
+  return reverseRatingIntToStrMap[ratingInt];
 }
