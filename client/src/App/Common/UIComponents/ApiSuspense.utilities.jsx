@@ -2,7 +2,6 @@ import { API_NETWORK_STATUS } from "../../Constants/app.constants";
 
 const successMeta = { status: API_NETWORK_STATUS.SUCCESS };
 export function getMeta(meta) {
-  console.log(meta);
   if (!meta) return successMeta;
   if (!Array.isArray(meta)) return meta;
 

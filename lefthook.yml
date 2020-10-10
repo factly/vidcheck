@@ -1,0 +1,7 @@
+pre-commit:
+  parallel: true
+  commands:
+    lint_frontend:
+      root: "client/"
+      glob: "*.{js,jsx}"
+      run: "yarn pretty-quick --staged"

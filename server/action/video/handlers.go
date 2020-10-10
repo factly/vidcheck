@@ -69,7 +69,7 @@ func create(w http.ResponseWriter, r *http.Request) {
             Fact            : analysisBlock.Fact,
             StartTime       : analysisBlock.StartTime,
             EndTime         : analysisBlock.EndTime,
-            EntTimeFraction : analysisBlock.EntTimeFraction,
+            EndTimeFraction : analysisBlock.EndTimeFraction,
         }
         err = tx.Model(&model.VideoAnalysis{}).Create(&analysisBlockObj).Error
         if err != nil {
@@ -213,7 +213,7 @@ func update(w http.ResponseWriter, r *http.Request) {
                 Fact            : analysisBlock.Fact,
                 StartTime       : analysisBlock.StartTime,
                 EndTime         : analysisBlock.EndTime,
-                EntTimeFraction : analysisBlock.EntTimeFraction,
+                EndTimeFraction : analysisBlock.EndTimeFraction,
             }).First(&analysisBlockObj)
 	    } else {
             analysisBlockObj := model.VideoAnalysis{}
@@ -225,7 +225,7 @@ func update(w http.ResponseWriter, r *http.Request) {
                 Fact            : analysisBlock.Fact,
                 StartTime       : analysisBlock.StartTime,
                 EndTime         : analysisBlock.EndTime,
-                EntTimeFraction : analysisBlock.EntTimeFraction,
+                EndTimeFraction : analysisBlock.EndTimeFraction,
             }
             err = tx.Model(&model.VideoAnalysis{}).Create(&analysisBlockObj).Error
             if err != nil {
