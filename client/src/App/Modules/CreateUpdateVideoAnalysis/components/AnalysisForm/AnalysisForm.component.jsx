@@ -28,7 +28,9 @@ function AnalysisForm({
   }, [form, formData]);
 
   React.useEffect(() => {
-    console.log(currentStartTime);
+    if (form.getFieldValue("id")) {
+      return;
+    }
     form.setFieldsValue({
       ...form.getFieldsValue(),
       startTime: currentStartTime,
@@ -73,7 +75,9 @@ function AnalysisForm({
   };
 
   const onReset = () => {
+    const startTime = form.getFieldValue("startTime");
     form.resetFields();
+    form.setFieldsValue({ startTime });
   };
 
   const fillCurrentTime = () => {

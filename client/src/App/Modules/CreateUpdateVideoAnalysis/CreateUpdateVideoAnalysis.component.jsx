@@ -115,15 +115,16 @@ function CreateUpdateVideoAnalysis() {
       },
       analysis: factCheckReview,
     };
-    let apiCall = null;
     if (!id) {
-      apiCall = createVideoAnalysisDetailsCall;
+      const [resp, meta] = await createVideoAnalysisDetailsCall(data);
+      if (meta.state === "success") {
+        history.push("/");
+      }
     } else {
-      apiCall = updateVideoAnalysisDetailsCall;
-    }
-    const [resp, meta] = await apiCall(data);
-    if (meta.state === "success") {
-      history.push("/");
+      const [resp, meta] = await updateVideoAnalysisDetailsCall(data, id);
+      if (meta.state === "success") {
+        history.push("/");
+      }
     }
   };
 
@@ -176,6 +177,11 @@ function CreateUpdateVideoAnalysis() {
     }
   };
 
+  const addNewAnalysis = () => {
+    setCurrentFormData({});
+    setCurrentStartTime("00:00");
+  };
+
   const updateVideoUrl = (e) => {
     const newUrl = e.target.value;
     setVideoUrl(newUrl);
@@ -226,9 +232,7 @@ function CreateUpdateVideoAnalysis() {
                 setCurrentFormData={updateFormState}
                 onDeleteFactCheckReview={onDeleteFactCheckReview}
               />
-              <Button onClick={() => setCurrentFormData({})}>
-                Add new Analysis
-              </Button>
+              <Button onClick={addNewAnalysis}>Add new Analysis</Button>
               {showSummaryForm ? (
                 <SummaryForm
                   data={summaryData}

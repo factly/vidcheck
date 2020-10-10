@@ -59,7 +59,7 @@ export function transformToServerCompatibleDate(data) {
       rating_value: ratingStrToInt(analysisData.rating),
       end_time_fraction: analysisData.endTimeFraction,
     };
-    if (analysisData.newEntry === true) {
+    if (typeof analysisData.id !== "undefined") {
       analysis["id"] = analysisData.id;
     }
     return analysis;
@@ -79,7 +79,9 @@ export function convertTimeStringToSeconds(timeString) {
 export function convertSecondsToTimeString(totalSecond) {
   const minutes = Math.floor(totalSecond / 60);
   const seconds = Math.floor(totalSecond % 60);
-  return `${minutes}:${seconds > 9 ? seconds : "0" + seconds}`;
+  return `${minutes > 9 ? minutes : "0" + minutes}:${
+    seconds > 9 ? seconds : "0" + seconds
+  }`;
 }
 
 export function ratingStrToInt(ratingStr) {
