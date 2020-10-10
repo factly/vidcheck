@@ -1,32 +1,139 @@
 version: "3.7"
 
 services:
-  server:
+  ###########################################################################
+  #######                       DB SERVICES                           #######
+  ###########################################################################
+  postgres:
+    image: postgres:11.7-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./pg-init-scripts:/docker-entrypoint-initdb.d
+      - ~/factly/vidcheck/postgresql:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_MULTIPLE_DATABASES=kratos,kavach,vidcheck
+    networks:
+      - intranet
+
+  ###########################################################################
+  #######               KRATOS AND OATHKEEPER                         #######
+  ###########################################################################
+  kratos-migrate:
+    depends_on:
+      - postgres
+    image: oryd/kratos:v0.3.0-alpha.1
+    environment:
+      - DSN=postgres://postgres:postgres@postgres:5432/kratos?sslmode=disable
+    volumes:
+      - type: bind
+        source: ./kratos/sqlite
+        target: /home/ory/sqlite
+      - type: bind
+        source: ./kratos/config
+        target: /etc/config/kratos
+    command: -c /etc/config/kratos/.kratos.yml migrate sql -e --yes
+    restart: on-failure
+    networks:
+      - intranet
+
+  kratos:
+    depends_on:
+      - kratos-migrate
+    image: oryd/kratos:v0.3.0-alpha.1
+    ports:
+      - "4433:4433" # public
+      - "4434:4434" # admin
+    environment:
+      - DSN=postgres://postgres:postgres@postgres:5432/kratos?sslmode=disable
+    volumes:
+      - type: bind
+        source: ./kratos/sqlite
+        target: /home/ory/sqlite
+      - type: bind
+        source: ./kratos/config
+        target: /etc/config/kratos
+    command: serve -c /etc/config/kratos/.kratos.yml --dev
+    restart: unless-stopped
+    networks:
+      - intranet
+
+  oathkeeper:
+    image: oryd/oathkeeper:latest-alpine
+    depends_on:
+      - kratos
+    ports:
+      - "4455:4455"
+      - "4456:4456"
+    environment:
+      - LOG_LEVEL=debug
+    volumes:
+      - type: bind
+        source: ./oathkeeper
+        target: /etc/config/oathkeeper
+    command: serve proxy -c "/etc/config/oathkeeper/.oathkeeper.yml"
+    restart: on-failure
+    networks:
+      - intranet
+
+  ###########################################################################
+  #######                     KAVACH                                  #######
+  ###########################################################################
+  kavach-server:
+    depends_on:
+      - postgres
+    ports:
+      - 5000:8000
+    build:
+      context: ./kavach/kavach-server
+      dockerfile: Dockerfile
+    environment:
+      - KETO=http://keto:4466
+      - DSN=postgres://postgres:postgres@postgres:5432/kavach?sslmode=disable
+      - WAIT_HOSTS=postgres:5432
+    volumes:
+      - type: bind
+        source: ./kavach/kavach-server
+        target: /app
     restart: always
-    container_name: vid_check_server
+    networks:
+      - intranet
+
+  kavach-web:
+    build:
+      context: ./kavach/kavach-web
+      dockerfile: Dockerfile
+    environment:
+      - PUBLIC_URL=http://127.0.0.1:4455/.factly/kavach/web
+    volumes:
+      - type: bind
+        source: ./kavach/kavach-web
+        target: /app
+      - /app/node_modules
+    restart: unless-stopped
+    networks:
+      - intranet
+
+  ###########################################################################
+  #######                       VID CHECK                             #######
+  ###########################################################################
+  vid-check-server:
+    depends_on:
+      - postgres
+    ports:
+      - 8080:8080
     build:
       context: ./server
-      dockerfile: $PWD/server/Dockerfile
+      dockerfile: Dockerfile
+    environment:
+      - WAIT_HOSTS=postgres:5432
+    restart: always
     volumes:
-      - ./server:/usr/src/app
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db
-
-  #  client:
-  #    container_name: vid_check_client
-  #    build:
-  #      context: ./client
-  #      dockerfile: $PWD/client/Dockerfile
-  #    volumes:
-  #      - ./client:/app
-  #      - /app/node_modules/
-  #    ports:
-  #      - 3000:3000
-  #    environment:
-  #      - CHOKIDAR_USEPOLLING=true
-  #    stdin_open: true
+      - ./server:/app
+    networks:
+      - intranet
 
   db:
     image: postgres:12.0-alpine
@@ -39,5 +146,24 @@ services:
       - POSTGRES_PASSWORD=example
       - POSTGRES_DB=vidcheck
 
+  vid-check-web:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    volumes:
+      - ./client:/app
+      - /app/node_modules/
+    ports:
+      - 3000:3000
+    environment:
+      - PUBLIC_URL=http://127.0.0.1:4455/.factly/vid-check/web
+      - CHOKIDAR_USEPOLLING=true
+    stdin_open: true
+    networks:
+      - intranet
+
 volumes:
   postgres_data:
+      
+networks:
+  intranet:
