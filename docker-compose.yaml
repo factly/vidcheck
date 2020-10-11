@@ -22,6 +22,28 @@ services:
   ###########################################################################
   #######               KRATOS AND OATHKEEPER                         #######
   ###########################################################################
+  keto-migrate:
+    image: oryd/keto:latest
+    environment:
+      - LOG_LEVEL=debug
+    depends_on:
+      - postgres
+    command: migrate sql postgres://postgres:postgres@postgres:5432/keto?sslmode=disable
+    restart: on-failure
+    networks:
+      - intranet
+
+  keto:
+    image: oryd/keto:latest
+    ports:
+      - "4466:4466"
+    depends_on:
+      - keto-migrate
+    environment:
+      - DSN=postgres://postgres:postgres@postgres:5432/keto?sslmode=disable
+    networks:
+      - intranet
+      
   kratos-migrate:
     depends_on:
       - postgres
