@@ -3,7 +3,7 @@
     "id": "vid-check:web:protected",
     "upstream": {
       "preserve_host": true,
-      "url": "http://vid-check-web:3000"
+      "url": "http://vid-check-web:3000/"
     },
     "match": {
       "url": "http://127.0.0.1:4455/.factly/vid-check/web/<.*>",
@@ -13,7 +13,7 @@
     },
     "authenticators": [
       {
-        "handler": "cookie_session"
+        "handler": "anonymous"
       }
     ],
     "authorizer": {

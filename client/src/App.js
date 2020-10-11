@@ -7,6 +7,7 @@ import routes from "./App/Router";
 
 
 function App() {
+    alert('test')
   return (
     <div className="App">
       <Router>
