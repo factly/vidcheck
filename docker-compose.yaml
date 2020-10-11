@@ -6,7 +6,6 @@ services:
   ###########################################################################
   postgres:
     image: postgres:11.7-alpine
-    container_name: postgres_data
     ports:
       - "5432:5432"
     volumes:
@@ -113,8 +112,7 @@ services:
       context: ./kavach/kavach-server
       dockerfile: Dockerfile
     environment:
-      - KETO=http://keto:4466
-      - DSN=postgres://postgres:postgres@postgres:5432/kavach?sslmode=disable
+      - CONFIG_FILE=kavach-server.yml
       - WAIT_HOSTS=postgres:5432
     volumes:
       - type: bind
