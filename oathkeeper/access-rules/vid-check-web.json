@@ -13,7 +13,7 @@
     },
     "authenticators": [
       {
-        "handler": "anonymous"
+        "handler": "cookie_session"
       }
     ],
     "authorizer": {
