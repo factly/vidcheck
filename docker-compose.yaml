@@ -15,7 +15,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_MULTIPLE_DATABASES=kratos,kavach,vidcheck
+      - POSTGRES_MULTIPLE_DATABASES=kratos,keto,kavach,vidcheck
     networks:
       - intranet
 
