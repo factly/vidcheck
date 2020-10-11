@@ -47,14 +47,13 @@ func create(w http.ResponseWriter, r *http.Request) {
 		errorx.Render(w, validationError)
 		return
 	}
-
 	tx := model.DB.Begin()
 	videoObj := model.Video{}
 	videoObj = model.Video{
-	    Url:           videoAnalysisData.Video.Url,
-		Title:         videoAnalysisData.Video.Title,
-		Summary:       videoAnalysisData.Video.Summary,
-		VideoType:     videoAnalysisData.Video.VideoType,
+	    Url:                videoAnalysisData.Video.Url,
+		Title:              videoAnalysisData.Video.Title,
+		Summary:            videoAnalysisData.Video.Summary,
+		VideoType:          videoAnalysisData.Video.VideoType,
 	}
     tx.Create(&videoObj)
 	analysisBlocks := []model.VideoAnalysis{}
@@ -104,7 +103,6 @@ func create(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} paging
 // @Router /videos [get]
 func list(w http.ResponseWriter, r *http.Request) {
-    fmt.Println("in the end...")
 	result := paging{}
 	result.Videos = make([]model.Video, 0)
 	offset, limit := paginationx.Parse(r.URL.Query())
@@ -203,10 +201,11 @@ func update(w http.ResponseWriter, r *http.Request) {
 		VideoType:      videoAnalysisData.Video.VideoType,
 	}).First(&videoObj)
 
+    var updatedOrCreatedVideoBlock []uint
 	for _, analysisBlock := range videoAnalysisData.Analysis {
-	    if (analysisBlock.id != uint(0)) {
+	    if (analysisBlock.Id != uint(0)) {
 	        analysisBlockObj := &model.VideoAnalysis{}
-	        analysisBlockObj.ID = uint(analysisBlock.id)
+	        analysisBlockObj.ID = uint(analysisBlock.Id)
             tx.Model(&analysisBlockObj).Updates(model.VideoAnalysis{
                 RatingValue     : analysisBlock.RatingValue,
                 Claim           : analysisBlock.Claim,
@@ -215,6 +214,7 @@ func update(w http.ResponseWriter, r *http.Request) {
                 EndTime         : analysisBlock.EndTime,
                 EndTimeFraction : analysisBlock.EndTimeFraction,
             }).First(&analysisBlockObj)
+            updatedOrCreatedVideoBlock = append(updatedOrCreatedVideoBlock, analysisBlockObj.ID)
 	    } else {
             analysisBlockObj := model.VideoAnalysis{}
             analysisBlockObj = model.VideoAnalysis{
@@ -234,9 +234,15 @@ func update(w http.ResponseWriter, r *http.Request) {
                 errorx.Render(w, errorx.Parser(errorx.DBError()))
                 return
             }
+            updatedOrCreatedVideoBlock = append(updatedOrCreatedVideoBlock, analysisBlockObj.ID)
         }
-
     }
+    // delete all the videoAnalysisBlocks which is neither updated/created.
+    if (len(updatedOrCreatedVideoBlock) > 0) {
+        analysisBlocks := []model.VideoAnalysis{}
+        tx.Model(&model.VideoAnalysis{}).Not(updatedOrCreatedVideoBlock).Where("video_id = ?", uint(id)).Delete(&analysisBlocks)
+    }
+
     tx.Commit()
 
     // Get all video analysisBlocks.
@@ -290,3 +296,16 @@ func delete(w http.ResponseWriter, r *http.Request) {
 	tx.Commit()
 	renderx.JSON(w, http.StatusOK, nil)
 }
+
+
+// func getUserAndOrganisation(r *http.Request) map[string]uint {
+//     userId, err := strconv.ParseUint(r.Header.Get("X-User-ID"))
+//     organisationId, err := strconv.ParseUint(r.Header.Get("X-Organisation-ID"))
+//
+// //     userId := r.Header.Get("X-User-ID")
+// //     organisationId := r.Header.Get("X-Organisation-ID")
+//     userAndOrgData := make(map[string]uint)
+//     userAndOrgData["user_id"] = userId
+//     userAndOrgData["organisation_id"] = organisationId
+//     return userAndOrgData
+// }

@@ -6,15 +6,15 @@ import (
 
 
 type video struct {
-    id          uint      `json:"id"`
-    Url         string    `json:"url" validate:"required"`
-    Title       string    `json:"title" validate:"required"`
-    Summary     string    `json:"summary"`
-    VideoType   string    `json:"video_type" validate:"required"`
+    Id                  uint      `json:"id"`
+    Url                 string    `json:"url" validate:"required"`
+    Title               string    `json:"title" validate:"required"`
+    Summary             string    `json:"summary"`
+    VideoType           string    `json:"video_type" validate:"required"`
 }
 
 type videoAnalysis struct {
-    id              uint    `json:"id"`
+    Id              uint    `json:"id"`
     RatingValue     int     `json:"rating_value" validate:"required"`
     Claim           string  `json:"claim"`
     Fact            string  `json:"fact"`
