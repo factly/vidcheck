@@ -3,13 +3,16 @@ package action
 import (
 	"net/http"
 
-    "github.com/factly/vidcheck/action/videoAnalysis"
-    "github.com/factly/vidcheck/action/video"
+	"github.com/factly/vidcheck/action/organisation"
+	"github.com/factly/vidcheck/action/videoAnalysis"
+
+	"github.com/factly/vidcheck/action/video"
+	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/loggerx"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
-// 	httpSwagger "github.com/swaggo/http-swagger"
+	// 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 // RegisterRoutes - register routes
@@ -34,7 +37,10 @@ func RegisterRoutes() http.Handler {
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 
-	r.Mount("/api/v1/analyse", videoAnalysis.Router())
-	r.Mount("/api/v1/video", video.Router())
+	r.With(util.CheckUser, util.CheckOrganisation).Group(func(r chi.Router) {
+		r.Mount("/api/v1/analyse", videoAnalysis.Router())
+		r.Mount("/api/v1/video", video.Router())
+		r.Mount("/api/v1/organisations", organisation.Router())
+	})
 	return r
 }

@@ -8,6 +8,7 @@ require (
 	github.com/go-chi/cors v1.1.1
 	github.com/jinzhu/gorm v1.9.16
 	github.com/joho/godotenv v1.3.0
+	github.com/spf13/viper v1.7.1
 	github.com/swaggo/http-swagger v0.0.0-20200308142732-58ac5e232fba
 	github.com/swaggo/swag v1.6.7
 	github.com/urfave/cli v1.22.2 // indirect
