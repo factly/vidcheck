@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import ReactPlayer from "react-player";
-import { useParams, useHistory } from "react-router-dom";
+import {useHistory, useParams} from "react-router-dom";
 import {
   FactCheckReviewWrapper,
   PageWrapper,
@@ -13,9 +13,9 @@ import {
   HorizontalTimelineBar,
   VerticalTimelineBar,
 } from "./components/AnalysisTimelineBar/AnalysisTimelineBar.components";
-import { Button } from "antd";
+import {Button} from "antd";
 
-import { useNetwork } from "../../../react-hooks/network/network";
+import {useNetwork} from "../../../react-hooks/network/network";
 import {
   createVideoAnalysisDetails,
   getAllVideoAnalysisDetails,
@@ -66,7 +66,7 @@ function CreateUpdateVideoAnalysis() {
   const [showSummaryForm, setShowSummaryForm] = useState(true);
 
   // Get edit video id.
-  let { id } = useParams();
+  let {id} = useParams();
 
   let history = useHistory();
 
@@ -88,14 +88,14 @@ function CreateUpdateVideoAnalysis() {
   const updateFormState = (data) => {
     setPlayed(data.endTimeFraction);
     player.current.seekTo(
-      convertTimeStringToSeconds(data.startTime),
-      "seconds"
+        convertTimeStringToSeconds(data.startTime),
+        "seconds"
     );
     setCurrentFormData(data);
   };
   const onDeleteFactCheckReview = (removeIndex) => {
     setfactCheckReview((factCheckReview) =>
-      recomputeAnalysisArray(factCheckReview, removeIndex)
+        recomputeAnalysisArray(factCheckReview, removeIndex)
     );
   };
 
@@ -137,9 +137,9 @@ function CreateUpdateVideoAnalysis() {
     const currentPlayedTime = player.current.getCurrentTime();
     const currentPlayed = currentPlayedTime / totalDuration;
     if (
-      loopDetails.loopEnabled &&
-      (currentPlayed < loopDetails.startFraction ||
-        currentPlayed > loopDetails.endFraction)
+        loopDetails.loopEnabled &&
+        (currentPlayed < loopDetails.startFraction ||
+            currentPlayed > loopDetails.endFraction)
     ) {
       player.current.seekTo(loopDetails.startFraction, "fraction");
       setPlaying(false);
@@ -149,7 +149,7 @@ function CreateUpdateVideoAnalysis() {
     for (index = 0; index < factCheckReview.length; ++index) {
       if (currentPlayed < factCheckReview[index].endTimeFraction) {
         currentFormStartTime =
-          index > 0 ? factCheckReview[index - 1].endTime : "00:00";
+            index > 0 ? factCheckReview[index - 1].endTime : "00:00";
         break;
       }
     }
@@ -158,7 +158,7 @@ function CreateUpdateVideoAnalysis() {
         currentFormStartTime = "00:00";
       } else {
         currentFormStartTime =
-          factCheckReview[factCheckReview.length - 1].endTime;
+            factCheckReview[factCheckReview.length - 1].endTime;
       }
     }
     setCurrentStartTime(currentFormStartTime);
@@ -167,7 +167,7 @@ function CreateUpdateVideoAnalysis() {
 
   const playOnLoop = () => {
     if (loopDetails.loopEnabled) {
-      setLoopDetails({ loopEnabled: false });
+      setLoopDetails({loopEnabled: false});
     } else {
       setLoopDetails({
         loopEnabled: true,
@@ -193,69 +193,73 @@ function CreateUpdateVideoAnalysis() {
   };
 
   return (
-    <ApiSuspense meta={networkData || networkCreateVideoAnalysisMeta}>
-      <PageWrapper>
-        <VideoInfoParentWrapper>
-          <ReactPlayer
-            url={videoUrl}
-            playing={playing}
-            controls={true}
-            ref={player}
-            volume={0}
-            onProgress={handleProgress}
-            onDuration={setTotalDuration}
-          />
-          <InfoDetails
-            videoUrl={videoUrl}
-            updateVideoUrl={updateVideoUrl}
-            played={played}
-            setPlaying={setPlaying}
-            playing={playing}
-            handleSeekChange={handleSeekChange}
-            totalDuration={totalDuration}
-          />
-        </VideoInfoParentWrapper>
-        {videoUrl ? (
-          <TimelineWrapper>
-            <HorizontalTimelineBar
-              factCheckReview={factCheckReview}
-              setCurrentFormData={updateFormState}
+      <ApiSuspense meta={networkData || networkCreateVideoAnalysisMeta}>
+        <PageWrapper>
+          <VideoInfoParentWrapper>
+            <ReactPlayer
+                url={videoUrl}
+                playing={playing}
+                controls={true}
+                ref={player}
+                volume={0}
+                onProgress={handleProgress}
+                onDuration={setTotalDuration}
             />
+            <InfoDetails
+                videoUrl={videoUrl}
+                updateVideoUrl={updateVideoUrl}
+                played={played}
+                setPlaying={setPlaying}
+                playing={playing}
+                handleSeekChange={handleSeekChange}
+                totalDuration={totalDuration}
+            />
+          </VideoInfoParentWrapper>
+          {videoUrl ? (
+              <TimelineWrapper>
+                <HorizontalTimelineBar
+                    factCheckReview={factCheckReview}
+                    setCurrentFormData={updateFormState}
+                />
 
-            <FactCheckReviewWrapper>
-              {summaryData ? <Summary data={summaryData} /> : null}
-              <Button onClick={() => setShowSummaryForm(!showSummaryForm)}>
-                {summaryData ? "Edit Summary" : "Add Summary"}
-              </Button>
-              <VerticalTimelineBar
-                factCheckReview={factCheckReview}
-                setCurrentFormData={updateFormState}
-                onDeleteFactCheckReview={onDeleteFactCheckReview}
-              />
-              <Button onClick={addNewAnalysis}>Add new Analysis</Button>
-              {showSummaryForm ? (
-                <SummaryForm
-                  data={summaryData}
-                  updateSummaryData={updateSummaryData}
-                />
-              ) : (
-                <AnalysisForm
-                  factCheckReview={factCheckReview}
-                  formData={currentFormdata}
-                  setfactCheckReview={setfactCheckReview}
-                  totalDuration={totalDuration}
-                  currentStartTime={currentStartTime}
-                  player={player}
-                />
-              )}
-            </FactCheckReviewWrapper>
-            <Button type="primary" onClick={submitFactcheck}>
-              Submit Fact Check
-            </Button>
-          </TimelineWrapper>
-        ) : null}
-      </PageWrapper>
-    </ApiSuspense>
+                <FactCheckReviewWrapper>
+                  {
+                    showSummaryForm ? null :
+                        <React.Fragment>
+                          <Summary data={summaryData}/>
+                          <Button onClick={() => setShowSummaryForm(!showSummaryForm)}>
+                            Edit Summary
+                          </Button>
+                          <VerticalTimelineBar factCheckReview={factCheckReview}
+                                               setCurrentFormData={updateFormState}
+                                               onDeleteFactCheckReview={onDeleteFactCheckReview}/>
+                          <Button onClick={addNewAnalysis}>Add new Analysis</Button>
+                        </React.Fragment>
+                  }
+                  {
+                    showSummaryForm ? (
+                        <SummaryForm
+                            data={summaryData}
+                            updateSummaryData={updateSummaryData}
+                        />
+                    ) : (
+                        <AnalysisForm
+                            factCheckReview={factCheckReview}
+                            formData={currentFormdata}
+                            setfactCheckReview={setfactCheckReview}
+                            totalDuration={totalDuration}
+                            currentStartTime={currentStartTime}
+                            player={player}
+                        />
+                    )}
+                </FactCheckReviewWrapper>
+                <Button type="primary" onClick={submitFactcheck}>
+                  Submit Fact Check
+                </Button>
+              </TimelineWrapper>
+          ) : null}
+        </PageWrapper>
+      </ApiSuspense>
   );
 }
 
