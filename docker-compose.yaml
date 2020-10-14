@@ -14,13 +14,35 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_MULTIPLE_DATABASES=kratos,kavach,vidcheck
+      - POSTGRES_MULTIPLE_DATABASES=kratos,keto,kavach,vidcheck
     networks:
       - intranet
 
   ###########################################################################
   #######               KRATOS AND OATHKEEPER                         #######
   ###########################################################################
+  keto-migrate:
+    image: oryd/keto:latest
+    environment:
+      - LOG_LEVEL=debug
+    depends_on:
+      - postgres
+    command: migrate sql postgres://postgres:postgres@postgres:5432/keto?sslmode=disable
+    restart: on-failure
+    networks:
+      - intranet
+
+  keto:
+    image: oryd/keto:latest
+    ports:
+      - "4466:4466"
+    depends_on:
+      - keto-migrate
+    environment:
+      - DSN=postgres://postgres:postgres@postgres:5432/keto?sslmode=disable
+    networks:
+      - intranet
+      
   kratos-migrate:
     depends_on:
       - postgres
@@ -90,8 +112,7 @@ services:
       context: ./kavach/kavach-server
       dockerfile: Dockerfile
     environment:
-      - KETO=http://keto:4466
-      - DSN=postgres://postgres:postgres@postgres:5432/kavach?sslmode=disable
+      - CONFIG_FILE=kavach-server.yml
       - WAIT_HOSTS=postgres:5432
     volumes:
       - type: bind
@@ -128,6 +149,7 @@ services:
       context: ./server
       dockerfile: Dockerfile
     environment:
+      - CONFIG_FILE=vid-check-server.yml
       - WAIT_HOSTS=postgres:5432
     restart: always
     volumes:
@@ -135,16 +157,16 @@ services:
     networks:
       - intranet
 
-  db:
-    image: postgres:12.0-alpine
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    ports:
-      - 5432:5432
-    environment:
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=example
-      - POSTGRES_DB=vidcheck
+#  db:
+#    image: postgres:12.0-alpine
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data/
+#    ports:
+#      - 5432:5432
+#    environment:
+#      - POSTGRES_USER=root
+#      - POSTGRES_PASSWORD=example
+#      - POSTGRES_DB=vidcheck
 
   vid-check-web:
     build:
@@ -162,8 +184,5 @@ services:
     networks:
       - intranet
 
-volumes:
-  postgres_data:
-      
 networks:
   intranet:

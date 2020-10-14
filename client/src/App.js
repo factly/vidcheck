@@ -9,7 +9,7 @@ import routes from "./App/Router";
 function App() {
   return (
     <div className="App">
-      <Router>
+      <Router basename={process.env.PUBLIC_URL}>
         <Switch>
           {routes.map((route) => (
               <Route

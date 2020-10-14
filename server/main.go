@@ -7,7 +7,9 @@ import (
 	"os"
 
 	"github.com/factly/vidcheck/action"
+	"github.com/factly/vidcheck/config"
 	"github.com/factly/vidcheck/model"
+	"github.com/spf13/viper"
 )
 
 func main() {
@@ -16,9 +18,11 @@ func main() {
 		port = "8080"
 	}
 	port = ":" + port
+
+	config.SetupVars()
+
 	// db setup
-	dsn := "postgres://postgres:postgres@postgres:5432/vidcheck?sslmode=disable"
-	model.SetupDB(dsn)
+	model.SetupDB(viper.GetString("postgres.dsn"))
 	fmt.Println("DB Migration Done...")
 
 	// register routes

@@ -1,7 +1,14 @@
 package model
 
-// Base with id, created_at, updated_at & deleted_at
+type organisationUser struct {
+	Base
+	Role string `json:"role"`
+}
+
+// Organisation model
 type Organisation struct {
 	Base
-	Name  string    `gorm:"column:organisation" json:"organisation", unique, index"`
+	Title      string           `json:"title"`
+	Slug       string           `json:"slug"`
+	Permission organisationUser `json:"permission"`
 }
