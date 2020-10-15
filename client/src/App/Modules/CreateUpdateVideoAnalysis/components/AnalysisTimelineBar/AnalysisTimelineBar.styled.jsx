@@ -7,8 +7,6 @@ export const VideoAnalysisTimelineBarWrapper = styled.div`
 
 export const VideoLengthBar = styled.div`
   width: 65%;
-  height: 30px;
-  background-color: #b3b3b3;
   color: white;
   text-align: center;
   display: flex;
@@ -19,6 +17,10 @@ export const VideoLengthPart = styled.div`
   height: 100%;
   background-color: ${(props) => props.backgroundColor};
   float: left;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  justify-content: center;
 `;
 
 export const FactCheckReviewListWrapper = styled.div`

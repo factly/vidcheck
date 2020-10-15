@@ -42,7 +42,7 @@ services:
       - DSN=postgres://postgres:postgres@postgres:5432/keto?sslmode=disable
     networks:
       - intranet
-      
+
   kratos-migrate:
     depends_on:
       - postgres
@@ -156,17 +156,6 @@ services:
       - ./server:/app
     networks:
       - intranet
-
-#  db:
-#    image: postgres:12.0-alpine
-#    volumes:
-#      - postgres_data:/var/lib/postgresql/data/
-#    ports:
-#      - 5432:5432
-#    environment:
-#      - POSTGRES_USER=root
-#      - POSTGRES_PASSWORD=example
-#      - POSTGRES_DB=vidcheck
 
   vid-check-web:
     build:

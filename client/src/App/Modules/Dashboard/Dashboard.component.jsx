@@ -8,6 +8,7 @@ import {
 import { transformVideoAnalysisInfo } from "./Dashboard.utilities";
 import ApiSuspense from "../../Common/UIComponents/ApiSuspense.component";
 import { Button } from "antd";
+import VideoAnalysisCard from "./components/VideoAnalysisCard.component";
 
 function Dashboard() {
   const {
@@ -23,15 +24,8 @@ function Dashboard() {
     network: networkMetaDelete,
     call: calldeleteAllVideosAnalysed,
   } = useNetwork(deleteAllVideosAnalysed, {
-    auto: true,
     transformer: transformVideoAnalysisInfo,
   });
-
-  const history = useHistory();
-
-  const gotoVideoAnalysisDetails = (id) => {
-    history.push(`edit/${id}`);
-  };
 
   const deleteVideoAnalysis = async (id) => {
     const [resp, meta] = await calldeleteAllVideosAnalysed(id);
@@ -40,21 +34,13 @@ function Dashboard() {
     }
   };
 
+  const history = useHistory();
+
   return (
     <ApiSuspense meta={networkMeta}>
       {allVideoAnalysisDetails.map((videoAnalysis) => {
         return (
-          <>
-            <div>{videoAnalysis.url}</div>
-            <div>{videoAnalysis.title}</div>
-            <div>{videoAnalysis.summary}</div>
-            <button onClick={() => gotoVideoAnalysisDetails(videoAnalysis.id)}>
-              {videoAnalysis.id}
-            </button>
-            <button onClick={() => deleteVideoAnalysis(videoAnalysis.id)}>
-              Delete
-            </button>
-          </>
+            <VideoAnalysisCard videoAnalysisData={videoAnalysis} deleteFunc={deleteVideoAnalysis}/>
         );
       })}
       <Button onClick={() => history.push(`create`)}>New Video Analysis</Button>

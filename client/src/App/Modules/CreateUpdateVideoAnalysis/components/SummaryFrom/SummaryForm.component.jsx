@@ -12,20 +12,29 @@ function SummaryForm({ data, updateSummaryData }) {
   const onUpdateSummaryFormData = (data) => {
     updateSummaryData(data);
   };
+    const layout = {
+        labelCol: { span: 8 },
+        wrapperCol: { span: 16 },
+    };
+    const tailLayout = {
+        wrapperCol: { offset: 8, span: 16 },
+    };
   return (
-    <Form form={form} name="control-hooks" onFinish={onUpdateSummaryFormData}>
-      <Form.Item name="title" label="Title" rules={[{ required: true }]}>
-        <Input.TextArea />
-      </Form.Item>
-      <Form.Item name="summary" label="Summary" rules={[{ required: true }]}>
-        <Input.TextArea />
-      </Form.Item>
-      <Form.Item>
-        <Button type="primary" htmlType="submit">
-          Save
-        </Button>
-      </Form.Item>
-    </Form>
+    <div style={{width: '80%'}}>
+        <Form {...layout} form={form} name="control-hooks" onFinish={onUpdateSummaryFormData}>
+            <Form.Item name="title" label="Title" rules={[{ required: true }]}>
+                <Input />
+            </Form.Item>
+            <Form.Item name="summary" label="Summary" rules={[{ required: true }]}>
+                <Input.TextArea />
+            </Form.Item>
+            <Form.Item {...tailLayout}>
+                <Button type="primary" htmlType="submit">
+                    Save
+                </Button>
+            </Form.Item>
+        </Form>
+    </div>
   );
 }
 

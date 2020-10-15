@@ -18,6 +18,7 @@ export function get(url, params = {}, overwriteBaseUrl = false) {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
+            "X-Organisation": 1
         },
     }).then((response) => {
         if (!response.ok) {
@@ -48,6 +49,7 @@ export function post(url, body, params = {}, overwriteBaseUrl = false) {
         body: JSON.stringify(body),
         headers: {
             "Content-Type": "application/json",
+            "X-Organisation": 1
         },
     }).then((response) => response.json());
 }
@@ -73,6 +75,7 @@ export function put(url, body, params = {}, overwriteBaseUrl = false) {
         body: JSON.stringify(body),
         headers: {
             "Content-Type": "application/json",
+            "X-Organisation": 1
         },
     }).then((response) => response.json());
 }
@@ -97,6 +100,7 @@ export function deleteAPI(url, params = {}, overwriteBaseUrl = false) {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",
+            "X-Organisation": 1
         },
     }).then((response) => response.json());
 }

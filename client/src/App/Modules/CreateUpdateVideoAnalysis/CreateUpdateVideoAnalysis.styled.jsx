@@ -16,9 +16,10 @@ export const VideoInfoParentWrapper = styled.div`
 
 export const FactCheckReviewWrapper = styled.div`
   padding: 20px;
+  width: 1200px;
+  margin: 0 auto;
   display: flex;
-  align-content: space-around;
-  justify-content: center;
+  justify-content: space-between;
 `;
 
 export const TimelineWrapper = styled.div``;
