@@ -42,7 +42,7 @@ services:
       - DSN=postgres://postgres:postgres@postgres:5432/keto?sslmode=disable
     networks:
       - intranet
-      
+
   kratos-migrate:
     depends_on:
       - postgres
