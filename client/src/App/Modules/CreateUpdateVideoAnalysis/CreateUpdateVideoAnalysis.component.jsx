@@ -217,19 +217,6 @@ function CreateUpdateVideoAnalysis() {
           </VideoInfoParentWrapper>
           {videoUrl ? (
               <TimelineWrapper>
-                {
-                  showSummaryForm ? null :
-                      <React.Fragment>
-                        <div style={{padding: '0 18%'}}>
-                          <Summary data={summaryData}/>
-                          <div style={{padding: '20px 0'}}>
-                            <Button type="link" onClick={() => setShowSummaryForm(!showSummaryForm)}>
-                              Edit Summary
-                            </Button>
-                          </div>
-                        </div>
-                      </React.Fragment>
-                }
                 <HorizontalTimelineBar
                     factCheckReview={factCheckReview}
                     setCurrentFormData={updateFormState}
@@ -273,6 +260,19 @@ function CreateUpdateVideoAnalysis() {
                 </FactCheckReviewWrapper>
               </TimelineWrapper>
           ) : null}
+          {
+            showSummaryForm ? null :
+                <React.Fragment>
+                  <div style={{padding: '0 18%'}}>
+                    <Summary data={summaryData}/>
+                    <div>
+                      <Button type="link" onClick={() => setShowSummaryForm(!showSummaryForm)}>
+                        Edit Summary
+                      </Button>
+                    </div>
+                  </div>
+                </React.Fragment>
+          }
           <div style={{display: 'flex', 'justify-content':'center'}}>
             <Button type="primary" onClick={submitFactcheck}>
               Submit Fact Check
