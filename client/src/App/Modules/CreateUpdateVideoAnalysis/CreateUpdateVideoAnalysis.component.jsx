@@ -224,22 +224,6 @@ function CreateUpdateVideoAnalysis() {
 
                 <FactCheckReviewWrapper>
                   {
-                    showSummaryForm ? null :
-                        <div style={{width: '60%'}}>
-                          <div style={{display: 'flex',
-                            'justify-content': 'flex-end',
-                            'padding': '0 20px'}}>
-                            <Button type="primary" onClick={addNewAnalysis}>Add new Analysis</Button>
-                          </div>
-                          <div>
-                          <VerticalTimelineBar factCheckReview={factCheckReview}
-                                               setCurrentFormData={updateFormState}
-                                               onDeleteFactCheckReview={onDeleteFactCheckReview}/>
-                          </div>
-                        </div>
-
-                  }
-                  {
                     showSummaryForm ? (
                         <SummaryForm
                             data={summaryData}
@@ -257,6 +241,23 @@ function CreateUpdateVideoAnalysis() {
                           />
                         </div>
                     )}
+                  {
+                    showSummaryForm ? null :
+                        <div style={{width: '60%'}}>
+                          <div style={{display: 'flex',
+                            'justify-content': 'flex-end',
+                            'padding': '0 20px'}}>
+                            <Button type="primary" onClick={addNewAnalysis}>Add new Analysis</Button>
+                          </div>
+                          <div>
+                            <VerticalTimelineBar factCheckReview={factCheckReview}
+                                                 setCurrentFormData={updateFormState}
+                                                 onDeleteFactCheckReview={onDeleteFactCheckReview}/>
+                          </div>
+                        </div>
+
+                  }
+
                 </FactCheckReviewWrapper>
               </TimelineWrapper>
           ) : null}
