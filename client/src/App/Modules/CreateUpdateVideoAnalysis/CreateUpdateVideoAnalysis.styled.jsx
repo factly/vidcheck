@@ -18,7 +18,7 @@ export const FactCheckReviewWrapper = styled.div`
   padding: 20px;
   display: flex;
   align-content: space-around;
-  justify-content: center;
+  justify-content: start;
 `;
 
 export const TimelineWrapper = styled.div``;
