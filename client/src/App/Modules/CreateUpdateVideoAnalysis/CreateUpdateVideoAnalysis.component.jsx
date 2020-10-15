@@ -217,6 +217,19 @@ function CreateUpdateVideoAnalysis() {
           </VideoInfoParentWrapper>
           {videoUrl ? (
               <TimelineWrapper>
+                {
+                  showSummaryForm ? null :
+                      <React.Fragment>
+                        <div style={{padding: '0 18%'}}>
+                          <Summary data={summaryData}/>
+                          <div style={{padding: '20px 0'}}>
+                            <Button type="link" onClick={() => setShowSummaryForm(!showSummaryForm)}>
+                              Edit Summary
+                            </Button>
+                          </div>
+                        </div>
+                      </React.Fragment>
+                }
                 <HorizontalTimelineBar
                     factCheckReview={factCheckReview}
                     setCurrentFormData={updateFormState}
@@ -225,16 +238,19 @@ function CreateUpdateVideoAnalysis() {
                 <FactCheckReviewWrapper>
                   {
                     showSummaryForm ? null :
-                        <React.Fragment>
-                          <Summary data={summaryData}/>
-                          <Button onClick={() => setShowSummaryForm(!showSummaryForm)}>
-                            Edit Summary
-                          </Button>
+                        <div style={{width: '60%'}}>
+                          <div style={{display: 'flex',
+                            'justify-content': 'flex-end',
+                            'padding': '0 20px'}}>
+                            <Button type="primary" onClick={addNewAnalysis}>Add new Analysis</Button>
+                          </div>
+                          <div>
                           <VerticalTimelineBar factCheckReview={factCheckReview}
                                                setCurrentFormData={updateFormState}
                                                onDeleteFactCheckReview={onDeleteFactCheckReview}/>
-                          <Button onClick={addNewAnalysis}>Add new Analysis</Button>
-                        </React.Fragment>
+                          </div>
+                        </div>
+
                   }
                   {
                     showSummaryForm ? (
@@ -243,21 +259,25 @@ function CreateUpdateVideoAnalysis() {
                             updateSummaryData={updateSummaryData}
                         />
                     ) : (
-                        <AnalysisForm
-                            factCheckReview={factCheckReview}
-                            formData={currentFormdata}
-                            setfactCheckReview={setfactCheckReview}
-                            totalDuration={totalDuration}
-                            currentStartTime={currentStartTime}
-                            player={player}
-                        />
+                        <div style={{width: '40%'}}>
+                          <AnalysisForm
+                              factCheckReview={factCheckReview}
+                              formData={currentFormdata}
+                              setfactCheckReview={setfactCheckReview}
+                              totalDuration={totalDuration}
+                              currentStartTime={currentStartTime}
+                              player={player}
+                          />
+                        </div>
                     )}
                 </FactCheckReviewWrapper>
-                <Button type="primary" onClick={submitFactcheck}>
-                  Submit Fact Check
-                </Button>
               </TimelineWrapper>
           ) : null}
+          <div style={{display: 'flex', 'justify-content':'center'}}>
+            <Button type="primary" onClick={submitFactcheck}>
+              Submit Fact Check
+            </Button>
+          </div>
         </PageWrapper>
       </ApiSuspense>
   );
