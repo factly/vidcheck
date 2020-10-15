@@ -16,27 +16,37 @@ export function transformVideoAnalysisInfo(resp) {
           {
             id: 1,
             widthPercentage: 20,
-            rating: 'False'
+            rating: 'False',
+            startTime: '00:00',
+            endTime: '00:20'
           },
           {
             id: 2,
             widthPercentage: 20,
-            rating: 'Partial False'
+            rating: 'Partial False',
+            startTime: '00:20',
+            endTime: '00:40'
           },
           {
             id: 3,
             widthPercentage: 20,
-            rating: 'False'
+            rating: 'False',
+            startTime: '00:40',
+            endTime: '01:00'
           },
           {
             id: 4,
             widthPercentage: 20,
-            rating: 'True'
+            rating: 'True',
+            startTime: '01:00',
+            endTime: '01:20'
           },
           {
             id: 5,
             widthPercentage: 20,
-            rating: 'Neutral'
+            rating: 'Neutral',
+            startTime: '01:20',
+            endTime: '01:40'
           }
         ]
       }

@@ -1,6 +1,11 @@
 import React from "react";
+import { Tooltip, Button } from "antd";
 import PropTypes from "prop-types";
 import { useHistory } from "react-router-dom";
+import {
+    VideoAnalysisTimelineBarWrapper,
+    VideoLengthBar, VideoLengthPart
+} from "../../CreateUpdateVideoAnalysis/components/AnalysisTimelineBar/AnalysisTimelineBar.styled";
 
 function VideoAnalysisCard({videoAnalysisData, deleteFunc}) {
     const history = useHistory();
@@ -14,12 +19,15 @@ function VideoAnalysisCard({videoAnalysisData, deleteFunc}) {
             <div>{videoAnalysisData.url}</div>
             <div>{videoAnalysisData.title}</div>
             <div>{videoAnalysisData.summary}</div>
-            <button onClick={() => gotoVideoAnalysisDetails(videoAnalysisData.id)}>
+            <div>Total Claims : {videoAnalysisData.details.totalClaims}</div>
+            <div>Total Time : {videoAnalysisData.details.totalTime} min</div>
+            <HorizontalTimelineBar factCheckReview={videoAnalysisData.details.claimsData}/>
+            <Button onClick={() => gotoVideoAnalysisDetails(videoAnalysisData.id)}>
                 {videoAnalysisData.id}
-            </button>
-            <button onClick={() => deleteFunc(videoAnalysisData.id)}>
+            </Button>
+            <Button onClick={() => deleteFunc(videoAnalysisData.id)}>
                 Delete
-            </button>
+            </Button>
         </React.Fragment>
     )
 }
@@ -30,3 +38,31 @@ VideoAnalysisCard.protoTypes = {
 };
 
 export default VideoAnalysisCard;
+
+
+function HorizontalTimelineBar({ factCheckReview }) {
+    const ratingColor = {
+        True: "#19b346",
+        "Partial True": "#8bb38d",
+        Neutral: "#b3b3b3",
+        "Partial False": "#b36d7e",
+        False: "#b30a25",
+    };
+
+    return (
+        <VideoAnalysisTimelineBarWrapper>
+            <VideoLengthBar>
+                {factCheckReview.map((review, index) => (
+                    <Tooltip title={review.startTime + '-' +review.endTime} key={index}>
+                        <VideoLengthPart
+                            width={`${review.widthPercentage}%`}
+                            backgroundColor={ratingColor[review.rating]}
+                        >
+                            <p>{review.rating}</p>
+                        </VideoLengthPart>
+                    </Tooltip>
+                ))}
+            </VideoLengthBar>
+        </VideoAnalysisTimelineBarWrapper>
+    );
+}

@@ -22,7 +22,7 @@ function HorizontalTimelineBar({ factCheckReview, setCurrentFormData }) {
     <VideoAnalysisTimelineBarWrapper>
       <VideoLengthBar>
         {factCheckReview.map((review, index) => (
-          <Tooltip title={review.endTime} key={index}>
+          <Tooltip title={review.startTime + '-' + review.endTime} key={index}>
             <VideoLengthPart
               width={`${review.widthPercentage}%`}
               backgroundColor={ratingColor[review.rating]}
