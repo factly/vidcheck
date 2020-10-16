@@ -26,7 +26,7 @@ type paging struct {
 // @Param limit query string false "limit per page"
 // @Param page query string false "page number"
 // @Success 200 {array} model.Organisation
-// @Router /organisations [get]
+// @Router /api/v1/organisations [get]
 func list(w http.ResponseWriter, r *http.Request) {
 
 	orgs, err := util.RequestOrganisation(r)

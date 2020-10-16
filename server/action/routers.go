@@ -1,10 +1,12 @@
 package action
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/factly/vidcheck/action/organisation"
-	"github.com/factly/vidcheck/action/videoAnalysis"
+	"github.com/factly/vidcheck/action/videoanalysis"
+	"github.com/spf13/viper"
 
 	"github.com/factly/vidcheck/action/video"
 	"github.com/factly/vidcheck/util"
@@ -12,7 +14,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
-	// 	httpSwagger "github.com/swaggo/http-swagger"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 // RegisterRoutes - register routes
@@ -37,8 +39,13 @@ func RegisterRoutes() http.Handler {
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 
+	if viper.IsSet("mode") && viper.GetString("mode") == "development" {
+		r.Get("/swagger/*", httpSwagger.WrapHandler)
+		fmt.Println("swagger-ui http://localhost:8080/swagger/index.html")
+	}
+
 	r.With(util.CheckUser, util.CheckOrganisation).Group(func(r chi.Router) {
-		r.Mount("/api/v1/analyse", videoAnalysis.Router())
+		r.Mount("/api/v1/analyse", videoanalysis.Router())
 		r.Mount("/api/v1/video", video.Router())
 		r.Mount("/api/v1/organisations", organisation.Router())
 	})
