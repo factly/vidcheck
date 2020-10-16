@@ -1,0 +1,612 @@
+basePath: /
+definitions:
+  model.Organisation:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      permission:
+        $ref: '#/definitions/model.organisationUser'
+        type: object
+      slug:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  model.Video:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      organisationID:
+        type: integer
+      summary:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+      url:
+        type: string
+      userID:
+        type: integer
+      videoType:
+        type: string
+    type: object
+  model.VideoAnalysis:
+    properties:
+      claim:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      endTime:
+        type: integer
+      endTimeFraction:
+        type: number
+      fact:
+        type: string
+      id:
+        type: integer
+      ratingValue:
+        type: integer
+      startTime:
+        type: integer
+      updated_at:
+        type: string
+      video:
+        $ref: '#/definitions/model.Video'
+        type: object
+      videoID:
+        type: integer
+    type: object
+  model.organisationUser:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      role:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  video.paging:
+    properties:
+      total:
+        type: integer
+      videos:
+        items:
+          $ref: '#/definitions/model.Video'
+        type: array
+    type: object
+  video.video:
+    properties:
+      id:
+        type: integer
+      summary:
+        type: string
+      title:
+        type: string
+      url:
+        type: string
+      video_type:
+        type: string
+    required:
+    - title
+    - url
+    - video_type
+    type: object
+  video.videoAnalysis:
+    properties:
+      claim:
+        type: string
+      end_time:
+        type: integer
+      end_time_fraction:
+        type: number
+      fact:
+        type: string
+      id:
+        type: integer
+      rating_value:
+        type: integer
+      start_time:
+        type: integer
+    required:
+    - end_time
+    - end_time_fraction
+    - rating_value
+    type: object
+  video.videoAnalysisApiData:
+    properties:
+      analysis:
+        items:
+          $ref: '#/definitions/video.videoAnalysis'
+        type: array
+      video:
+        $ref: '#/definitions/video.video'
+        type: object
+    required:
+    - analysis
+    - video
+    type: object
+  videoanalysis.paging:
+    properties:
+      nodes:
+        items:
+          $ref: '#/definitions/model.VideoAnalysis'
+        type: array
+      total:
+        type: integer
+    type: object
+  videoanalysis.video:
+    properties:
+      summary:
+        type: string
+      title:
+        type: string
+      url:
+        type: string
+      video_type:
+        type: string
+    required:
+    - title
+    - url
+    - video_type
+    type: object
+  videoanalysis.videoAnalysis:
+    properties:
+      claim:
+        type: string
+      end_time:
+        type: integer
+      end_time_fraction:
+        type: number
+      fact:
+        type: string
+      rating_value:
+        type: integer
+      start_time:
+        type: integer
+    required:
+    - end_time
+    - end_time_fraction
+    - rating_value
+    type: object
+  videoanalysis.videoAnalysisApiData:
+    properties:
+      analysis:
+        items:
+          $ref: '#/definitions/videoanalysis.videoAnalysis'
+        type: array
+      video:
+        $ref: '#/definitions/videoanalysis.video'
+        type: object
+    required:
+    - analysis
+    - video
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: VidCheck server API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: VidCheck API
+  version: "1.0"
+paths:
+  /api/v1/analyse:
+    get:
+      description: Show all video analysis
+      operationId: get-all-video-analysis
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Organisation ID
+        in: header
+        name: X-Organisation
+        required: true
+        type: string
+      - description: limt per page
+        in: query
+        name: limit
+        type: string
+      - description: page number
+        in: query
+        name: page
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/videoanalysis.paging'
+      summary: Show all video analysis
+      tags:
+      - VideoAnalysis
+    post:
+      description: Create videoAnalysis
+      operationId: add-video-analysis
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Organisation ID
+        in: header
+        name: X-Organisation
+        required: true
+        type: string
+      - description: Video Analysis Api Data
+        in: body
+        name: Data
+        required: true
+        schema:
+          $ref: '#/definitions/videoanalysis.videoAnalysisApiData'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Video'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Create videoAnalysis
+      tags:
+      - VideoAnalysis
+  /api/v1/analyse/video/{video_id}/analysis/{video_analysis_id}:
+    delete:
+      description: Delete videoAnalysis by id
+      operationId: delete-video-analysis-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Organisation ID
+        in: header
+        name: X-Organisation
+        required: true
+        type: string
+      - description: Video ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Video Analysis ID
+        in: path
+        name: video_analysis_id
+        required: true
+        type: string
+      responses:
+        "200": {}
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Delete a videoAnalysis by id
+      tags:
+      - VideoAnalysis
+    get:
+      description: Get videosAnalysis by ID
+      operationId: get-video-analysis-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Organisation ID
+        in: header
+        name: X-Organisation
+        required: true
+        type: string
+      - description: Video ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Video Analysis ID
+        in: path
+        name: video_analysis_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.VideoAnalysis'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Show a videosAnalysis by id
+      tags:
+      - VideoAnalysis
+    put:
+      description: Update videosAnalysis by ID
+      operationId: update-video-analysis-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Organisation ID
+        in: header
+        name: X-Organisation
+        required: true
+        type: string
+      - description: Video ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Video Analysis ID
+        in: path
+        name: video_analysis_id
+        required: true
+        type: string
+      - description: Video Analysis Data
+        in: body
+        name: Data
+        required: true
+        schema:
+          $ref: '#/definitions/videoanalysis.videoAnalysis'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.VideoAnalysis'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Update a videosAnalysis by id
+      tags:
+      - VideoAnalysis
+  /api/v1/organisations:
+    get:
+      description: Get all organisations
+      operationId: get-all-organisations
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Organisation ID
+        in: header
+        name: X-Organisation
+        required: true
+        type: string
+      - description: limit per page
+        in: query
+        name: limit
+        type: string
+      - description: page number
+        in: query
+        name: page
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Organisation'
+            type: array
+      summary: Show all organisations
+      tags:
+      - Organisation
+  /api/v1/video:
+    get:
+      description: Get all videos
+      operationId: get-all-videos
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Organisation ID
+        in: header
+        name: X-Organisation
+        required: true
+        type: string
+      - description: limt per page
+        in: query
+        name: limit
+        type: string
+      - description: page number
+        in: query
+        name: page
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/video.paging'
+      summary: Show all videos
+      tags:
+      - Videos
+    post:
+      description: Create video
+      operationId: add-video
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Organisation ID
+        in: header
+        name: X-Organisation
+        required: true
+        type: string
+      - description: Video Analysis Api Data
+        in: body
+        name: Data
+        required: true
+        schema:
+          $ref: '#/definitions/video.videoAnalysisApiData'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Video'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Create video
+      tags:
+      - Videos
+  /api/v1/video/{video_id}:
+    delete:
+      description: Delete video by ID
+      operationId: delete-video-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Organisation ID
+        in: header
+        name: X-Organisation
+        required: true
+        type: string
+      - description: Video ID
+        in: path
+        name: video_id
+        required: true
+        type: string
+      responses:
+        "200": {}
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Delete a video
+      tags:
+      - Videos
+    get:
+      description: Get video by ID
+      operationId: get-video by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Organisation ID
+        in: header
+        name: X-Organisation
+        required: true
+        type: string
+      - description: Video ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Video'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Show a video by id
+      tags:
+      - Videos
+    put:
+      description: Update video by ID
+      operationId: update-video-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Organisation ID
+        in: header
+        name: X-Organisation
+        required: true
+        type: string
+      - description: Video ID
+        in: path
+        name: video_id
+        required: true
+        type: string
+      - description: Video Analysis Api Data
+        in: body
+        name: Data
+        required: true
+        schema:
+          $ref: '#/definitions/video.videoAnalysisApiData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Video'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Update a video by id
+      tags:
+      - Videos
+swagger: "2.0"
