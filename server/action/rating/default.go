@@ -55,14 +55,11 @@ func createDefaults(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tx := model.DB.Begin()
-
 	for i := range ratings {
 		ratings[i].SpaceID = uint(sID)
-		tx.Model(&model.Rating{}).Create(&ratings[i])
 	}
 
-	tx.Commit()
+	model.DB.Model(&model.Rating{}).Create(&ratings)
 
 	renderx.JSON(w, http.StatusCreated, ratings)
 }
