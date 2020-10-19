@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/factly/vidcheck/model"
+	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/renderx"
@@ -27,12 +28,12 @@ import (
 // @Success 200 {object} model.Space
 // @Router /spaces/{space_id} [put]
 func update(w http.ResponseWriter, r *http.Request) {
-	// uID, err := util.GetUser(r.Context())
-	// if err != nil {
-	// 	loggerx.Error(err)
-	// 	errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-	// 	return
-	// }
+	uID, err := util.GetUser(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
 
 	spaceID := chi.URLParam(r, "space_id")
 	id, err := strconv.Atoi(spaceID)
@@ -62,6 +63,15 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if space.OrganisationID == 0 {
+		return
+	}
+
+	// Check if the user is owner of organisation
+	if isOwner(uID, space.OrganisationID) != nil {
+		errorx.Render(w, errorx.Parser(errorx.Message{
+			Code:    http.StatusUnauthorized,
+			Message: "operation not allowed for member",
+		}))
 		return
 	}
 

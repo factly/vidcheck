@@ -45,34 +45,10 @@ func my(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Fetched all organisations of the user
-	req, err := http.NewRequest("GET", viper.GetString("kavach.url")+"/organisations/my", nil)
+	allOrg, err := getMyOrganisations(uID)
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-		return
-	}
-	req.Header.Set("X-User", strconv.Itoa(uID))
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-
-	if err != nil {
-		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.NetworkError()))
-		return
-	}
-
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
-
-	allOrg := []orgWithSpace{}
-	err = json.Unmarshal(body, &allOrg)
-
-	if err != nil {
-		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.DecodeError()))
 		return
 	}
 
@@ -88,4 +64,33 @@ func my(w http.ResponseWriter, r *http.Request) {
 	model.DB.Model(model.Space{}).Where("organisation_id IN (?)", allOrgIDs).Find(&allSpaces)
 
 	renderx.JSON(w, http.StatusOK, allSpaces)
+}
+
+func getMyOrganisations(uID int) ([]orgWithSpace, error) {
+	// Fetched all organisations of the user
+	req, err := http.NewRequest("GET", viper.GetString("kavach.url")+"/organisations/my", nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("X-User", strconv.Itoa(uID))
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	allOrg := []orgWithSpace{}
+	err = json.Unmarshal(body, &allOrg)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return allOrg, nil
 }

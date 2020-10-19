@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/factly/vidcheck/model"
+	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/renderx"
@@ -24,16 +25,16 @@ import (
 // @Success 201 {object} model.Space
 // @Router /spaces [post]
 func create(w http.ResponseWriter, r *http.Request) {
-	// uID, err := util.GetUser(r.Context())
-	// if err != nil {
-	// 	loggerx.Error(err)
-	// 	errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-	// 	return
-	// }
+	uID, err := util.GetUser(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
 
 	space := &space{}
 
-	err := json.NewDecoder(r.Body).Decode(&space)
+	err = json.NewDecoder(r.Body).Decode(&space)
 
 	if err != nil {
 		loggerx.Error(err)
@@ -53,15 +54,14 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// err = util.CheckSpaceKetoPermission("create", uint(space.OrganisationID), uint(uID))
-	// if err != nil {
-	// 	loggerx.Error(err)
-	// 	errorx.Render(w, errorx.Parser(errorx.Message{
-	// 		Code:    http.StatusUnauthorized,
-	// 		Message: err.Error(),
-	// 	}))
-	// 	return
-	// }
+	// Check if the user is owner of organisation
+	if isOwner(uID, space.OrganisationID) != nil {
+		errorx.Render(w, errorx.Parser(errorx.Message{
+			Code:    http.StatusUnauthorized,
+			Message: "operation not allowed for member",
+		}))
+		return
+	}
 
 	result := model.Space{
 		Name:              space.Name,
@@ -84,4 +84,19 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	renderx.JSON(w, http.StatusCreated, result)
+}
+
+func isOwner(uID, oID int) error {
+	// Check if the user is owner of organisation
+	allOrg, err := getMyOrganisations(uID)
+	if err != nil {
+		return err
+	}
+
+	for _, eachOrg := range allOrg {
+		if eachOrg.ID == uint(oID) && eachOrg.Permission.Role == "owner" {
+			return nil
+		}
+	}
+	return errors.New("logged in user is not owner")
 }
