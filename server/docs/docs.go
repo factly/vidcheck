@@ -32,54 +32,7 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/analyse": {
-            "get": {
-                "description": "Show all video analysis",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "VideoAnalysis"
-                ],
-                "summary": "Show all video analysis",
-                "operationId": "get-all-video-analysis",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "X-User",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "limt per page",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "page number",
-                        "name": "page",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/videoanalysis.paging"
-                        }
-                    }
-                }
-            },
+        "/analysis": {
             "post": {
                 "description": "Create videoAnalysis",
                 "tags": [
@@ -131,7 +84,7 @@ var doc = `{
                 }
             }
         },
-        "/api/v1/analyse/video/{video_id}/analysis/{video_analysis_id}": {
+        "/analysis/video/{video_id}/analysis/{video_analysis_id}": {
             "get": {
                 "description": "Get videosAnalysis by ID",
                 "produces": [
@@ -176,7 +129,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.VideoAnalysis"
+                            "$ref": "#/definitions/model.Analysis"
                         }
                     },
                     "400": {
@@ -243,7 +196,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.VideoAnalysis"
+                            "$ref": "#/definitions/model.Analysis"
                         }
                     },
                     "400": {
@@ -308,17 +261,17 @@ var doc = `{
                 }
             }
         },
-        "/api/v1/organisations": {
+        "/api/v1/analyse": {
             "get": {
-                "description": "Get all organisations",
+                "description": "Show all video analysis",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Organisation"
+                    "VideoAnalysis"
                 ],
-                "summary": "Show all organisations",
-                "operationId": "get-all-organisations",
+                "summary": "Show all video analysis",
+                "operationId": "get-all-video-analysis",
                 "parameters": [
                     {
                         "type": "string",
@@ -331,6 +284,55 @@ var doc = `{
                         "type": "string",
                         "description": "Organisation ID",
                         "name": "X-Organisation",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "limt per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "page number",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/videoanalysis.paging"
+                        }
+                    }
+                }
+            }
+        },
+        "/ratings": {
+            "get": {
+                "description": "Get all ratings",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rating"
+                ],
+                "summary": "Show all ratings",
+                "operationId": "get-all-ratings",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -351,16 +353,399 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "$ref": "#/definitions/rating.paging"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create rating",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rating"
+                ],
+                "summary": "Create rating",
+                "operationId": "add-rating",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Rating Object",
+                        "name": "Rating",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/rating.rating"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Rating"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.Organisation"
+                                "type": "string"
                             }
                         }
                     }
                 }
             }
         },
-        "/api/v1/video": {
+        "/ratings/default": {
+            "post": {
+                "description": "Create Default Ratings",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rating"
+                ],
+                "summary": "Create Default Ratings",
+                "operationId": "add-default-ratings",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Rating"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ratings/{rating_id}": {
+            "get": {
+                "description": "Get rating by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rating"
+                ],
+                "summary": "Show a rating by id",
+                "operationId": "get-rating-by-id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Rating ID",
+                        "name": "rating_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Rating"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update rating by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rating"
+                ],
+                "summary": "Update a rating by id",
+                "operationId": "update-rating-by-id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Rating ID",
+                        "name": "rating_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Rating",
+                        "name": "Rating",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/rating.rating"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Rating"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete rating by ID",
+                "tags": [
+                    "Rating"
+                ],
+                "summary": "Delete a rating",
+                "operationId": "delete-rating-by-id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Rating ID",
+                        "name": "rating_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {}
+                }
+            }
+        },
+        "/spaces": {
+            "get": {
+                "description": "Get all spaces",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Space"
+                ],
+                "summary": "Show all spaces",
+                "operationId": "get-all-spaces",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/model.Space"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create space",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Space"
+                ],
+                "summary": "Create space",
+                "operationId": "add-space",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Space Object",
+                        "name": "Space",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/space.space"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Space"
+                        }
+                    }
+                }
+            }
+        },
+        "/spaces/{space_id}": {
+            "put": {
+                "description": "Update space",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Space"
+                ],
+                "summary": "Update space",
+                "operationId": "update-space",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "space_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Space Object",
+                        "name": "Space",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/space.space"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Space"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete space",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Space"
+                ],
+                "summary": "Delete space",
+                "operationId": "delete-space",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "space_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {}
+                }
+            }
+        },
+        "/videos": {
             "get": {
                 "description": "Get all videos",
                 "produces": [
@@ -381,8 +766,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -425,8 +810,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -436,7 +821,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/video.videoAnalysisApiData"
+                            "$ref": "#/definitions/video.videoanalysisReqData"
                         }
                     }
                 ],
@@ -444,7 +829,7 @@ var doc = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/model.Video"
+                            "$ref": "#/definitions/video.videoanalysisData"
                         }
                     },
                     "400": {
@@ -459,7 +844,7 @@ var doc = `{
                 }
             }
         },
-        "/api/v1/video/{video_id}": {
+        "/videos/{video_id}": {
             "get": {
                 "description": "Get video by ID",
                 "produces": [
@@ -480,8 +865,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -497,7 +882,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.Video"
+                            "$ref": "#/definitions/video.videoanalysisData"
                         }
                     },
                     "400": {
@@ -531,8 +916,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -549,7 +934,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/video.videoAnalysisApiData"
+                            "$ref": "#/definitions/video.videoanalysisReqData"
                         }
                     }
                 ],
@@ -588,8 +973,8 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
+                        "description": "Space ID",
+                        "name": "X-Space",
                         "in": "header",
                         "required": true
                     },
@@ -617,7 +1002,53 @@ var doc = `{
         }
     },
     "definitions": {
-        "model.Organisation": {
+        "model.Analysis": {
+            "type": "object",
+            "properties": {
+                "claim": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "end_time": {
+                    "type": "integer"
+                },
+                "end_time_fraction": {
+                    "type": "number"
+                },
+                "fact": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "rating": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Rating"
+                },
+                "rating_id": {
+                    "type": "integer"
+                },
+                "start_time": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "video": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Video"
+                },
+                "video_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.Rating": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -626,20 +1057,72 @@ var doc = `{
                 "deleted_at": {
                     "type": "string"
                 },
+                "description": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
-                "permission": {
-                    "type": "object",
-                    "$ref": "#/definitions/model.organisationUser"
+                "name": {
+                    "type": "string"
+                },
+                "numeric_value": {
+                    "type": "integer"
                 },
                 "slug": {
                     "type": "string"
                 },
-                "title": {
+                "space_id": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Space": {
+            "type": "object",
+            "properties": {
+                "contact_info": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "organisation_id": {
+                    "type": "integer"
+                },
+                "site_address": {
+                    "type": "string"
+                },
+                "site_title": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "social_media_urls": {
+                    "type": "string"
+                },
+                "tag_line": {
                     "type": "string"
                 },
                 "updated_at": {
+                    "type": "string"
+                },
+                "verification_codes": {
                     "type": "string"
                 }
             }
@@ -656,7 +1139,7 @@ var doc = `{
                 "id": {
                     "type": "integer"
                 },
-                "organisationID": {
+                "space_id": {
                     "type": "integer"
                 },
                 "summary": {
@@ -671,72 +1154,81 @@ var doc = `{
                 "url": {
                     "type": "string"
                 },
-                "userID": {
-                    "type": "integer"
-                },
-                "videoType": {
+                "video_type": {
                     "type": "string"
                 }
             }
         },
-        "model.VideoAnalysis": {
+        "rating.paging": {
             "type": "object",
             "properties": {
-                "claim": {
-                    "type": "string"
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Rating"
+                    }
                 },
-                "created_at": {
-                    "type": "string"
-                },
-                "deleted_at": {
-                    "type": "string"
-                },
-                "endTime": {
-                    "type": "integer"
-                },
-                "endTimeFraction": {
-                    "type": "number"
-                },
-                "fact": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "ratingValue": {
-                    "type": "integer"
-                },
-                "startTime": {
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "video": {
-                    "type": "object",
-                    "$ref": "#/definitions/model.Video"
-                },
-                "videoID": {
+                "total": {
                     "type": "integer"
                 }
             }
         },
-        "model.organisationUser": {
+        "rating.rating": {
             "type": "object",
+            "required": [
+                "name",
+                "numeric_value"
+            ],
             "properties": {
-                "created_at": {
+                "description": {
                     "type": "string"
                 },
-                "deleted_at": {
+                "name": {
                     "type": "string"
                 },
-                "id": {
+                "numeric_value": {
                     "type": "integer"
                 },
-                "role": {
+                "slug": {
+                    "type": "string"
+                }
+            }
+        },
+        "space.space": {
+            "type": "object",
+            "required": [
+                "name",
+                "organisation_id"
+            ],
+            "properties": {
+                "contact_info": {
                     "type": "string"
                 },
-                "updated_at": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "organisation_id": {
+                    "type": "integer"
+                },
+                "site_address": {
+                    "type": "string"
+                },
+                "site_title": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "social_media_urls": {
+                    "type": "string"
+                },
+                "tag_line": {
+                    "type": "string"
+                },
+                "verification_codes": {
                     "type": "string"
                 }
             }
@@ -763,7 +1255,7 @@ var doc = `{
                 "video_type"
             ],
             "properties": {
-                "id": {
+                "space_id": {
                     "type": "integer"
                 },
                 "summary": {
@@ -780,12 +1272,12 @@ var doc = `{
                 }
             }
         },
-        "video.videoAnalysis": {
+        "video.videoanalysis": {
             "type": "object",
             "required": [
                 "end_time",
                 "end_time_fraction",
-                "rating_value"
+                "rating_id"
             ],
             "properties": {
                 "claim": {
@@ -803,7 +1295,7 @@ var doc = `{
                 "id": {
                     "type": "integer"
                 },
-                "rating_value": {
+                "rating_id": {
                     "type": "integer"
                 },
                 "start_time": {
@@ -811,7 +1303,22 @@ var doc = `{
                 }
             }
         },
-        "video.videoAnalysisApiData": {
+        "video.videoanalysisData": {
+            "type": "object",
+            "properties": {
+                "analysis": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Analysis"
+                    }
+                },
+                "video": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Video"
+                }
+            }
+        },
+        "video.videoanalysisReqData": {
             "type": "object",
             "required": [
                 "analysis",
@@ -821,7 +1328,7 @@ var doc = `{
                 "analysis": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/video.videoAnalysis"
+                        "$ref": "#/definitions/video.videoanalysis"
                     }
                 },
                 "video": {
@@ -836,7 +1343,7 @@ var doc = `{
                 "nodes": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/model.VideoAnalysis"
+                        "$ref": "#/definitions/model.Analysis"
                     }
                 },
                 "total": {
@@ -871,7 +1378,7 @@ var doc = `{
             "required": [
                 "end_time",
                 "end_time_fraction",
-                "rating_value"
+                "rating_id"
             ],
             "properties": {
                 "claim": {
@@ -886,7 +1393,7 @@ var doc = `{
                 "fact": {
                     "type": "string"
                 },
-                "rating_value": {
+                "rating_id": {
                     "type": "integer"
                 },
                 "start_time": {

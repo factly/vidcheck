@@ -10,14 +10,13 @@ require (
 	github.com/go-openapi/spec v0.19.9 // indirect
 	github.com/go-openapi/swag v0.19.9 // indirect
 	github.com/jinzhu/gorm v1.9.16
-	github.com/jinzhu/now v1.1.1 // indirect
-	github.com/lib/pq v1.3.0 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect
-	github.com/mattn/go-sqlite3 v2.0.1+incompatible // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/viper v1.7.1
-	github.com/stretchr/testify v1.5.1 // indirect
 	github.com/swaggo/http-swagger v0.0.0-20200308142732-58ac5e232fba
 	github.com/swaggo/swag v1.6.7
 	golang.org/x/tools v0.0.0-20200903005429-2364a5e8fdcf // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
+	gorm.io/driver/postgres v1.0.2
+	gorm.io/gorm v1.20.2
 )

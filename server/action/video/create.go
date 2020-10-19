@@ -3,10 +3,10 @@ package video
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/factly/vidcheck/model"
+	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/renderx"
@@ -19,14 +19,21 @@ import (
 // @Tags Videos
 // @ID add-video
 // @Param X-User header string true "User ID"
-// @Param X-Organisation header string true "Organisation ID"
-// @Param Video Analysis Api Data body videoAnalysisApiData true "Video Analysis Api Data"
-// @Success 201 {object} model.Video
+// @Param X-Space header string true "Space ID"
+// @Param Video Analysis Api Data body videoanalysisReqData true "Video Analysis Api Data"
+// @Success 201 {object} videoanalysisData
 // @Failure 400 {array} string
-// @Router /api/v1/video [post]
+// @Router /videos [post]
 func create(w http.ResponseWriter, r *http.Request) {
-	videoAnalysisData := &videoAnalysisApiData{}
-	err := json.NewDecoder(r.Body).Decode(&videoAnalysisData)
+	sID, err := util.GetSpace(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	videoAnalysisData := &videoanalysisReqData{}
+	err = json.NewDecoder(r.Body).Decode(&videoAnalysisData)
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DecodeError()))
@@ -35,7 +42,6 @@ func create(w http.ResponseWriter, r *http.Request) {
 
 	validationError := validationx.Check(videoAnalysisData)
 	if validationError != nil {
-		fmt.Println("validationError", validationError)
 		loggerx.Error(errors.New("validation error"))
 		errorx.Render(w, validationError)
 		return
@@ -43,43 +49,37 @@ func create(w http.ResponseWriter, r *http.Request) {
 	tx := model.DB.Begin()
 	videoObj := model.Video{}
 	videoObj = model.Video{
-		Url:       videoAnalysisData.Video.Url,
+		URL:       videoAnalysisData.Video.URL,
 		Title:     videoAnalysisData.Video.Title,
 		Summary:   videoAnalysisData.Video.Summary,
 		VideoType: videoAnalysisData.Video.VideoType,
+		SpaceID:   uint(sID),
 	}
 	tx.Create(&videoObj)
-	analysisBlocks := []model.VideoAnalysis{}
+	analysisBlocks := []model.Analysis{}
 
 	for _, analysisBlock := range videoAnalysisData.Analysis {
-		analysisBlockObj := model.VideoAnalysis{}
-		analysisBlockObj = model.VideoAnalysis{
+
+		// check if rating exist
+
+		analysisBlockObj := model.Analysis{
 			VideoID:         videoObj.ID,
-			Video:           videoObj,
-			RatingValue:     analysisBlock.RatingValue,
+			RatingID:        analysisBlock.RatingID,
 			Claim:           analysisBlock.Claim,
 			Fact:            analysisBlock.Fact,
 			StartTime:       analysisBlock.StartTime,
 			EndTime:         analysisBlock.EndTime,
 			EndTimeFraction: analysisBlock.EndTimeFraction,
 		}
-		err = tx.Model(&model.VideoAnalysis{}).Create(&analysisBlockObj).Error
-		if err != nil {
-			tx.Rollback()
-			loggerx.Error(err)
-			errorx.Render(w, errorx.Parser(errorx.DBError()))
-			return
-		}
-		if err != nil {
-			tx.Rollback()
-			loggerx.Error(err)
-			errorx.Render(w, errorx.Parser(errorx.DBError()))
-			return
-		}
 		analysisBlocks = append(analysisBlocks, analysisBlockObj)
 	}
+	model.DB.Create(&analysisBlocks)
+
 	tx.Commit()
 
-	result := map[string]interface{}{"video": videoObj, "analysis": analysisBlocks}
+	result := videoanalysisData{
+		Video:    videoObj,
+		Analysis: analysisBlocks,
+	}
 	renderx.JSON(w, http.StatusCreated, result)
 }

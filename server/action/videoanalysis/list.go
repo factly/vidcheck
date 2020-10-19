@@ -10,8 +10,8 @@ import (
 
 // list response
 type paging struct {
-	Total int                   `json:"total"`
-	Nodes []model.VideoAnalysis `json:"nodes"`
+	Total int64            `json:"total"`
+	Nodes []model.Analysis `json:"nodes"`
 }
 
 // list - Get all videosAnalysis
@@ -28,8 +28,8 @@ type paging struct {
 // @Router /api/v1/analyse [get]
 func list(w http.ResponseWriter, r *http.Request) {
 	result := paging{}
-	result.Nodes = make([]model.VideoAnalysis, 0)
+	result.Nodes = make([]model.Analysis, 0)
 	offset, limit := paginationx.Parse(r.URL.Query())
-	model.DB.Model(&model.VideoAnalysis{}).Count(&result.Total).Offset(offset).Limit(limit).Find(&result.Nodes)
+	model.DB.Model(&model.Analysis{}).Count(&result.Total).Offset(offset).Limit(limit).Find(&result.Nodes)
 	renderx.JSON(w, http.StatusOK, result)
 }

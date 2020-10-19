@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/factly/vidcheck/action/organisation"
+	"github.com/factly/vidcheck/action/rating"
+	"github.com/factly/vidcheck/action/space"
 	"github.com/factly/vidcheck/action/videoanalysis"
 	"github.com/spf13/viper"
 
@@ -44,10 +45,11 @@ func RegisterRoutes() http.Handler {
 		fmt.Println("swagger-ui http://localhost:8080/swagger/index.html")
 	}
 
-	r.With(util.CheckUser, util.CheckOrganisation).Group(func(r chi.Router) {
-		r.Mount("/api/v1/analyse", videoanalysis.Router())
-		r.Mount("/api/v1/video", video.Router())
-		r.Mount("/api/v1/organisations", organisation.Router())
+	r.With(util.CheckUser, util.CheckSpace, util.CheckOrganisation).Group(func(r chi.Router) {
+		r.Mount("/analysis", videoanalysis.Router())
+		r.Mount("/videos", video.Router())
+		r.Mount("/spaces", space.Router())
+		r.Mount("/ratings", rating.Router())
 	})
 	return r
 }

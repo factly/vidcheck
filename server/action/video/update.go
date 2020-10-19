@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/factly/vidcheck/model"
+	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/renderx"
@@ -22,22 +23,29 @@ import (
 // @Produce json
 // @Consume json
 // @Param X-User header string true "User ID"
-// @Param X-Organisation header string true "Organisation ID"
+// @Param X-Space header string true "Space ID"
 // @Param video_id path string true "Video ID"
-// @Param Video Analysis Api Data body videoAnalysisApiData true "Video Analysis Api Data"
+// @Param Video Analysis Api Data body videoanalysisReqData true "Video Analysis Api Data"
 // @Success 200 {object} model.Video
 // @Failure 400 {array} string
-// @Router /api/v1/video/{video_id} [put]
+// @Router /videos/{video_id} [put]
 func update(w http.ResponseWriter, r *http.Request) {
-	videoAnalysisData := &videoAnalysisApiData{}
-	videoId := chi.URLParam(r, "video_id")
-	id, err := strconv.Atoi(videoId)
+	sID, err := util.GetSpace(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	videoID := chi.URLParam(r, "video_id")
+	id, err := strconv.Atoi(videoID)
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InvalidID()))
 		return
 	}
 
+	videoAnalysisData := &videoanalysisReqData{}
 	err = json.NewDecoder(r.Body).Decode(&videoAnalysisData)
 	if err != nil {
 		loggerx.Error(err)
@@ -55,7 +63,10 @@ func update(w http.ResponseWriter, r *http.Request) {
 	videoObj := &model.Video{}
 	videoObj.ID = uint(id)
 
-	err = model.DB.First(&videoObj).Error
+	// Check if video exist
+	err = model.DB.Where(&model.Video{
+		SpaceID: uint(sID),
+	}).First(&videoObj).Error
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.RecordNotFound()))
@@ -71,11 +82,11 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	var updatedOrCreatedVideoBlock []uint
 	for _, analysisBlock := range videoAnalysisData.Analysis {
-		if analysisBlock.Id != uint(0) {
-			analysisBlockObj := &model.VideoAnalysis{}
-			analysisBlockObj.ID = uint(analysisBlock.Id)
-			tx.Model(&analysisBlockObj).Updates(model.VideoAnalysis{
-				RatingValue:     analysisBlock.RatingValue,
+		if analysisBlock.ID != uint(0) {
+			analysisBlockObj := &model.Analysis{}
+			analysisBlockObj.ID = uint(analysisBlock.ID)
+			tx.Model(&analysisBlockObj).Updates(model.Analysis{
+				RatingID:        analysisBlock.RatingID,
 				Claim:           analysisBlock.Claim,
 				Fact:            analysisBlock.Fact,
 				StartTime:       analysisBlock.StartTime,
@@ -84,18 +95,18 @@ func update(w http.ResponseWriter, r *http.Request) {
 			}).First(&analysisBlockObj)
 			updatedOrCreatedVideoBlock = append(updatedOrCreatedVideoBlock, analysisBlockObj.ID)
 		} else {
-			analysisBlockObj := model.VideoAnalysis{}
-			analysisBlockObj = model.VideoAnalysis{
+			analysisBlockObj := model.Analysis{}
+			analysisBlockObj = model.Analysis{
 				VideoID:         videoObj.ID,
 				Video:           *videoObj,
-				RatingValue:     analysisBlock.RatingValue,
+				RatingID:        analysisBlock.RatingID,
 				Claim:           analysisBlock.Claim,
 				Fact:            analysisBlock.Fact,
 				StartTime:       analysisBlock.StartTime,
 				EndTime:         analysisBlock.EndTime,
 				EndTimeFraction: analysisBlock.EndTimeFraction,
 			}
-			err = tx.Model(&model.VideoAnalysis{}).Create(&analysisBlockObj).Error
+			err = tx.Model(&model.Analysis{}).Create(&analysisBlockObj).Error
 			if err != nil {
 				tx.Rollback()
 				loggerx.Error(err)
@@ -107,15 +118,19 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}
 	// delete all the videoAnalysisBlocks which is neither updated/created.
 	if len(updatedOrCreatedVideoBlock) > 0 {
-		analysisBlocks := []model.VideoAnalysis{}
-		tx.Model(&model.VideoAnalysis{}).Not(updatedOrCreatedVideoBlock).Where("video_id = ?", uint(id)).Delete(&analysisBlocks)
+		analysisBlocks := []model.Analysis{}
+		tx.Model(&model.Analysis{}).Not(updatedOrCreatedVideoBlock).Where("video_id = ?", uint(id)).Delete(&analysisBlocks)
 	}
 
 	tx.Commit()
 
 	// Get all video analysisBlocks.
-	analysisBlocks := []model.VideoAnalysis{}
-	model.DB.Model(&model.VideoAnalysis{}).Order("start_time").Where("video_id = ?", uint(id)).Find(&analysisBlocks)
-	result := map[string]interface{}{"video": videoObj, "analysis": analysisBlocks}
+	analysisBlocks := []model.Analysis{}
+	model.DB.Model(&model.Analysis{}).Order("start_time").Where("video_id = ?", uint(id)).Find(&analysisBlocks)
+
+	result := videoanalysisData{
+		Video:    *videoObj,
+		Analysis: analysisBlocks,
+	}
 	renderx.JSON(w, http.StatusOK, result)
 }
