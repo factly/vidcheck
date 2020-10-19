@@ -5,6 +5,8 @@ import (
 	"errors"
 	"net/http"
 
+	"gorm.io/gorm"
+
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
@@ -53,12 +55,16 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get table name
+	stmt := &gorm.Statement{DB: model.DB}
+	stmt.Parse(&model.Rating{})
+
 	// Check if rating with same name exist
-	// if util.CheckName(uint(sID), rating.Name, config.DB.NewScope(&model.Rating{}).TableName()) {
-	// 	loggerx.Error(err)
-	// 	errorx.Render(w, errorx.Parser(errorx.CannotSaveChanges()))
-	// 	return
-	// }
+	if util.CheckName(uint(sID), rating.Name, stmt.Schema.Table) {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.CannotSaveChanges()))
+		return
+	}
 
 	result := &model.Rating{
 		Name:         rating.Name,

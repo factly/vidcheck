@@ -13,6 +13,7 @@ import (
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/validationx"
 	"github.com/go-chi/chi"
+	"gorm.io/gorm"
 )
 
 // update - Update rating by id
@@ -76,12 +77,16 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get table name
+	stmt := &gorm.Statement{DB: model.DB}
+	stmt.Parse(&model.Rating{})
+
 	// Check if rating with same name exist
-	// if rating.Name != result.Name && util.CheckName(uint(sID), rating.Name, config.DB.NewScope(&model.Rating{}).TableName()) {
-	// 	loggerx.Error(err)
-	// 	errorx.Render(w, errorx.Parser(errorx.CannotSaveChanges()))
-	// 	return
-	// }
+	if rating.Name != result.Name && util.CheckName(uint(sID), rating.Name, stmt.Schema.Table) {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.CannotSaveChanges()))
+		return
+	}
 
 	err = model.DB.Model(&result).Updates(model.Rating{
 		Name:         rating.Name,
