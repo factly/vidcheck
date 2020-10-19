@@ -22,7 +22,7 @@ import (
 // @Param Video Analysis Data body videoAnalysisApiData true "Video Analysis Api Data"
 // @Success 201 {object} model.Video
 // @Failure 400 {array} string
-// @Router /api/v1/analyse [post]
+// @Router /analysis [post]
 func create(w http.ResponseWriter, r *http.Request) {
 	videoAnalysisData := &videoAnalysisApiData{}
 	err := json.NewDecoder(r.Body).Decode(&videoAnalysisData)
@@ -42,26 +42,26 @@ func create(w http.ResponseWriter, r *http.Request) {
 	tx := model.DB.Begin()
 	videoObj := model.Video{}
 	videoObj = model.Video{
-		Url:       videoAnalysisData.Video.Url,
+		URL:       videoAnalysisData.Video.URL,
 		Title:     videoAnalysisData.Video.Title,
 		Summary:   videoAnalysisData.Video.Summary,
 		VideoType: videoAnalysisData.Video.VideoType,
 	}
 	tx.Model(&model.Video{}).Create(&videoObj)
-	analysisBlocks := []model.VideoAnalysis{}
+	analysisBlocks := []model.Analysis{}
 
 	for _, analysisBlock := range videoAnalysisData.Analysis {
-		analysisBlockObj := model.VideoAnalysis{}
-		analysisBlockObj = model.VideoAnalysis{
+		analysisBlockObj := model.Analysis{}
+		analysisBlockObj = model.Analysis{
 			VideoID:         videoObj.ID,
-			RatingValue:     analysisBlock.RatingValue,
+			RatingID:        analysisBlock.RatingID,
 			Claim:           analysisBlock.Claim,
 			Fact:            analysisBlock.Fact,
 			StartTime:       analysisBlock.StartTime,
 			EndTime:         analysisBlock.EndTime,
 			EndTimeFraction: analysisBlock.EndTimeFraction,
 		}
-		err = tx.Model(&model.VideoAnalysis{}).Create(&analysisBlockObj).Error
+		err = tx.Model(&model.Analysis{}).Create(&analysisBlockObj).Error
 		if err != nil {
 			tx.Rollback()
 			loggerx.Error(err)

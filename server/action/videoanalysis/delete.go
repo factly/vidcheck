@@ -24,7 +24,7 @@ import (
 // @Param video_analysis_id path string true "Video Analysis ID"
 // @Success 200
 // @Failure 400 {array} string
-// @Router /api/v1/analyse/video/{video_id}/analysis/{video_analysis_id} [delete]
+// @Router /analysis/video/{video_id}/analysis/{video_analysis_id} [delete]
 func delete(w http.ResponseWriter, r *http.Request) {
 
 	videoAnalysisId := chi.URLParam(r, "video_analysis_id")
@@ -36,7 +36,7 @@ func delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := &model.VideoAnalysis{}
+	result := &model.Analysis{}
 	result.ID = uint(id)
 
 	// check record exists or not

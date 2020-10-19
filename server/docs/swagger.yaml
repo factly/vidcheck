@@ -1,21 +1,86 @@
 basePath: /
 definitions:
-  model.Organisation:
+  model.Analysis:
+    properties:
+      claim:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      end_time:
+        type: integer
+      end_time_fraction:
+        type: number
+      fact:
+        type: string
+      id:
+        type: integer
+      rating:
+        $ref: '#/definitions/model.Rating'
+        type: object
+      rating_id:
+        type: integer
+      start_time:
+        type: integer
+      updated_at:
+        type: string
+      video:
+        $ref: '#/definitions/model.Video'
+        type: object
+      video_id:
+        type: integer
+    type: object
+  model.Rating:
     properties:
       created_at:
         type: string
       deleted_at:
         type: string
+      description:
+        type: string
       id:
         type: integer
-      permission:
-        $ref: '#/definitions/model.organisationUser'
-        type: object
+      name:
+        type: string
+      numeric_value:
+        type: integer
       slug:
         type: string
-      title:
+      space_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  model.Space:
+    properties:
+      contact_info:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      organisation_id:
+        type: integer
+      site_address:
+        type: string
+      site_title:
+        type: string
+      slug:
+        type: string
+      social_media_urls:
+        type: string
+      tag_line:
         type: string
       updated_at:
+        type: string
+      verification_codes:
         type: string
     type: object
   model.Video:
@@ -26,7 +91,7 @@ definitions:
         type: string
       id:
         type: integer
-      organisationID:
+      space_id:
         type: integer
       summary:
         type: string
@@ -36,51 +101,57 @@ definitions:
         type: string
       url:
         type: string
-      userID:
-        type: integer
-      videoType:
+      video_type:
         type: string
     type: object
-  model.VideoAnalysis:
+  rating.paging:
     properties:
-      claim:
-        type: string
-      created_at:
-        type: string
-      deleted_at:
-        type: string
-      endTime:
-        type: integer
-      endTimeFraction:
-        type: number
-      fact:
-        type: string
-      id:
-        type: integer
-      ratingValue:
-        type: integer
-      startTime:
-        type: integer
-      updated_at:
-        type: string
-      video:
-        $ref: '#/definitions/model.Video'
-        type: object
-      videoID:
+      nodes:
+        items:
+          $ref: '#/definitions/model.Rating'
+        type: array
+      total:
         type: integer
     type: object
-  model.organisationUser:
+  rating.rating:
     properties:
-      created_at:
+      description:
         type: string
-      deleted_at:
+      name:
         type: string
-      id:
+      numeric_value:
         type: integer
-      role:
+      slug:
         type: string
-      updated_at:
+    required:
+    - name
+    - numeric_value
+    type: object
+  space.space:
+    properties:
+      contact_info:
         type: string
+      description:
+        type: string
+      name:
+        type: string
+      organisation_id:
+        type: integer
+      site_address:
+        type: string
+      site_title:
+        type: string
+      slug:
+        type: string
+      social_media_urls:
+        type: string
+      tag_line:
+        type: string
+      verification_codes:
+        type: string
+    required:
+    - name
+    - organisation_id
     type: object
   video.paging:
     properties:
@@ -93,7 +164,7 @@ definitions:
     type: object
   video.video:
     properties:
-      id:
+      space_id:
         type: integer
       summary:
         type: string
@@ -108,7 +179,7 @@ definitions:
     - url
     - video_type
     type: object
-  video.videoAnalysis:
+  video.videoanalysis:
     properties:
       claim:
         type: string
@@ -120,20 +191,30 @@ definitions:
         type: string
       id:
         type: integer
-      rating_value:
+      rating_id:
         type: integer
       start_time:
         type: integer
     required:
     - end_time
     - end_time_fraction
-    - rating_value
+    - rating_id
     type: object
-  video.videoAnalysisApiData:
+  video.videoanalysisData:
     properties:
       analysis:
         items:
-          $ref: '#/definitions/video.videoAnalysis'
+          $ref: '#/definitions/model.Analysis'
+        type: array
+      video:
+        $ref: '#/definitions/model.Video'
+        type: object
+    type: object
+  video.videoanalysisReqData:
+    properties:
+      analysis:
+        items:
+          $ref: '#/definitions/video.videoanalysis'
         type: array
       video:
         $ref: '#/definitions/video.video'
@@ -146,7 +227,7 @@ definitions:
     properties:
       nodes:
         items:
-          $ref: '#/definitions/model.VideoAnalysis'
+          $ref: '#/definitions/model.Analysis'
         type: array
       total:
         type: integer
@@ -176,14 +257,14 @@ definitions:
         type: number
       fact:
         type: string
-      rating_value:
+      rating_id:
         type: integer
       start_time:
         type: integer
     required:
     - end_time
     - end_time_fraction
-    - rating_value
+    - rating_id
     type: object
   videoanalysis.videoAnalysisApiData:
     properties:
@@ -211,39 +292,7 @@ info:
   title: VidCheck API
   version: "1.0"
 paths:
-  /api/v1/analyse:
-    get:
-      description: Show all video analysis
-      operationId: get-all-video-analysis
-      parameters:
-      - description: User ID
-        in: header
-        name: X-User
-        required: true
-        type: string
-      - description: Organisation ID
-        in: header
-        name: X-Organisation
-        required: true
-        type: string
-      - description: limt per page
-        in: query
-        name: limit
-        type: string
-      - description: page number
-        in: query
-        name: page
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/videoanalysis.paging'
-      summary: Show all video analysis
-      tags:
-      - VideoAnalysis
+  /analysis:
     post:
       description: Create videoAnalysis
       operationId: add-video-analysis
@@ -278,7 +327,7 @@ paths:
       summary: Create videoAnalysis
       tags:
       - VideoAnalysis
-  /api/v1/analyse/video/{video_id}/analysis/{video_analysis_id}:
+  /analysis/video/{video_id}/analysis/{video_analysis_id}:
     delete:
       description: Delete videoAnalysis by id
       operationId: delete-video-analysis-by-id
@@ -344,7 +393,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.VideoAnalysis'
+            $ref: '#/definitions/model.Analysis'
         "400":
           description: Bad Request
           schema:
@@ -390,7 +439,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.VideoAnalysis'
+            $ref: '#/definitions/model.Analysis'
         "400":
           description: Bad Request
           schema:
@@ -400,10 +449,10 @@ paths:
       summary: Update a videosAnalysis by id
       tags:
       - VideoAnalysis
-  /api/v1/organisations:
+  /api/v1/analyse:
     get:
-      description: Get all organisations
-      operationId: get-all-organisations
+      description: Show all video analysis
+      operationId: get-all-video-analysis
       parameters:
       - description: User ID
         in: header
@@ -413,6 +462,39 @@ paths:
       - description: Organisation ID
         in: header
         name: X-Organisation
+        required: true
+        type: string
+      - description: limt per page
+        in: query
+        name: limit
+        type: string
+      - description: page number
+        in: query
+        name: page
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/videoanalysis.paging'
+      summary: Show all video analysis
+      tags:
+      - VideoAnalysis
+  /ratings:
+    get:
+      description: Get all ratings
+      operationId: get-all-ratings
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
         required: true
         type: string
       - description: limit per page
@@ -429,13 +511,274 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/model.Organisation'
-            type: array
-      summary: Show all organisations
+            $ref: '#/definitions/rating.paging'
+      summary: Show all ratings
       tags:
-      - Organisation
-  /api/v1/video:
+      - Rating
+    post:
+      description: Create rating
+      operationId: add-rating
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Rating Object
+        in: body
+        name: Rating
+        required: true
+        schema:
+          $ref: '#/definitions/rating.rating'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Rating'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Create rating
+      tags:
+      - Rating
+  /ratings/{rating_id}:
+    delete:
+      description: Delete rating by ID
+      operationId: delete-rating-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Rating ID
+        in: path
+        name: rating_id
+        required: true
+        type: string
+      responses:
+        "200": {}
+      summary: Delete a rating
+      tags:
+      - Rating
+    get:
+      description: Get rating by ID
+      operationId: get-rating-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Rating ID
+        in: path
+        name: rating_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Rating'
+      summary: Show a rating by id
+      tags:
+      - Rating
+    put:
+      description: Update rating by ID
+      operationId: update-rating-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Rating ID
+        in: path
+        name: rating_id
+        required: true
+        type: string
+      - description: Rating
+        in: body
+        name: Rating
+        schema:
+          $ref: '#/definitions/rating.rating'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Rating'
+      summary: Update a rating by id
+      tags:
+      - Rating
+  /ratings/default:
+    post:
+      description: Create Default Ratings
+      operationId: add-default-ratings
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/model.Rating'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Create Default Ratings
+      tags:
+      - Rating
+  /spaces:
+    get:
+      description: Get all spaces
+      operationId: get-all-spaces
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/model.Space'
+              type: array
+            type: array
+      summary: Show all spaces
+      tags:
+      - Space
+    post:
+      description: Create space
+      operationId: add-space
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space Object
+        in: body
+        name: Space
+        required: true
+        schema:
+          $ref: '#/definitions/space.space'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Space'
+      summary: Create space
+      tags:
+      - Space
+  /spaces/{space_id}:
+    delete:
+      description: Delete space
+      operationId: delete-space
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: path
+        name: space_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200": {}
+      summary: Delete space
+      tags:
+      - Space
+    put:
+      description: Update space
+      operationId: update-space
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: path
+        name: space_id
+        required: true
+        type: string
+      - description: Space Object
+        in: body
+        name: Space
+        required: true
+        schema:
+          $ref: '#/definitions/space.space'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Space'
+      summary: Update space
+      tags:
+      - Space
+  /videos:
     get:
       description: Get all videos
       operationId: get-all-videos
@@ -445,9 +788,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: limt per page
@@ -477,9 +820,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: Video Analysis Api Data
@@ -487,12 +830,12 @@ paths:
         name: Data
         required: true
         schema:
-          $ref: '#/definitions/video.videoAnalysisApiData'
+          $ref: '#/definitions/video.videoanalysisReqData'
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/model.Video'
+            $ref: '#/definitions/video.videoanalysisData'
         "400":
           description: Bad Request
           schema:
@@ -502,7 +845,7 @@ paths:
       summary: Create video
       tags:
       - Videos
-  /api/v1/video/{video_id}:
+  /videos/{video_id}:
     delete:
       description: Delete video by ID
       operationId: delete-video-by-id
@@ -512,9 +855,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: Video ID
@@ -542,9 +885,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: Video ID
@@ -558,7 +901,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.Video'
+            $ref: '#/definitions/video.videoanalysisData'
         "400":
           description: Bad Request
           schema:
@@ -577,9 +920,9 @@ paths:
         name: X-User
         required: true
         type: string
-      - description: Organisation ID
+      - description: Space ID
         in: header
-        name: X-Organisation
+        name: X-Space
         required: true
         type: string
       - description: Video ID
@@ -592,7 +935,7 @@ paths:
         name: Data
         required: true
         schema:
-          $ref: '#/definitions/video.videoAnalysisApiData'
+          $ref: '#/definitions/video.videoanalysisReqData'
       produces:
       - application/json
       responses:

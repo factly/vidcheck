@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/chi"
 
 	"github.com/factly/vidcheck/model"
+	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/renderx"
@@ -19,15 +20,22 @@ import (
 // @ID delete-video-by-id
 // @Consume  json
 // @Param X-User header string true "User ID"
-// @Param X-Organisation header string true "Organisation ID"
+// @Param X-Space header string true "Space ID"
 // @Param video_id path string true "Video ID"
 // @Success 200
 // @Failure 400 {array} string
-// @Router /api/v1/video/{video_id} [delete]
+// @Router /videos/{video_id} [delete]
 func delete(w http.ResponseWriter, r *http.Request) {
 
-	videoId := chi.URLParam(r, "video_id")
-	id, err := strconv.Atoi(videoId)
+	sID, err := util.GetSpace(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	videoID := chi.URLParam(r, "video_id")
+	id, err := strconv.Atoi(videoID)
 
 	if err != nil {
 		loggerx.Error(err)
@@ -39,7 +47,9 @@ func delete(w http.ResponseWriter, r *http.Request) {
 	result.ID = uint(id)
 
 	// check record exists or not
-	err = model.DB.First(&result).Error
+	err = model.DB.Where(&model.Video{
+		SpaceID: uint(sID),
+	}).First(&result).Error
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.RecordNotFound()))

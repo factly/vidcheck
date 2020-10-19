@@ -26,9 +26,9 @@ import (
 // @Param video_id id path string true "Video ID"
 // @Param video_analysis_id path string true "Video Analysis ID"
 // @Param Video Analysis Data body videoAnalysis true "Video Analysis Data"
-// @Success 200 {object} model.VideoAnalysis
+// @Success 200 {object} model.Analysis
 // @Failure 400 {array} string
-// @Router /api/v1/analyse/video/{video_id}/analysis/{video_analysis_id} [put]
+// @Router /analysis/video/{video_id}/analysis/{video_analysis_id} [put]
 func update(w http.ResponseWriter, r *http.Request) {
 	videoAnalysisId := chi.URLParam(r, "video_analysis_id")
 	id, err := strconv.Atoi(videoAnalysisId)
@@ -54,7 +54,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := &model.VideoAnalysis{}
+	result := &model.Analysis{}
 	result.ID = uint(id)
 
 	err = model.DB.First(&result).Error
@@ -64,8 +64,8 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	model.DB.Model(&result).Updates(model.VideoAnalysis{
-		RatingValue:     videoAnalysis.RatingValue,
+	model.DB.Model(&result).Updates(model.Analysis{
+		RatingID:        videoAnalysis.RatingID,
 		Claim:           videoAnalysis.Claim,
 		Fact:            videoAnalysis.Fact,
 		StartTime:       videoAnalysis.StartTime,

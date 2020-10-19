@@ -5,14 +5,14 @@ import (
 )
 
 type video struct {
-	Url       string `json:"url" validate:"required"`
+	URL       string `json:"url" validate:"required"`
 	Title     string `json:"title" validate:"required"`
 	Summary   string `json:"summary"`
 	VideoType string `json:"video_type" validate:"required"`
 }
 
 type videoAnalysis struct {
-	RatingValue     int     `json:"rating_value" validate:"required"`
+	RatingID        uint    `json:"rating_id" validate:"required"`
 	Claim           string  `json:"claim"`
 	Fact            string  `json:"fact"`
 	StartTime       int     `json:"start_time"`

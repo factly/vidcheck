@@ -1,4 +1,4 @@
-package video
+package rating
 
 import (
 	"net/http"
@@ -13,23 +13,24 @@ import (
 
 // list response
 type paging struct {
-	Total  int64         `json:"total"`
-	Videos []model.Video `json:"videos"`
+	Total int64          `json:"total"`
+	Nodes []model.Rating `json:"nodes"`
 }
 
-// list - Get all videos
-// @Summary Show all videos
-// @Description Get all videos
-// @Tags Videos
-// @ID get-all-videos
-// @Produce json
+// list - Get all ratings
+// @Summary Show all ratings
+// @Description Get all ratings
+// @Tags Rating
+// @ID get-all-ratings
+// @Produce  json
 // @Param X-User header string true "User ID"
 // @Param X-Space header string true "Space ID"
-// @Param limit query string false "limt per page"
+// @Param limit query string false "limit per page"
 // @Param page query string false "page number"
 // @Success 200 {object} paging
-// @Router /videos [get]
+// @Router /ratings [get]
 func list(w http.ResponseWriter, r *http.Request) {
+
 	sID, err := util.GetSpace(r.Context())
 	if err != nil {
 		loggerx.Error(err)
@@ -38,10 +39,19 @@ func list(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result := paging{}
-	result.Videos = make([]model.Video, 0)
+	result.Nodes = make([]model.Rating, 0)
+
 	offset, limit := paginationx.Parse(r.URL.Query())
-	model.DB.Model(&model.Video{}).Where(&model.Video{
+
+	err = model.DB.Model(&model.Rating{}).Where(&model.Rating{
 		SpaceID: uint(sID),
-	}).Count(&result.Total).Offset(offset).Limit(limit).Find(&result.Videos)
+	}).Count(&result.Total).Order("id desc").Offset(offset).Limit(limit).Find(&result.Nodes).Error
+
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.DBError()))
+		return
+	}
+
 	renderx.JSON(w, http.StatusOK, result)
 }
