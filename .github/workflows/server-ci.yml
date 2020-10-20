@@ -23,6 +23,7 @@ jobs:
       - run: go mod download
         working-directory: ./server
       - run: go get github.com/golangci/golangci-lint/cmd/golangci-lint@v1.30.0
+        working-directory: ./server
       - run: golangci-lint run  ./...
         working-directory: ./server
       - run: go test ./test/... -coverpkg ./action/... -coverprofile=cov.out
