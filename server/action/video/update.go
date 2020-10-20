@@ -92,13 +92,12 @@ func update(w http.ResponseWriter, r *http.Request) {
 				StartTime:       analysisBlock.StartTime,
 				EndTime:         analysisBlock.EndTime,
 				EndTimeFraction: analysisBlock.EndTimeFraction,
-			}).First(&analysisBlockObj)
+			})
 			updatedOrCreatedVideoBlock = append(updatedOrCreatedVideoBlock, analysisBlockObj.ID)
 		} else {
 			analysisBlockObj := model.Analysis{}
 			analysisBlockObj = model.Analysis{
 				VideoID:         videoObj.ID,
-				Video:           *videoObj,
 				RatingID:        analysisBlock.RatingID,
 				Claim:           analysisBlock.Claim,
 				Fact:            analysisBlock.Fact,
@@ -126,7 +125,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	// Get all video analysisBlocks.
 	analysisBlocks := []model.Analysis{}
-	model.DB.Model(&model.Analysis{}).Order("start_time").Where("video_id = ?", uint(id)).Find(&analysisBlocks)
+	model.DB.Model(&model.Analysis{}).Preload("Rating").Order("start_time").Where("video_id = ?", uint(id)).Find(&analysisBlocks)
 
 	result := videoanalysisData{
 		Video:    *videoObj,

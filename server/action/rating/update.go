@@ -79,7 +79,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	// Get table name
 	stmt := &gorm.Statement{DB: model.DB}
-	stmt.Parse(&model.Rating{})
+	_ = stmt.Parse(&model.Rating{})
 
 	// Check if rating with same name exist
 	if rating.Name != result.Name && util.CheckName(uint(sID), rating.Name, stmt.Schema.Table) {
@@ -93,13 +93,15 @@ func update(w http.ResponseWriter, r *http.Request) {
 		Slug:         rating.Slug,
 		Description:  rating.Description,
 		NumericValue: rating.NumericValue,
-	}).First(&result).Error
+	}).Error
 
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
 	}
+
+	model.DB.First(&result)
 
 	renderx.JSON(w, http.StatusOK, result)
 }

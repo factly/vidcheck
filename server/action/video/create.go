@@ -55,7 +55,14 @@ func create(w http.ResponseWriter, r *http.Request) {
 		VideoType: videoAnalysisData.Video.VideoType,
 		SpaceID:   uint(sID),
 	}
-	tx.Create(&videoObj)
+	err = tx.Create(&videoObj).Error
+	if err != nil {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.DBError()))
+		return
+	}
+
 	analysisBlocks := []model.Analysis{}
 
 	for _, analysisBlock := range videoAnalysisData.Analysis {
@@ -73,7 +80,14 @@ func create(w http.ResponseWriter, r *http.Request) {
 		}
 		analysisBlocks = append(analysisBlocks, analysisBlockObj)
 	}
-	model.DB.Create(&analysisBlocks)
+
+	err = tx.Create(&analysisBlocks).Error
+	if err != nil {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.DBError()))
+		return
+	}
 
 	tx.Commit()
 

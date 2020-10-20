@@ -57,7 +57,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 
 	// Get table name
 	stmt := &gorm.Statement{DB: model.DB}
-	stmt.Parse(&model.Rating{})
+	_ = stmt.Parse(&model.Rating{})
 
 	// Check if rating with same name exist
 	if util.CheckName(uint(sID), rating.Name, stmt.Schema.Table) {

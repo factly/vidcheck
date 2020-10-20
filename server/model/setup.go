@@ -3,6 +3,8 @@ package model
 import (
 	"log"
 
+	"gorm.io/gorm/logger"
+
 	"github.com/spf13/viper"
 	"gorm.io/gorm/schema"
 
@@ -20,6 +22,7 @@ func SetupDB(DSN interface{}) {
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},
+		Logger: logger.Default.LogMode(logger.Info),
 	})
 
 	if err != nil {
@@ -29,9 +32,16 @@ func SetupDB(DSN interface{}) {
 	log.Println("connected to database ...")
 
 	// Migrating schema.
-	// DB.AutoMigrate(&User{})
-	DB.AutoMigrate(&Video{})
-	DB.AutoMigrate(&Analysis{})
-	DB.AutoMigrate(&Rating{})
-	DB.AutoMigrate(&Space{})
+	if err = DB.AutoMigrate(&Video{}); err != nil {
+		log.Fatal(err)
+	}
+	if err = DB.AutoMigrate(&Analysis{}); err != nil {
+		log.Fatal(err)
+	}
+	if err = DB.AutoMigrate(&Rating{}); err != nil {
+		log.Fatal(err)
+	}
+	if err = DB.AutoMigrate(&Space{}); err != nil {
+		log.Fatal(err)
+	}
 }
