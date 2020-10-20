@@ -93,13 +93,15 @@ func update(w http.ResponseWriter, r *http.Request) {
 		Slug:         rating.Slug,
 		Description:  rating.Description,
 		NumericValue: rating.NumericValue,
-	}).First(&result).Error
+	}).Error
 
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
 	}
+
+	model.DB.First(&result)
 
 	renderx.JSON(w, http.StatusOK, result)
 }
