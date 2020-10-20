@@ -20,7 +20,7 @@ import (
 // @Produce json
 // @Param X-User header string true "User ID"
 // @Param X-Space header string true "Space ID"
-// @Param video id path string true "Video ID"
+// @Param video_id path string true "Video ID"
 // @Success 200 {object} videoanalysisData
 // @Failure 400 {array} string
 // @Router /videos/{video_id} [get]
