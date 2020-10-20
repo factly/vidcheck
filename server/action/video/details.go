@@ -51,12 +51,8 @@ func details(w http.ResponseWriter, r *http.Request) {
 		errorx.Render(w, errorx.Parser(errorx.RecordNotFound()))
 		return
 	}
-	err = model.DB.Model(&model.Analysis{}).Order("start_time").Where("video_id = ?", uint(id)).Find(&analysisBlocks).Error
-	if err != nil {
-		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.RecordNotFound()))
-		return
-	}
+
+	model.DB.Model(&model.Analysis{}).Preload("Rating").Order("start_time").Where("video_id = ?", uint(id)).Find(&analysisBlocks)
 
 	result := videoanalysisData{
 		Video:    *videoObj,
