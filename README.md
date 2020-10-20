@@ -1,4 +1,10 @@
 # Vidcheck
+## Server
+**Releasability:** [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=factly_vidcheck_server&metric=alert_status)](https://sonarcloud.io/dashboard?id=factly_vidcheck_server)  
+**Reliability:** [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=factly_vidcheck_server&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=factly_vidcheck_server) [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=factly_vidcheck_server&metric=bugs)](https://sonarcloud.io/dashboard?id=factly_vidcheck_server)  
+**Security:** [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=factly_vidcheck_server&metric=security_rating)](https://sonarcloud.io/dashboard?id=factly_vidcheck_server) [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=factly_vidcheck_server&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=factly_vidcheck_server)  
+**Maintainability:** [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=factly_vidcheck_server&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=factly_vidcheck_server) [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=factly_vidcheck_server&metric=sqale_index)](https://sonarcloud.io/dashboard?id=factly_vidcheck_server) [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=factly_vidcheck_server&metric=code_smells)](https://sonarcloud.io/dashboard?id=factly_vidcheck_server)  
+**Other:** [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=factly_vidcheck_server&metric=ncloc)](https://sonarcloud.io/dashboard?id=factly_vidcheck_server) [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=factly_vidcheck_server&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=factly_vidcheck_server) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=factly_vidcheck_server&metric=coverage)](https://sonarcloud.io/dashboard?id=factly_vidcheck_server)
 
 ## Setting up development environment for Vidcheck
 
