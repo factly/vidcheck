@@ -69,7 +69,10 @@ var doc = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/model.Video"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Analysis"
+                            }
                         }
                     },
                     "400": {
@@ -1236,14 +1239,14 @@ var doc = `{
         "video.paging": {
             "type": "object",
             "properties": {
-                "total": {
-                    "type": "integer"
-                },
-                "videos": {
+                "nodes": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/model.Video"
                     }
+                },
+                "total": {
+                    "type": "integer"
                 }
             }
         },

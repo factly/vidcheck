@@ -20,7 +20,7 @@ import (
 // @Param X-User header string true "User ID"
 // @Param X-Organisation header string true "Organisation ID"
 // @Param Video Analysis Data body videoAnalysisApiData true "Video Analysis Api Data"
-// @Success 201 {object} model.Video
+// @Success 201 {object} []model.Analysis
 // @Failure 400 {array} string
 // @Router /analysis [post]
 func create(w http.ResponseWriter, r *http.Request) {
@@ -77,5 +77,5 @@ func create(w http.ResponseWriter, r *http.Request) {
 		analysisBlocks = append(analysisBlocks, analysisBlockObj)
 	}
 	tx.Commit()
-	renderx.JSON(w, http.StatusCreated, videoObj)
+	renderx.JSON(w, http.StatusCreated, analysisBlocks)
 }

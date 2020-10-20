@@ -155,12 +155,12 @@ definitions:
     type: object
   video.paging:
     properties:
-      total:
-        type: integer
-      videos:
+      nodes:
         items:
           $ref: '#/definitions/model.Video'
         type: array
+      total:
+        type: integer
     type: object
   video.video:
     properties:
@@ -317,7 +317,9 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/model.Video'
+            items:
+              $ref: '#/definitions/model.Analysis'
+            type: array
         "400":
           description: Bad Request
           schema:

@@ -32,8 +32,16 @@ func SetupDB(DSN interface{}) {
 	log.Println("connected to database ...")
 
 	// Migrating schema.
-	DB.AutoMigrate(&Video{})
-	DB.AutoMigrate(&Analysis{})
-	DB.AutoMigrate(&Rating{})
-	DB.AutoMigrate(&Space{})
+	if err = DB.AutoMigrate(&Video{}); err != nil {
+		log.Fatal(err)
+	}
+	if err = DB.AutoMigrate(&Analysis{}); err != nil {
+		log.Fatal(err)
+	}
+	if err = DB.AutoMigrate(&Rating{}); err != nil {
+		log.Fatal(err)
+	}
+	if err = DB.AutoMigrate(&Space{}); err != nil {
+		log.Fatal(err)
+	}
 }
