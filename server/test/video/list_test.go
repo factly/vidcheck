@@ -9,6 +9,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/vidcheck/action"
 	"github.com/factly/vidcheck/test"
+	"github.com/factly/vidcheck/test/rating"
 	"github.com/gavv/httpexpect"
 )
 
@@ -33,6 +34,10 @@ func TestVideoList(t *testing.T) {
 			WillReturnRows(sqlmock.NewRows(Columns).
 				AddRow(1, time.Now(), time.Now(), nil, videolist[0]["url"], videolist[0]["title"], videolist[0]["summary"], videolist[0]["video_type"], videolist[0]["space_id"]).
 				AddRow(2, time.Now(), time.Now(), nil, videolist[1]["url"], videolist[1]["title"], videolist[1]["summary"], videolist[1]["video_type"], videolist[1]["space_id"]))
+		analysisSelectQuery(mock, 1)
+		rating.SelectWithoutSpace(mock)
+		analysisSelectQuery(mock, 2)
+		rating.SelectWithoutSpace(mock)
 
 		e.GET(basePath).
 			WithHeaders(headers).
@@ -44,6 +49,8 @@ func TestVideoList(t *testing.T) {
 			Value("nodes").
 			Array().
 			Element(0).
+			Object().
+			Value("video").
 			Object().
 			ContainsMap(videolist[0])
 
@@ -61,6 +68,8 @@ func TestVideoList(t *testing.T) {
 			WithArgs(1).
 			WillReturnRows(sqlmock.NewRows(Columns).
 				AddRow(2, time.Now(), time.Now(), nil, videolist[1]["url"], videolist[1]["title"], videolist[1]["summary"], videolist[1]["video_type"], videolist[1]["space_id"]))
+		analysisSelectQuery(mock, 2)
+		rating.SelectWithoutSpace(mock)
 
 		e.GET(basePath).
 			WithHeaders(headers).
@@ -76,6 +85,8 @@ func TestVideoList(t *testing.T) {
 			Value("nodes").
 			Array().
 			Element(0).
+			Object().
+			Value("video").
 			Object().
 			ContainsMap(videolist[1])
 
