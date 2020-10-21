@@ -4,6 +4,9 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/factly/vidcheck/config"
+
+	"github.com/factly/vidcheck/action/rating"
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
@@ -32,6 +35,13 @@ func details(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	uID, err := util.GetUser(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
 	videoID := chi.URLParam(r, "video_id")
 	id, err := strconv.Atoi(videoID)
 	if err != nil {
@@ -43,6 +53,7 @@ func details(w http.ResponseWriter, r *http.Request) {
 	videoObj := &model.Video{}
 	videoObj.ID = uint(id)
 	analysisBlocks := []model.Analysis{}
+
 	err = model.DB.Model(&model.Video{}).Where(&model.Video{
 		SpaceID: uint(sID),
 	}).First(&videoObj).Error
@@ -52,11 +63,30 @@ func details(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	model.DB.Model(&model.Analysis{}).Preload("Rating").Order("start_time").Where("video_id = ?", uint(id)).Find(&analysisBlocks)
+	stmt := model.DB.Model(&model.Analysis{}).Order("start_time").Where("video_id = ?", uint(id))
+
+	if !config.DegaIntegrated() {
+		stmt.Preload("Rating")
+	}
+
+	stmt.Find(&analysisBlocks)
+
+	if config.DegaIntegrated() {
+		analysisBlocks = AddDegaRatings(uID, sID, analysisBlocks)
+	}
 
 	result := videoanalysisData{
 		Video:    *videoObj,
 		Analysis: analysisBlocks,
 	}
 	renderx.JSON(w, http.StatusOK, result)
+}
+
+// AddDegaRatings added ratings from dega server in analysis list
+func AddDegaRatings(uID, sID int, analysisList []model.Analysis) []model.Analysis {
+	for i := range analysisList {
+		rat, _ := rating.ExistInDega(analysisList[i].RatingID, uint(uID), uint(sID))
+		analysisList[i].Rating = rat
+	}
+	return analysisList
 }

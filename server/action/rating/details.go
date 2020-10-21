@@ -1,6 +1,9 @@
 package rating
 
 import (
+	"encoding/json"
+	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -10,6 +13,7 @@ import (
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/renderx"
 	"github.com/go-chi/chi"
+	"github.com/spf13/viper"
 )
 
 // details - Get rating by id
@@ -56,4 +60,33 @@ func details(w http.ResponseWriter, r *http.Request) {
 	}
 
 	renderx.JSON(w, http.StatusOK, result)
+}
+
+//ExistInDega checks if rating exist in dega server db
+func ExistInDega(id, uID, sID uint) (*model.Rating, error) {
+	url := fmt.Sprint(viper.GetString("dega.url"), "/fact-check/ratings/", id)
+	req, _ := http.NewRequest("GET", url, nil)
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-User", fmt.Sprint(uID))
+	req.Header.Set("X-Space", fmt.Sprint(sID))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	var rating model.Rating
+	err = json.NewDecoder(resp.Body).Decode(&rating)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		return &rating, nil
+	}
+	return nil, errors.New("rating does not exist")
 }

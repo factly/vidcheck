@@ -57,6 +57,10 @@ func TestVideoDelete(t *testing.T) {
 		mock.ExpectExec(regexp.QuoteMeta(`UPDATE "video"`)).
 			WithArgs(test.AnyTime{}, 1).
 			WillReturnResult(sqlmock.NewResult(1, 1))
+
+		mock.ExpectExec(regexp.QuoteMeta(`UPDATE "analysis"`)).
+			WithArgs(test.AnyTime{}, 1).
+			WillReturnResult(sqlmock.NewResult(1, 1))
 		mock.ExpectCommit()
 
 		e.DELETE(path).
