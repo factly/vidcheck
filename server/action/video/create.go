@@ -89,7 +89,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	model.DB.Model(&model.Analysis{}).Preload("Rating").Order("start_time").Where("video_id = ?", videoObj.ID).Find(&analysisBlocks)
+	tx.Model(&model.Analysis{}).Preload("Rating").Order("start_time").Where("video_id = ?", videoObj.ID).Find(&analysisBlocks)
 
 	tx.Commit()
 
