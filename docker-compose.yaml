@@ -168,6 +168,7 @@ services:
       - 3000:3000
     environment:
       - PUBLIC_URL=http://127.0.0.1:4455/.factly/vid-check/web
+      - REACT_APP_API_URL=http://127.0.0.1:4455/.factly/vid-check/server
       - CHOKIDAR_USEPOLLING=true
     stdin_open: true
     networks:
