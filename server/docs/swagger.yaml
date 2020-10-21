@@ -127,6 +127,41 @@ definitions:
     - name
     - numeric_value
     type: object
+  space.orgWithSpace:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      permission:
+        $ref: '#/definitions/space.organisationUser'
+        type: object
+      slug:
+        type: string
+      spaces:
+        items:
+          $ref: '#/definitions/model.Space'
+        type: array
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  space.organisationUser:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      role:
+        type: string
+      updated_at:
+        type: string
+    type: object
   space.space:
     properties:
       contact_info:
@@ -157,15 +192,13 @@ definitions:
     properties:
       nodes:
         items:
-          $ref: '#/definitions/model.Video'
+          $ref: '#/definitions/video.videoanalysisData'
         type: array
       total:
         type: integer
     type: object
   video.video:
     properties:
-      space_id:
-        type: integer
       summary:
         type: string
       title:
@@ -697,7 +730,7 @@ paths:
           schema:
             items:
               items:
-                $ref: '#/definitions/model.Space'
+                $ref: '#/definitions/space.orgWithSpace'
               type: array
             type: array
       summary: Show all spaces
@@ -894,7 +927,7 @@ paths:
         type: string
       - description: Video ID
         in: path
-        name: id
+        name: video_id
         required: true
         type: string
       produces:

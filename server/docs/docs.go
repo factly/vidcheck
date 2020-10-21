@@ -627,7 +627,7 @@ var doc = `{
                             "items": {
                                 "type": "array",
                                 "items": {
-                                    "$ref": "#/definitions/model.Space"
+                                    "$ref": "#/definitions/space.orgWithSpace"
                                 }
                             }
                         }
@@ -876,7 +876,7 @@ var doc = `{
                     {
                         "type": "string",
                         "description": "Video ID",
-                        "name": "id",
+                        "name": "video_id",
                         "in": "path",
                         "required": true
                     }
@@ -1197,6 +1197,59 @@ var doc = `{
                 }
             }
         },
+        "space.orgWithSpace": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "permission": {
+                    "type": "object",
+                    "$ref": "#/definitions/space.organisationUser"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "spaces": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Space"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "space.organisationUser": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
         "space.space": {
             "type": "object",
             "required": [
@@ -1242,7 +1295,7 @@ var doc = `{
                 "nodes": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/model.Video"
+                        "$ref": "#/definitions/video.videoanalysisData"
                     }
                 },
                 "total": {
@@ -1258,9 +1311,6 @@ var doc = `{
                 "video_type"
             ],
             "properties": {
-                "space_id": {
-                    "type": "integer"
-                },
                 "summary": {
                     "type": "string"
                 },

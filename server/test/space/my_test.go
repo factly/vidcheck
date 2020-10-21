@@ -35,6 +35,10 @@ func TestSpaceMy(t *testing.T) {
 			Array().
 			Element(0).
 			Object().
+			Value("spaces").
+			Array().
+			Element(0).
+			Object().
 			ContainsMap(Data)
 
 		test.ExpectationsMet(t, mock)

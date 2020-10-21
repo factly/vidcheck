@@ -13,8 +13,8 @@ import (
 
 // list response
 type paging struct {
-	Total int64         `json:"total"`
-	Nodes []model.Video `json:"nodes"`
+	Total int64               `json:"total"`
+	Nodes []videoanalysisData `json:"nodes"`
 }
 
 // list - Get all videos
@@ -38,11 +38,22 @@ func list(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result := paging{}
-	result.Nodes = make([]model.Video, 0)
+	result.Nodes = make([]videoanalysisData, 0)
+
+	videos := make([]model.Video, 0)
 	offset, limit := paginationx.Parse(r.URL.Query())
+
 	model.DB.Model(&model.Video{}).Where(&model.Video{
 		SpaceID: uint(sID),
-	}).Count(&result.Total).Offset(offset).Limit(limit).Find(&result.Nodes)
+	}).Count(&result.Total).Offset(offset).Limit(limit).Find(&videos)
+
+	for _, video := range videos {
+		var analysisData videoanalysisData
+		analysisData.Video = video
+		model.DB.Model(&model.Analysis{}).Preload("Rating").Order("start_time").Where("video_id = ?", video.ID).Find(&analysisData.Analysis)
+
+		result.Nodes = append(result.Nodes, analysisData)
+	}
 
 	renderx.JSON(w, http.StatusOK, result)
 }

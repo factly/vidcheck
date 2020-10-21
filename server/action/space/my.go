@@ -35,7 +35,7 @@ type orgWithSpace struct {
 // @Produce  json
 // @Param X-User header string true "User ID"
 // @Param X-Space header string true "Space ID"
-// @Success 200 {array} []model.Space
+// @Success 200 {array} []orgWithSpace
 // @Router /spaces [get]
 func my(w http.ResponseWriter, r *http.Request) {
 	uID, err := util.GetUser(r.Context())
@@ -45,7 +45,7 @@ func my(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	allOrg, err := getMyOrganisations(uID)
+	allOrgs, err := getMyOrganisations(uID)
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
@@ -54,7 +54,7 @@ func my(w http.ResponseWriter, r *http.Request) {
 
 	var allOrgIDs []int
 
-	for _, each := range allOrg {
+	for _, each := range allOrgs {
 		allOrgIDs = append(allOrgIDs, int(each.ID))
 	}
 
@@ -63,7 +63,24 @@ func my(w http.ResponseWriter, r *http.Request) {
 
 	model.DB.Model(model.Space{}).Where("organisation_id IN (?)", allOrgIDs).Find(&allSpaces)
 
-	renderx.JSON(w, http.StatusOK, allSpaces)
+	orgSpaceMap := make(map[uint][]model.Space)
+
+	for _, space := range allSpaces {
+		if _, found := orgSpaceMap[uint(space.OrganisationID)]; !found {
+			orgSpaceMap[uint(space.OrganisationID)] = make([]model.Space, 0)
+		}
+		orgSpaceMap[uint(space.OrganisationID)] = append(orgSpaceMap[uint(space.OrganisationID)], space)
+	}
+
+	for i := range allOrgs {
+		if _, found := orgSpaceMap[allOrgs[i].ID]; found {
+			allOrgs[i].Spaces = orgSpaceMap[allOrgs[i].ID]
+		} else {
+			allOrgs[i].Spaces = make([]model.Space, 0)
+		}
+	}
+
+	renderx.JSON(w, http.StatusOK, allOrgs)
 }
 
 func getMyOrganisations(uID int) ([]orgWithSpace, error) {
