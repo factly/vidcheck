@@ -28,4 +28,15 @@ func SetupVars() {
 	if !viper.IsSet("kavach.url") {
 		log.Fatal("please provide kavach.url in config file")
 	}
+
+	if DegaIntegrated() {
+		if !viper.IsSet("dega.url") {
+			log.Fatal("please provide dega.url in config file")
+		}
+	}
+}
+
+// DegaIntegrated checks if dega integration is on
+func DegaIntegrated() bool {
+	return viper.IsSet("dega.integration") && viper.GetBool("dega.integration")
 }

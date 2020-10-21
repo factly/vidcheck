@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/factly/vidcheck/config"
+
 	"github.com/factly/vidcheck/action/rating"
 	"github.com/factly/vidcheck/action/space"
 	"github.com/factly/vidcheck/action/videoanalysis"
@@ -48,8 +50,10 @@ func RegisterRoutes() http.Handler {
 	r.With(util.CheckUser, util.CheckSpace, util.CheckOrganisation).Group(func(r chi.Router) {
 		r.Mount("/analysis", videoanalysis.Router())
 		r.Mount("/videos", video.Router())
-		r.Mount("/spaces", space.Router())
-		r.Mount("/ratings", rating.Router())
+		if !config.DegaIntegrated() {
+			r.Mount("/spaces", space.Router())
+			r.Mount("/ratings", rating.Router())
+		}
 	})
 	return r
 }

@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/factly/vidcheck/config"
+
 	"github.com/factly/vidcheck/model"
 )
 
@@ -19,19 +21,31 @@ func CheckOrganisation(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		if strings.Split(strings.Trim(r.URL.Path, "/"), "/")[0] != "spaces" {
-			ctx := r.Context()
-			sID, err := GetSpace(ctx)
+			if !config.DegaIntegrated() {
+				ctx := r.Context()
+				sID, err := GetSpace(ctx)
 
-			if err != nil {
-				w.WriteHeader(http.StatusUnauthorized)
+				if err != nil {
+					w.WriteHeader(http.StatusUnauthorized)
+					return
+				}
+
+				space := &model.Space{}
+				space.ID = uint(sID)
+
+				err = model.DB.First(&space).Error
+
+				if err != nil {
+					w.WriteHeader(http.StatusUnauthorized)
+					return
+				}
+
+				ctx = context.WithValue(ctx, OrganisationIDKey, space.OrganisationID)
+				h.ServeHTTP(w, r.WithContext(ctx))
 				return
 			}
-
-			space := &model.Space{}
-			space.ID = uint(sID)
-
-			err = model.DB.First(&space).Error
-
+			ctx := r.Context()
+			space, err := GetDegaSpace(ctx)
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)
 				return
