@@ -56,6 +56,9 @@ func TestVideoCreate(t *testing.T) {
 				NewRows([]string{"id"}).
 				AddRow(1))
 
+		rating.SelectWithoutSpace(mock)
+		rating.SelectWithoutSpace(mock)
+
 		second := requestData["analysis"].([]map[string]interface{})[1]
 		mock.ExpectQuery(`INSERT INTO "analysis"`).
 			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, analysisData["video_id"], analysisData["rating_id"], analysisData["claim"], analysisData["fact"], analysisData["end_time"], analysisData["start_time"], analysisData["end_time_fraction"], test.AnyTime{}, test.AnyTime{}, nil, second["video_id"], second["rating_id"], second["claim"], second["fact"], second["end_time"], second["start_time"], second["end_time_fraction"]).
@@ -107,6 +110,9 @@ func TestVideoCreate(t *testing.T) {
 			WillReturnRows(sqlmock.
 				NewRows([]string{"id"}).
 				AddRow(1))
+
+		rating.SelectWithoutSpace(mock)
+		rating.SelectWithoutSpace(mock)
 
 		second := requestData["analysis"].([]map[string]interface{})[1]
 		mock.ExpectQuery(`INSERT INTO "analysis"`).
