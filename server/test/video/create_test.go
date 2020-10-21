@@ -9,6 +9,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/vidcheck/action"
 	"github.com/factly/vidcheck/test"
+	"github.com/factly/vidcheck/test/rating"
 	"github.com/gavv/httpexpect"
 )
 
@@ -61,6 +62,11 @@ func TestVideoCreate(t *testing.T) {
 			WillReturnRows(sqlmock.
 				NewRows([]string{"id"}).
 				AddRow(1))
+
+		analysisSelectQuery(mock, 1)
+
+		rating.SelectWithoutSpace(mock)
+
 		mock.ExpectCommit()
 
 		res := e.POST(basePath).

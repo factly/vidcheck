@@ -199,8 +199,6 @@ definitions:
     type: object
   video.video:
     properties:
-      space_id:
-        type: integer
       summary:
         type: string
       title:

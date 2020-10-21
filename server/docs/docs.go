@@ -1311,9 +1311,6 @@ var doc = `{
                 "video_type"
             ],
             "properties": {
-                "space_id": {
-                    "type": "integer"
-                },
                 "summary": {
                     "type": "string"
                 },

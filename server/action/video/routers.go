@@ -10,7 +10,6 @@ type video struct {
 	Title     string `json:"title" validate:"required"`
 	Summary   string `json:"summary"`
 	VideoType string `json:"video_type" validate:"required"`
-	SpaceID   uint   `json:"space_id"`
 }
 
 type videoanalysis struct {
