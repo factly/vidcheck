@@ -57,3 +57,71 @@ func KavachGock() {
 		Reply(http.StatusOK).
 		JSON(Dummy_OrgList)
 }
+
+var Dummy_RatingList = []map[string]interface{}{
+	{
+		"id":            1,
+		"created_at":    time.Now(),
+		"updated_at":    time.Now(),
+		"deleted_at":    nil,
+		"name":          "Partly False",
+		"slug":          "partly-false",
+		"description":   "Partly False",
+		"numeric_value": 2,
+		"space_id":      1,
+	},
+	{
+		"id":            2,
+		"created_at":    time.Now(),
+		"updated_at":    time.Now(),
+		"deleted_at":    nil,
+		"name":          "False",
+		"slug":          "false",
+		"description":   "False",
+		"numeric_value": 1,
+		"space_id":      1,
+	},
+}
+
+func DegaGock() {
+	paiganationResponse := map[string]interface{}{
+		"total": len(Dummy_RatingList),
+		"nodes": Dummy_RatingList,
+	}
+
+	gock.New(viper.GetString("dega.url")).
+		Get("/fact-check/ratings").
+		MatchParam("all", "true").
+		Persist().
+		Reply(http.StatusOK).
+		JSON(paiganationResponse)
+
+	DummyOwner_Org["spaces"] = []map[string]interface{}{
+		{
+			"id":                 1,
+			"created_at":         time.Now(),
+			"updated_at":         time.Now(),
+			"deleted_at":         nil,
+			"name":               "Test Space",
+			"slug":               "test-space",
+			"site_title":         "none",
+			"tag_line":           "none",
+			"description":        "This is test space",
+			"site_address":       "none",
+			"verification_codes": "none",
+			"social_media_urls":  "none",
+			"contact_info":       "none",
+			"organisation_id":    1,
+		},
+	}
+
+	var orgWithSpaces = []map[string]interface{}{
+		DummyOwner_Org,
+	}
+
+	gock.New(viper.GetString("dega.url")).
+		Get("/core/spaces").
+		Persist().
+		Reply(http.StatusOK).
+		JSON(orgWithSpaces)
+}
