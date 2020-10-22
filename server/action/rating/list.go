@@ -2,7 +2,6 @@ package rating
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 
@@ -83,9 +82,6 @@ func GetDegaRatings(uID, sID int) (map[uint]model.Rating, error) {
 		return nil, err
 	}
 
-	if pagingRes.Total == 0 {
-		return nil, errors.New(`empty ratings response`)
-	}
 	ratmap := make(map[uint]model.Rating)
 	for _, rating := range pagingRes.Nodes {
 		ratmap[rating.ID] = rating
