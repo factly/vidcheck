@@ -47,7 +47,7 @@ func RegisterRoutes() http.Handler {
 		fmt.Println("swagger-ui http://localhost:8080/swagger/index.html")
 	}
 
-	r.With(util.CheckUser, util.CheckSpace, util.CheckOrganisation).Group(func(r chi.Router) {
+	r.With(util.CheckUser, util.CheckSpace).Group(func(r chi.Router) {
 		r.Mount("/analysis", videoanalysis.Router())
 		r.Mount("/videos", video.Router())
 		if !config.DegaIntegrated() {

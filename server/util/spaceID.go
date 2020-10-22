@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/factly/vidcheck/config"
+
 	"github.com/factly/vidcheck/model"
 	"github.com/spf13/viper"
 )
@@ -42,14 +44,33 @@ func CheckSpace(h http.Handler) http.Handler {
 				return
 			}
 
-			uid, err := strconv.Atoi(space)
+			sid, err := strconv.Atoi(space)
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
-			ctx := r.Context()
 
-			ctx = context.WithValue(ctx, SpaceIDKey, uid)
+			ctx := r.Context()
+			ctx = context.WithValue(ctx, SpaceIDKey, sid)
+
+			var spaceObj *model.Space
+			if !config.DegaIntegrated() {
+				spaceObj = &model.Space{}
+				spaceObj.ID = uint(sid)
+
+				err = model.DB.First(&spaceObj).Error
+				if err != nil {
+					w.WriteHeader(http.StatusUnauthorized)
+					return
+				}
+			} else {
+				_, err := GetDegaSpace(ctx)
+				if err != nil {
+					w.WriteHeader(http.StatusUnauthorized)
+					return
+				}
+			}
+
 			h.ServeHTTP(w, r.WithContext(ctx))
 			return
 		}
