@@ -133,4 +133,30 @@ func TestVideoList(t *testing.T) {
 
 		viper.Set("dega.integration", false)
 	})
+
+	t.Run("dega returns invalid response", func(t *testing.T) {
+		viper.Set("dega.integration", true)
+		gock.Off()
+
+		gock.New(testServer.URL).EnableNetworking().Persist()
+		defer gock.Off()
+		test.DegaSpaceGock()
+		gock.New(viper.GetString("dega.url")).
+			Get("/fact-check/ratings").
+			MatchParam("all", "true").
+			Persist().
+			Reply(http.StatusInternalServerError)
+
+		mock.ExpectQuery(countQuery).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(videolist)))
+
+		e.GET(basePath).
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusInternalServerError)
+		test.ExpectationsMet(t, mock)
+
+		viper.Set("dega.integration", false)
+	})
 }

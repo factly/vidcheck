@@ -70,17 +70,19 @@ var Dummy_RatingList = []map[string]interface{}{
 		"numeric_value": 2,
 		"space_id":      1,
 	},
-	{
-		"id":            2,
-		"created_at":    time.Now(),
-		"updated_at":    time.Now(),
-		"deleted_at":    nil,
-		"name":          "False",
-		"slug":          "false",
-		"description":   "False",
-		"numeric_value": 1,
-		"space_id":      1,
-	},
+	AnotherRating,
+}
+
+var AnotherRating = map[string]interface{}{
+	"id":            2,
+	"created_at":    time.Now(),
+	"updated_at":    time.Now(),
+	"deleted_at":    nil,
+	"name":          "False",
+	"slug":          "false",
+	"description":   "False",
+	"numeric_value": 1,
+	"space_id":      1,
 }
 
 func DegaGock() {
@@ -96,6 +98,10 @@ func DegaGock() {
 		Reply(http.StatusOK).
 		JSON(paiganationResponse)
 
+	DegaSpaceGock()
+}
+
+func DegaSpaceGock() {
 	DummyOwner_Org["spaces"] = []map[string]interface{}{
 		{
 			"id":                 1,

@@ -81,6 +81,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 	if config.DegaIntegrated() {
 		degaRatingMap, err = rating.GetDegaRatings(uID, sID)
 		if err != nil {
+			tx.Rollback()
 			loggerx.Error(err)
 			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
 			return

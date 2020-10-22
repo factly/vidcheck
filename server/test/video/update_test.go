@@ -174,4 +174,73 @@ func TestVideoUpdate(t *testing.T) {
 		viper.Set("dega.integration", false)
 	})
 
+	t.Run("dega returns invalid response", func(t *testing.T) {
+		viper.Set("dega.integration", true)
+		gock.Off()
+
+		gock.New(testServer.URL).EnableNetworking().Persist()
+		defer gock.Off()
+		test.DegaSpaceGock()
+		gock.New(viper.GetString("dega.url")).
+			Get("/fact-check/ratings").
+			MatchParam("all", "true").
+			Persist().
+			Reply(http.StatusInternalServerError)
+
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1, 1).
+			WillReturnRows(sqlmock.NewRows(Columns).
+				AddRow(1, time.Now(), time.Now(), nil, "url", "title", "summary", "video_type", 1))
+
+		e.PUT(path).
+			WithPath("video_id", 1).
+			WithHeaders(headers).
+			WithJSON(requestData).
+			Expect().
+			Status(http.StatusInternalServerError)
+		test.ExpectationsMet(t, mock)
+		viper.Set("dega.integration", false)
+	})
+
+	t.Run("ratings not in dega server while updating analysis block", func(t *testing.T) {
+		viper.Set("dega.integration", true)
+		gock.Off()
+
+		gock.New(testServer.URL).EnableNetworking().Persist()
+		defer gock.Off()
+		test.DegaSpaceGock()
+		gock.New(viper.GetString("dega.url")).
+			Get("/fact-check/ratings").
+			MatchParam("all", "true").
+			Persist().
+			Reply(http.StatusOK).
+			JSON(map[string]interface{}{
+				"total": 1,
+				"nodes": []map[string]interface{}{
+					test.AnotherRating,
+				},
+			})
+
+		mock.ExpectQuery(selectQuery).
+			WithArgs(1, 1).
+			WillReturnRows(sqlmock.NewRows(Columns).
+				AddRow(1, time.Now(), time.Now(), nil, "url", "title", "summary", "video_type", 1))
+
+		mock.ExpectBegin()
+		mock.ExpectExec(regexp.QuoteMeta(`UPDATE "video"`)).
+			WithArgs(test.AnyTime{}, Data["title"], Data["summary"], Data["video_type"], 1).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+
+		SelectQuery(mock, 1, 1)
+		mock.ExpectRollback()
+
+		e.PUT(path).
+			WithPath("video_id", 1).
+			WithHeaders(headers).
+			WithJSON(requestData).
+			Expect().
+			Status(http.StatusInternalServerError)
+		test.ExpectationsMet(t, mock)
+		viper.Set("dega.integration", false)
+	})
 }
