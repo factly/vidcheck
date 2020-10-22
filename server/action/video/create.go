@@ -76,14 +76,26 @@ func create(w http.ResponseWriter, r *http.Request) {
 
 	analysisBlocks := []model.Analysis{}
 	ratingMap := make(map[float64]*model.Rating)
+	var degaRatingMap map[uint]model.Rating
+
+	if config.DegaIntegrated() {
+		degaRatingMap, err = rating.GetDegaRatings(uID, sID)
+		if err != nil {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+			return
+		}
+	}
 
 	for _, analysisBlock := range videoAnalysisData.Analysis {
 
 		// check if associated rating exist
 		if config.DegaIntegrated() {
-			var rat *model.Rating
-			rat, err = rating.ExistInDega(analysisBlock.RatingID, uint(uID), uint(sID))
-			ratingMap[analysisBlock.EndTimeFraction] = rat
+			if rat, found := degaRatingMap[analysisBlock.RatingID]; found {
+				ratingMap[analysisBlock.EndTimeFraction] = &rat
+			} else {
+				err = errors.New(`rating does not exist in dega`)
+			}
 		} else {
 			rat := model.Rating{}
 			rat.ID = analysisBlock.RatingID

@@ -72,7 +72,14 @@ func details(w http.ResponseWriter, r *http.Request) {
 	stmt.Find(&analysisBlocks)
 
 	if config.DegaIntegrated() {
-		analysisBlocks = AddDegaRatings(uID, sID, analysisBlocks)
+		ratingMap, err := rating.GetDegaRatings(uID, sID)
+		if err != nil {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+			return
+		}
+
+		analysisBlocks = AddDegaRatings(uID, sID, analysisBlocks, ratingMap)
 	}
 
 	result := videoanalysisData{
@@ -83,10 +90,11 @@ func details(w http.ResponseWriter, r *http.Request) {
 }
 
 // AddDegaRatings added ratings from dega server in analysis list
-func AddDegaRatings(uID, sID int, analysisList []model.Analysis) []model.Analysis {
+func AddDegaRatings(uID, sID int, analysisList []model.Analysis, ratingMap map[uint]model.Rating) []model.Analysis {
 	for i := range analysisList {
-		rat, _ := rating.ExistInDega(analysisList[i].RatingID, uint(uID), uint(sID))
-		analysisList[i].Rating = rat
+		if rat, found := ratingMap[analysisList[i].RatingID]; found {
+			analysisList[i].Rating = &rat
+		}
 	}
 	return analysisList
 }
