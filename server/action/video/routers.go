@@ -10,6 +10,7 @@ type video struct {
 	Title     string `json:"title" validate:"required"`
 	Summary   string `json:"summary"`
 	VideoType string `json:"video_type" validate:"required"`
+	Status    string `json:"status"`
 }
 
 type videoanalysis struct {
@@ -36,7 +37,8 @@ type videoanalysisData struct {
 func Router() chi.Router {
 	r := chi.NewRouter()
 
-	r.Get("/", list)    // GET /video - return list of videos.
+	r.Get("/", list) // GET /video - return list of videos.
+	r.Get("/published", publishedList)
 	r.Post("/", create) // POST /video - create a new video and persist it.
 	r.Route("/{video_id}", func(r chi.Router) {
 		r.Get("/", details)   // GET /videos/{video_id} - read a single video by :video_id

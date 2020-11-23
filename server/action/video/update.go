@@ -78,6 +78,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		Title:     videoAnalysisData.Video.Title,
 		Summary:   videoAnalysisData.Video.Summary,
 		VideoType: videoAnalysisData.Video.VideoType,
+		Status:    videoAnalysisData.Video.Status,
 	}).First(&videoObj)
 
 	var updatedOrCreatedVideoBlock []uint

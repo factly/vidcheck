@@ -78,13 +78,13 @@ func TestRatingUpdate(t *testing.T) {
 		mock.ExpectQuery(selectQuery).
 			WithArgs(1, 1).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, time.Now(), time.Now(), nil, "name", "slug", "description", 3, 1))
+				AddRow(1, time.Now(), time.Now(), nil, "name", "slug", "description", 3, "", 1))
 
 		sameNameCount(mock, 0, Data["name"])
 
 		mock.ExpectBegin()
 		mock.ExpectExec(regexp.QuoteMeta(`UPDATE "rating"`)).
-			WithArgs(test.AnyTime{}, Data["name"], Data["slug"], Data["description"], Data["numeric_value"], 1).
+			WithArgs(test.AnyTime{}, Data["name"], Data["slug"], Data["description"], Data["numeric_value"], Data["colour"], 1).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		mock.ExpectCommit()
 
@@ -105,7 +105,7 @@ func TestRatingUpdate(t *testing.T) {
 		mock.ExpectQuery(selectQuery).
 			WithArgs(1, 1).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, time.Now(), time.Now(), nil, "name", "slug", "description", 3, 1))
+				AddRow(1, time.Now(), time.Now(), nil, "name", "slug", "description", 3, "", 1))
 
 		sameNameCount(mock, 1, Data["name"])
 

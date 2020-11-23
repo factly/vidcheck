@@ -30,11 +30,11 @@ func TestVideoUpdate(t *testing.T) {
 		mock.ExpectQuery(selectQuery).
 			WithArgs(1, 1).
 			WillReturnRows(sqlmock.NewRows(Columns).
-				AddRow(1, time.Now(), time.Now(), nil, "url", "title", "summary", "video_type", 1))
+				AddRow(1, time.Now(), time.Now(), nil, "url", "title", "summary", "video_type", "draft", 1))
 
 		mock.ExpectBegin()
 		mock.ExpectExec(regexp.QuoteMeta(`UPDATE "video"`)).
-			WithArgs(test.AnyTime{}, Data["title"], Data["summary"], Data["video_type"], 1).
+			WithArgs(test.AnyTime{}, Data["title"], Data["summary"], Data["video_type"], Data["status"], 1).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
 		SelectQuery(mock, 1, 1)
