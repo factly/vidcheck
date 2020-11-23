@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Tooltip, Button } from "antd";
+import React from "react";
+import { Tooltip, Button, Row, Col, Typography } from "antd";
 import { useHistory } from "react-router-dom";
 import {
   VideoAnalysisTimelineBarWrapper,
@@ -14,26 +14,55 @@ function VideoAnalysisCard({ data }) {
   const history = useHistory();
   const dispatch = useDispatch();
 
+  let ratingsCount = {};
+
+  const getRatingsCount = () =>
+    data.analysis?.map((each) => {
+      if (ratingsCount[each.rating.name]) {
+        ratingsCount[each.rating.name] += 1;
+      } else {
+        ratingsCount = { ...ratingsCount, [each.rating.name]: { count: 1 } };
+      }
+    });
+  getRatingsCount();
+
+  const getId = (url) => {
+    const index = url.indexOf("?v=") + 3;
+    return url.substring(index, url.length);
+  };
+
   return (
     <React.Fragment>
-      <div>{data.video.url}</div>
-      <div>{data.video.title}</div>
-      <div>{data.video.summary}</div>
-      <div>Total Claims : {data.analysis.length}</div>
-      {/* <div>Total Time : {data.details.totalTime} min</div> */}
-      <HorizontalTimelineBar
-        factCheckReview={transformVideoAnalysisdetails(data).analysis}
-      />
-      <Button onClick={() => history.push(`/videos/${data.video.id}/edit`)}>
-        Edit
-      </Button>
-      <Button
-        onClick={() =>
-          dispatch(deleteVideo(data.video.id)).then(() => history.push("/"))
-        }
-      >
-        Delete
-      </Button>
+      <Row gutter={16}>
+        <Col span={4}>
+          <img
+            width={"100%"}
+            alt="thumbnail"
+            src={`https://img.youtube.com/vi/${getId(data.video.url)}/0.jpg`}
+          />
+        </Col>
+        <Col span={18}>
+          <Typography.Title level={2}>{data.video.title}</Typography.Title>
+          <Typography>{`${data.analysis.length} CLAIMS IN TOTAL`}</Typography>
+          <HorizontalTimelineBar
+            factCheckReview={transformVideoAnalysisdetails(data).analysis}
+          />
+          <br />
+
+          <Typography>{data.video.summary}</Typography>
+
+          <Button onClick={() => history.push(`/videos/${data.video.id}/edit`)}>
+            Edit
+          </Button>
+          <Button
+            onClick={() =>
+              dispatch(deleteVideo(data.video.id)).then(() => history.push("/"))
+            }
+          >
+            Delete
+          </Button>
+        </Col>
+      </Row>
     </React.Fragment>
   );
 }
@@ -59,7 +88,15 @@ function HorizontalTimelineBar({ factCheckReview }) {
 
   return (
     <VideoAnalysisTimelineBarWrapper>
-      <VideoLengthBar>
+      <div
+        style={{
+          color: "white",
+          textAlign: "center",
+          display: "flex",
+          width: "100%",
+          height: "25px",
+        }}
+      >
         {factCheckReview.map((review, index) => (
           <Tooltip
             title={review.start_time + "-" + review.end_time}
@@ -73,7 +110,7 @@ function HorizontalTimelineBar({ factCheckReview }) {
             </VideoLengthPart>
           </Tooltip>
         ))}
-      </VideoLengthBar>
+      </div>
     </VideoAnalysisTimelineBarWrapper>
   );
 }

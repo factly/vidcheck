@@ -5,23 +5,35 @@ import "antd/dist/antd.css";
 import BasicLayout from "../src/layouts/basic";
 
 import routes from "../src/config/routesConfig";
+import Preview from "./pages/preview";
 
 function App() {
   return (
     <div className="App">
       <Router basename={process.env.PUBLIC_URL}>
-        <BasicLayout>
-          <Switch>
-            {routes.map((route) => (
-              <Route
-                key={route.path}
-                exact
-                path={route.path}
-                component={route.Component}
-              />
-            ))}
-          </Switch>
-        </BasicLayout>
+        <Switch>
+          <Route
+            key={"route.path"}
+            exact
+            path={"/preview"}
+            component={Preview}
+          />
+          <Route
+            key={"route.path11"}
+            component={() => (
+              <BasicLayout>
+                {routes.map((route) => (
+                  <Route
+                    key={route.path}
+                    exact
+                    path={route.path}
+                    component={route.Component}
+                  />
+                ))}
+              </BasicLayout>
+            )}
+          />
+        </Switch>
       </Router>
     </div>
   );

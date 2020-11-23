@@ -14,6 +14,8 @@ import EditSpace from "../pages/spaces/EditSpace";
 import CreateVideo from "../pages/analysis/CreateVideo";
 import EditVideo from "../pages/analysis/EditVideo";
 
+import Preview from "../pages/preview";
+
 const routes = [
   {
     path: "/",
