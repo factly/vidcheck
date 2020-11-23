@@ -18,7 +18,6 @@ definitions:
         type: integer
       rating:
         $ref: '#/definitions/model.Rating'
-        type: object
       rating_id:
         type: integer
       start_time:
@@ -27,12 +26,13 @@ definitions:
         type: string
       video:
         $ref: '#/definitions/model.Video'
-        type: object
       video_id:
         type: integer
     type: object
   model.Rating:
     properties:
+      colour:
+        type: string
       created_at:
         type: string
       deleted_at:
@@ -93,6 +93,8 @@ definitions:
         type: integer
       space_id:
         type: integer
+      status:
+        type: string
       summary:
         type: string
       title:
@@ -115,6 +117,8 @@ definitions:
     type: object
   rating.rating:
     properties:
+      colour:
+        type: string
       description:
         type: string
       name:
@@ -137,7 +141,6 @@ definitions:
         type: integer
       permission:
         $ref: '#/definitions/space.organisationUser'
-        type: object
       slug:
         type: string
       spaces:
@@ -199,6 +202,8 @@ definitions:
     type: object
   video.video:
     properties:
+      status:
+        type: string
       summary:
         type: string
       title:
@@ -241,7 +246,6 @@ definitions:
         type: array
       video:
         $ref: '#/definitions/model.Video'
-        type: object
     type: object
   video.videoanalysisReqData:
     properties:
@@ -251,7 +255,6 @@ definitions:
         type: array
       video:
         $ref: '#/definitions/video.video'
-        type: object
     required:
     - analysis
     - video
@@ -307,7 +310,6 @@ definitions:
         type: array
       video:
         $ref: '#/definitions/videoanalysis.video'
-        type: object
     required:
     - analysis
     - video
@@ -985,6 +987,39 @@ paths:
               type: string
             type: array
       summary: Update a video by id
+      tags:
+      - Videos
+  /videos/published:
+    get:
+      description: Get all published videos
+      operationId: get-all-published-videos
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: limt per page
+        in: query
+        name: limit
+        type: string
+      - description: page number
+        in: query
+        name: page
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/video.paging'
+      summary: Show all published videos
       tags:
       - Videos
 swagger: "2.0"
