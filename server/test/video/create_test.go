@@ -51,7 +51,7 @@ func TestVideoCreate(t *testing.T) {
 
 		mock.ExpectBegin()
 		mock.ExpectQuery(`INSERT INTO "video"`).
-			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, Data["url"], Data["title"], Data["summary"], Data["video_type"], Data["space_id"]).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, Data["url"], Data["title"], Data["summary"], Data["video_type"], Data["status"], Data["space_id"]).
 			WillReturnRows(sqlmock.
 				NewRows([]string{"id"}).
 				AddRow(1))
@@ -86,7 +86,7 @@ func TestVideoCreate(t *testing.T) {
 
 		mock.ExpectBegin()
 		mock.ExpectQuery(`INSERT INTO "video"`).
-			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, Data["url"], Data["title"], Data["summary"], Data["video_type"], Data["space_id"]).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, Data["url"], Data["title"], Data["summary"], Data["video_type"], Data["status"], Data["space_id"]).
 			WillReturnError(errors.New(`creating video failed`))
 		mock.ExpectRollback()
 
@@ -103,7 +103,7 @@ func TestVideoCreate(t *testing.T) {
 
 		mock.ExpectBegin()
 		mock.ExpectQuery(`INSERT INTO "video"`).
-			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, Data["url"], Data["title"], Data["summary"], Data["video_type"], Data["space_id"]).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, Data["url"], Data["title"], Data["summary"], Data["video_type"], Data["status"], Data["space_id"]).
 			WillReturnRows(sqlmock.
 				NewRows([]string{"id"}).
 				AddRow(1))

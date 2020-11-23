@@ -51,8 +51,8 @@ func TestRatingList(t *testing.T) {
 		mock.ExpectQuery(selectQuery).
 			WithArgs(1).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(1, time.Now(), time.Now(), nil, defaultData[0]["name"], defaultData[0]["slug"], defaultData[0]["description"], defaultData[0]["numeric_value"], 1).
-				AddRow(2, time.Now(), time.Now(), nil, defaultData[1]["name"], defaultData[1]["slug"], defaultData[1]["description"], defaultData[1]["numeric_value"], 1))
+				AddRow(1, time.Now(), time.Now(), nil, defaultData[0]["name"], defaultData[0]["slug"], defaultData[0]["description"], defaultData[0]["numeric_value"], defaultData[0]["colour"], 1).
+				AddRow(2, time.Now(), time.Now(), nil, defaultData[1]["name"], defaultData[1]["slug"], defaultData[1]["description"], defaultData[1]["numeric_value"], defaultData[1]["colour"], 1))
 
 		e.GET(basePath).
 			WithHeaders(headers).
@@ -79,7 +79,7 @@ func TestRatingList(t *testing.T) {
 		mock.ExpectQuery(selectQuery).
 			WithArgs(1).
 			WillReturnRows(sqlmock.NewRows(columns).
-				AddRow(2, time.Now(), time.Now(), nil, defaultData[1]["name"], defaultData[1]["slug"], defaultData[1]["description"], defaultData[1]["numeric_value"], 1))
+				AddRow(2, time.Now(), time.Now(), nil, defaultData[1]["name"], defaultData[1]["slug"], defaultData[1]["description"], defaultData[1]["numeric_value"], defaultData[1]["colour"], 1))
 
 		e.GET(basePath).
 			WithHeaders(headers).

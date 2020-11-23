@@ -13,9 +13,9 @@ type space struct {
 	TagLine           string         `json:"tag_line"`
 	Description       string         `json:"description"`
 	SiteAddress       string         `json:"site_address"`
-	VerificationCodes postgres.Jsonb `json:"verification_codes"`
-	SocialMediaURLs   postgres.Jsonb `json:"social_media_urls"`
-	ContactInfo       postgres.Jsonb `json:"contact_info"`
+	VerificationCodes postgres.Jsonb `json:"verification_codes" swaggertype:"primitive,string"`
+	SocialMediaURLs   postgres.Jsonb `json:"social_media_urls" swaggertype:"primitive,string"`
+	ContactInfo       postgres.Jsonb `json:"contact_info" swaggertype:"primitive,string"`
 	OrganisationID    int            `json:"organisation_id" validate:"required"`
 }
 
