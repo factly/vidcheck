@@ -1,4 +1,4 @@
-import { Space } from "antd";
+import { Col, Row, Space, Card } from "antd";
 import React from "react";
 import ReactPlayer from "react-player";
 import { HorizontalTimelineBar } from "../analysis/components/AnalysisTimelineBar/AnalysisTimelineBar";
@@ -182,22 +182,29 @@ function Preview() {
     setPlayed(currentPlayed);
   };
   return (
-    <>
-      <ReactPlayer
-        url={videoData.video.url}
-        playing={playing}
-        controls={true}
-        ref={player}
-        volume={0}
-        onProgress={handleProgress}
-        onDuration={setTotalDuration}
-      />
-
+    <div style={{ margin: 50 }}>
+      <Row gutter={4} style={{ marginLeft: "100px" }}>
+        <Col span={12}>
+          <ReactPlayer
+            url={videoData.video.url}
+            playing={playing}
+            controls={true}
+            ref={player}
+            volume={0}
+            onProgress={handleProgress}
+            onDuration={setTotalDuration}
+          />
+        </Col>
+        <Col span={12}>
+          <Card>{videoData.video.summary}</Card>
+        </Col>
+      </Row>
+      <br />
       <HorizontalTimelineBar
         factCheckReview={factCheckReview}
         setCurrentFormData={updateFormState}
       />
-    </>
+    </div>
   );
 }
 
