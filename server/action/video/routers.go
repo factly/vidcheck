@@ -3,6 +3,7 @@ package video
 import (
 	"github.com/factly/vidcheck/model"
 	"github.com/go-chi/chi"
+	"github.com/jinzhu/gorm/dialects/postgres"
 )
 
 type video struct {
@@ -14,10 +15,13 @@ type video struct {
 }
 
 type videoanalysis struct {
-	ID              uint    `json:"id"`
-	RatingID        uint    `json:"rating_id" validate:"required"`
-	Claim           string  `json:"claim"`
-	Fact            string  `json:"fact"`
+	ID            uint           `json:"id"`
+	RatingID      uint           `json:"rating_id" validate:"required"`
+	Claim         string         `json:"claim"`
+	Fact          string         `json:"fact"`
+	Description   postgres.Jsonb `json:"description" swaggertype:"primitive,string"`
+	ReviewSources string         `json:"review_sources"`
+
 	StartTime       int     `json:"start_time"`
 	EndTime         int     `json:"end_time" validate:"required"`
 	EndTimeFraction float64 `json:"end_time_fraction" validate:"required"`

@@ -6,6 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/jinzhu/gorm/dialects/postgres"
+
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/factly/vidcheck/action"
 	"github.com/factly/vidcheck/test"
@@ -57,8 +59,9 @@ func TestVideoCreate(t *testing.T) {
 				AddRow(1))
 
 		second := requestData["analysis"].([]map[string]interface{})[1]
+		desc := postgres.Jsonb{RawMessage: []byte(`"` + second["description"].(string) + `"`)}
 		mock.ExpectQuery(`INSERT INTO "analysis"`).
-			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, analysisData["video_id"], analysisData["rating_id"], analysisData["claim"], analysisData["fact"], analysisData["end_time"], analysisData["start_time"], analysisData["end_time_fraction"], test.AnyTime{}, test.AnyTime{}, nil, second["video_id"], second["rating_id"], second["claim"], second["fact"], second["end_time"], second["start_time"], second["end_time_fraction"]).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, analysisData["video_id"], analysisData["rating_id"], analysisData["claim"], analysisData["fact"], analysisData["description"], analysisData["review_sources"], analysisData["end_time"], analysisData["start_time"], analysisData["end_time_fraction"], test.AnyTime{}, test.AnyTime{}, nil, second["video_id"], second["rating_id"], second["claim"], second["fact"], desc, second["review_sources"], second["end_time"], second["start_time"], second["end_time_fraction"]).
 			WillReturnRows(sqlmock.
 				NewRows([]string{"id"}).
 				AddRow(1))
@@ -109,8 +112,10 @@ func TestVideoCreate(t *testing.T) {
 				AddRow(1))
 
 		second := requestData["analysis"].([]map[string]interface{})[1]
+		desc := postgres.Jsonb{RawMessage: []byte(`"` + second["description"].(string) + `"`)}
+
 		mock.ExpectQuery(`INSERT INTO "analysis"`).
-			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, analysisData["video_id"], analysisData["rating_id"], analysisData["claim"], analysisData["fact"], analysisData["end_time"], analysisData["start_time"], analysisData["end_time_fraction"], test.AnyTime{}, test.AnyTime{}, nil, second["video_id"], second["rating_id"], second["claim"], second["fact"], second["end_time"], second["start_time"], second["end_time_fraction"]).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, analysisData["video_id"], analysisData["rating_id"], analysisData["claim"], analysisData["fact"], analysisData["description"], analysisData["review_sources"], analysisData["end_time"], analysisData["start_time"], analysisData["end_time_fraction"], test.AnyTime{}, test.AnyTime{}, nil, second["video_id"], second["rating_id"], second["claim"], second["fact"], desc, second["review_sources"], second["end_time"], second["start_time"], second["end_time_fraction"]).
 			WillReturnError(errors.New(`creating analysis fails`))
 		mock.ExpectRollback()
 

@@ -12,6 +12,7 @@ import (
 	"github.com/factly/vidcheck/test"
 	"github.com/factly/vidcheck/test/rating"
 	"github.com/gavv/httpexpect"
+	"github.com/jinzhu/gorm/dialects/postgres"
 )
 
 func TestVideoUpdate(t *testing.T) {
@@ -40,12 +41,14 @@ func TestVideoUpdate(t *testing.T) {
 		SelectQuery(mock, 1, 1)
 
 		mock.ExpectExec(regexp.QuoteMeta(`UPDATE "analysis"`)).
-			WithArgs(test.AnyTime{}, analysisData["rating_id"], analysisData["claim"], analysisData["fact"], analysisData["end_time"], analysisData["end_time_fraction"], 1).
+			WithArgs(test.AnyTime{}, analysisData["rating_id"], analysisData["claim"], analysisData["fact"], analysisData["description"], analysisData["review_sources"], analysisData["end_time"], analysisData["end_time_fraction"], 1).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
 		second := requestData["analysis"].([]map[string]interface{})[1]
+		desc := postgres.Jsonb{RawMessage: []byte(`"` + second["description"].(string) + `"`)}
+
 		mock.ExpectQuery(`INSERT INTO "analysis"`).
-			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, second["video_id"], second["rating_id"], second["claim"], second["fact"], second["end_time"], second["start_time"], second["end_time_fraction"]).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, second["video_id"], second["rating_id"], second["claim"], second["fact"], desc, second["review_sources"], second["end_time"], second["start_time"], second["end_time_fraction"]).
 			WillReturnRows(sqlmock.NewRows([]string{"id"}).
 				AddRow(2))
 

@@ -75,6 +75,8 @@ func create(w http.ResponseWriter, r *http.Request) {
 			RatingID:        analysisBlock.RatingID,
 			Claim:           analysisBlock.Claim,
 			Fact:            analysisBlock.Fact,
+			Description:     analysisBlock.Description,
+			ReviewSources:   analysisBlock.ReviewSources,
 			StartTime:       analysisBlock.StartTime,
 			EndTime:         analysisBlock.EndTime,
 			EndTimeFraction: analysisBlock.EndTimeFraction,
