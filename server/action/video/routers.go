@@ -37,10 +37,10 @@ type videoanalysisData struct {
 func Router() chi.Router {
 	r := chi.NewRouter()
 
-	r.Get("/", list) // GET /video - return list of videos.
-	r.Get("/published", publishedList)
+	r.Get("/", list)    // GET /video - return list of videos.
 	r.Post("/", create) // POST /video - create a new video and persist it.
 	r.Route("/{video_id}", func(r chi.Router) {
+		r.Get("/published", publishedDetails)
 		r.Get("/", details)   // GET /videos/{video_id} - read a single video by :video_id
 		r.Put("/", update)    // PUT /videos/{video_id} - update a single video by :video_id
 		r.Delete("/", delete) // DELETE /videos/{video_id} - delete a single video by :video_id

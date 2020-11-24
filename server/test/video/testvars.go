@@ -111,7 +111,7 @@ var countQuery string = regexp.QuoteMeta(`SELECT count(1) FROM "video"`)
 
 const path string = "/videos/{video_id}"
 const basePath string = "/videos"
-const publishedPath string = "/videos/published"
+const publishedDetailsPath string = "/videos/{video_id}/published"
 
 func SelectQuery(mock sqlmock.Sqlmock, args ...driver.Value) {
 	mock.ExpectQuery(selectQuery).
