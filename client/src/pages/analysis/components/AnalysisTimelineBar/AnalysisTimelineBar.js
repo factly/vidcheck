@@ -9,7 +9,14 @@ import {
 } from "../../../../StyledComponents";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
-function HorizontalTimelineBar({ factCheckReview, setCurrentFormData }) {
+function HorizontalTimelineBar({
+  factCheckReview,
+  currentFormdata = {},
+  setCurrentFormData,
+  disabled,
+  height,
+}) {
+  console.log({ factCheckReview, currentFormdata, setCurrentFormData });
   const ratingColor = {
     1: "#19b346",
     2: "#8bb38d",
@@ -33,16 +40,18 @@ function HorizontalTimelineBar({ factCheckReview, setCurrentFormData }) {
           <Tooltip
             title={review.start_time + "-" + review.end_time}
             key={index}
+            disabled={disabled}
+            disable={disabled}
           >
             <VideoLengthPart
+              height={height}
               width={`${review.widthPercentage}%`}
+              showBorder={currentFormdata.id === review.id}
               backgroundColor={ratingColor[review.rating]}
-              onClick={() => setCurrentFormData(review)}
-            >
-              <p style={{ margin: "0px", padding: "5px", "font-size": "10px" }}>
-                {ratingValue[review.rating]}
-              </p>
-            </VideoLengthPart>
+              onClick={() => {
+                !disabled && setCurrentFormData(review);
+              }}
+            ></VideoLengthPart>
           </Tooltip>
         ))}
       </VideoLengthBar>

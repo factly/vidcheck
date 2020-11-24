@@ -8,6 +8,13 @@ import {
 } from "../analysis/utilities/analysis";
 
 function Preview() {
+  const ratingColor = {
+    1: "#19b346",
+    2: "#8bb38d",
+    3: "#b3b3b3",
+    4: "#b36d7e",
+    5: "#b30a25",
+  };
   const videoData = {
     video: {
       id: 1,
@@ -181,29 +188,114 @@ function Preview() {
     setCurrentStartTime(currentFormStartTime);
     setPlayed(currentPlayed);
   };
+
+  const ratingCount = videoData.analysis.reduce((acc, claim) => {
+    if (!acc[claim.rating.name]) {
+      acc[claim.rating.name] = {
+        count: 0,
+        color: ratingColor[claim.rating.numeric_value],
+      };
+    }
+    acc[claim.rating.name].count += 1;
+    return acc;
+  }, {});
+
+  console.log({ ratingCount });
+
   return (
-    <div style={{ margin: 50 }}>
-      <Row gutter={4} style={{ marginLeft: "100px" }}>
-        <Col span={12}>
-          <ReactPlayer
-            url={videoData.video.url}
-            playing={playing}
-            controls={true}
-            ref={player}
-            volume={0}
-            onProgress={handleProgress}
-            onDuration={setTotalDuration}
+    <div style={{}}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-around",
+          width: "70%",
+          marginTop: "20px",
+          marginLeft: "auto",
+          marginRight: "auto",
+        }}
+      >
+        <div
+          style={{
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <div style={{ marginBottom: 20 }}>
+            <ReactPlayer
+              url={videoData.video.url}
+              playing={playing}
+              controls={true}
+              ref={player}
+              volume={0}
+              onProgress={handleProgress}
+              onDuration={setTotalDuration}
+            />
+          </div>
+          <HorizontalTimelineBar
+            factCheckReview={factCheckReview}
+            setCurrentFormData={updateFormState}
+            currentFormdata={currentFormdata}
           />
-        </Col>
-        <Col span={12}>
-          <Card>{videoData.video.summary}</Card>
-        </Col>
-      </Row>
+        </div>
+        <div
+          style={{
+            height: "420px",
+            boxShadow: "0px 0px 9px 1px grey",
+            borderRadius: "5px",
+            width: "260px",
+            padding: "20px",
+            paddingTop: "4px",
+            overflowX: "auto",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "14px",
+              marginTop: "6px",
+              textTransform: "uppercase",
+              fontWeight: "bold",
+            }}
+          >
+            {videoData.analysis.length} claims in total
+          </div>
+          <HorizontalTimelineBar
+            factCheckReview={factCheckReview}
+            disabled={true}
+            height={"12px"}
+          />
+          <div
+            style={{
+              fontSize: "12px",
+              marginTop: "6px",
+            }}
+          >
+            {Object.keys(ratingCount).map((rating) => (
+              <div
+                style={{
+                  color: ratingCount[rating].color,
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                }}
+              >
+                {ratingCount[rating].count} {rating}
+              </div>
+            ))}
+          </div>
+          <div
+            style={{
+              fontSize: "18px",
+              marginTop: "6px",
+            }}
+          >
+            {videoData.video.summary}
+          </div>
+        </div>
+      </div>
       <br />
-      <HorizontalTimelineBar
-        factCheckReview={factCheckReview}
-        setCurrentFormData={updateFormState}
-      />
     </div>
   );
 }
