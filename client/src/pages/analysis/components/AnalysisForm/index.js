@@ -105,7 +105,7 @@ function AnalysisForm({
   const onReset = () => {
     const startTime = form.getFieldValue("start_time");
     form.resetFields();
-    form.setFieldsValue({ start_time });
+    form.setFieldsValue({ startTime });
   };
 
   const fillCurrentTime = () => {
