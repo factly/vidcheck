@@ -1,5 +1,5 @@
-import { Col, Row, Space, Card } from "antd";
 import React from "react";
+import { LeftCircleFilled, RightCircleFilled } from "@ant-design/icons";
 import ReactPlayer from "react-player";
 import { HorizontalTimelineBar } from "../analysis/components/AnalysisTimelineBar/AnalysisTimelineBar";
 import {
@@ -137,6 +137,7 @@ function Preview() {
   const [playing, setPlaying] = React.useState(true);
   const [played, setPlayed] = React.useState(0);
   const [currentFormdata, setCurrentFormData] = React.useState({});
+  const [currentClaimIndex, setCurrentClaimIndex] = React.useState(0);
   const [totalDuration, setTotalDuration] = React.useState(0);
   const [loopDetails, setLoopDetails] = React.useState({
     loopEnabled: false,
@@ -151,6 +152,10 @@ function Preview() {
       "seconds"
     );
     setCurrentFormData(data);
+    const claimIndex = videoData.analysis.findIndex(
+      (item) => item.id === data.id
+    );
+    setCurrentClaimIndex(claimIndex);
   };
   const factCheckReview =
     videoData && videoData.analysis && videoData.analysis.length > 0
@@ -200,8 +205,8 @@ function Preview() {
     return acc;
   }, {});
 
-  console.log({ ratingCount });
-
+  console.log({ currentFormdata });
+  const currentClaim = videoData.analysis[currentClaimIndex];
   return (
     <div style={{}}>
       <div
@@ -250,6 +255,7 @@ function Preview() {
             padding: "20px",
             paddingTop: "4px",
             overflowX: "auto",
+            backgroundColor: "#fff",
           }}
         >
           <div
@@ -296,6 +302,114 @@ function Preview() {
         </div>
       </div>
       <br />
+      <div
+        style={{
+          alignItems: "center",
+          justifyContent: "space-around",
+          width: "70%",
+          height: "360px",
+          marginTop: "20px",
+          marginLeft: "auto",
+          marginRight: "auto",
+          backgroundColor: "#ccc",
+          marginTop: -120,
+        }}
+      >
+        <div style={{ height: 60 }}></div>
+        {currentClaimIndex > -1 && currentClaim && (
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <div
+              style={{ padding: 20 }}
+              onClick={() =>
+                currentClaimIndex === 0
+                  ? null
+                  : updateFormState(factCheckReview[currentClaimIndex - 1])
+              }
+            >
+              <LeftCircleFilled
+                style={{
+                  fontSize: 30,
+                  color: currentClaimIndex === 0 ? "#ddd" : "#222",
+                }}
+              />
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                flex: 1,
+                boxShadow: "0px 0px 9px 1px grey",
+                borderStyle: "solid",
+                borderWidth: "2px",
+                borderRadius: "6px",
+                borderColor: ratingColor[currentClaim.rating.numeric_value],
+                backgroundColor: "#fff",
+                padding: "20px",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div style={{ fontSize: "12px", textTransform: "uppercase" }}>
+                  {currentClaimIndex + 1} of {videoData.analysis.length} claims
+                </div>
+                <div
+                  style={{
+                    fontSize: "14px",
+                    textTransform: "uppercase",
+                    color: ratingColor[currentClaim.rating.numeric_value],
+                  }}
+                >
+                  {currentClaim.rating.name}
+                </div>
+              </div>
+              <div stle={{ height: "40%", margin: 10, overflowX: "auto" }}>
+                <h4>Claim:</h4>
+                {currentClaim.claim}
+              </div>
+              <div stle={{ height: "40%", margin: 10, overflowX: "auto" }}>
+                <h4>Fact:</h4>
+                <div
+                  style={{
+                    color: ratingColor[currentClaim.rating.numeric_value],
+                  }}
+                >
+                  {currentClaim.fact}
+                </div>
+              </div>
+            </div>
+            <div
+              style={{ padding: 20 }}
+              onClick={() =>
+                currentClaimIndex === videoData.analysis.length - 1
+                  ? null
+                  : updateFormState(factCheckReview[currentClaimIndex + 1])
+              }
+            >
+              <RightCircleFilled
+                style={{
+                  fontSize: 30,
+                  color:
+                    currentClaimIndex === videoData.analysis.length - 1
+                      ? "#ddd"
+                      : "#222",
+                }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
