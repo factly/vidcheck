@@ -16,7 +16,7 @@ function VideoAnalysisForm({ data, onSubmit }) {
   });
   return (
     <PageWrapper>
-      <Steps current={current} onChange={(value) => setCurrent(value)}>
+      <Steps current={current}>
         <Steps.Step title="Enter video url" />
         <Steps.Step title="Fact Check" />
         <Steps.Step title="Preview" />

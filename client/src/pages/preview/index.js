@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { LeftCircleFilled, RightCircleFilled } from "@ant-design/icons";
 import ReactPlayer from "react-player";
 import {
@@ -7,8 +7,14 @@ import {
 } from "../analysis/utilities/analysis";
 
 import { HorizontalTimelineBar } from "../analysis/components/AnalysisTimelineBar/AnalysisTimelineBar";
+import axios from "axios";
+import { VIDEOS_API } from "../../constants/videos";
+import { addErrorNotification } from "../../actions/notifications";
+import { Result, Skeleton } from "antd";
+import { useDispatch } from "react-redux";
 
-function Preview() {
+function Preview({ id }) {
+  const dispatch = useDispatch();
   const ratingColor = {
     1: "#19b346",
     2: "#8bb38d",
@@ -16,131 +22,11 @@ function Preview() {
     4: "#b36d7e",
     5: "#b30a25",
   };
-  const videoData = {
-    video: {
-      id: 1,
-      created_at: "2020-11-23T05:50:01.336246Z",
-      updated_at: "2020-11-23T12:27:17.903399Z",
-      deleted_at: null,
-      url: "https://www.youtube.com/watch?v=2Opid0P1P_I",
-      title:
-        "Explainer: What are the directions by Courts & Tribunals about bursting firecrackers during festivals & celebrations?",
-      summary:
-        "It is that time of the year when there is an intense debate around the directions by courts regarding bursting firecrackers. We take a look at the Supreme Court order of 2018 & the recent NGT order that laid down guidelines for bursting firecrackers during any celebration. ",
-      video_type: "www.youtube.com",
-      space_id: 1,
-    },
-    analysis: [
-      {
-        id: 1,
-        created_at: "2020-11-23T05:50:01.348783Z",
-        updated_at: "2020-11-23T12:27:17.907896Z",
-        deleted_at: null,
-        video_id: 1,
-        video: null,
-        rating_id: 5,
-        rating: {
-          id: 5,
-          created_at: "2020-11-23T05:47:42.731056Z",
-          updated_at: "2020-11-23T05:47:42.731056Z",
-          deleted_at: null,
-          name: "False",
-          slug: "false",
-          description: "False",
-          numeric_value: 1,
-          space_id: 1,
-        },
-        claim:
-          "India generated the 3rd highest volume of E-waste even as its per capita generation is 1/3rd the Global Average",
-        fact:
-          "With the generation of E-waste increasing every year, it is soon becoming an important environmental issue around the world. India generated the 3rd highest volume of E-waste in 2019, behind China & USA as per the Global E-waste Monitor. ",
-        end_time: 16,
-        start_time: 0,
-        end_time_fraction: 0.05423728813559322,
-      },
-      {
-        id: 3,
-        created_at: "2020-11-23T05:50:01.348783Z",
-        updated_at: "2020-11-23T12:27:17.911846Z",
-        deleted_at: null,
-        video_id: 1,
-        video: null,
-        rating_id: 3,
-        rating: {
-          id: 3,
-          created_at: "2020-11-23T05:47:42.731056Z",
-          updated_at: "2020-11-23T05:47:42.731056Z",
-          deleted_at: null,
-          name: "Misleading",
-          slug: "misleading",
-          description: "Misleading",
-          numeric_value: 3,
-          space_id: 1,
-        },
-        claim:
-          "Review: What is the latest on the COVID-19 Vaccine development?",
-        fact:
-          "At least eleven (11) COVID-19 vaccine candidates are in phase-3 of clinical trials. Multiple companies have announced encouraging results through preliminary analysis. Pfizer & BioNTech have already applied to US FDA for emergency use authorization (EUA).  ",
-        end_time: 161,
-        start_time: 16,
-        end_time_fraction: 0.5457627118644067,
-      },
-      {
-        id: 4,
-        created_at: "2020-11-23T05:50:01.348783Z",
-        updated_at: "2020-11-23T12:27:17.912689Z",
-        deleted_at: null,
-        video_id: 1,
-        video: null,
-        rating_id: 2,
-        rating: {
-          id: 2,
-          created_at: "2020-11-23T05:47:42.731056Z",
-          updated_at: "2020-11-23T05:47:42.731056Z",
-          deleted_at: null,
-          name: "Partly True",
-          slug: "partly-true",
-          description: "Partly True",
-          numeric_value: 4,
-          space_id: 1,
-        },
-        claim:
-          "Data: NOTA polled more votes than the margin of victory in 30 constituencies of Bihar",
-        fact:
-          "The overall NOTA vote share in the 2020 Bihar Assembly elections decreased to 1.68% compared to 2.46% in 2015. This decrease in the NOTA vote share is consistent with the overall trend of declining preference for NOTA. ",
-        end_time: 209,
-        start_time: 161,
-        end_time_fraction: 0.7084745762711865,
-      },
-      {
-        id: 5,
-        created_at: "2020-11-23T05:50:01.348783Z",
-        updated_at: "2020-11-23T12:27:17.913573Z",
-        deleted_at: null,
-        video_id: 1,
-        video: null,
-        rating_id: 1,
-        rating: {
-          id: 1,
-          created_at: "2020-11-23T05:47:42.731056Z",
-          updated_at: "2020-11-23T05:47:42.731056Z",
-          deleted_at: null,
-          name: "True",
-          slug: "true",
-          description: "True",
-          numeric_value: 5,
-          space_id: 1,
-        },
-        claim:
-          "Review: What do the SC Guidelines say about granting Maintenance to Wife & Children?",
-        fact:
-          "While hearing an appeal on an issue related to grant of maintenance, the Supreme Court recently laid down guidelines for lower courts to decide on such cases. Among other things, the SC directed that information be filed by both parties in a prescribed format. Here is a review of these guidelines.",
-        end_time: 292,
-        start_time: 209,
-        end_time_fraction: 0.9898305084745763,
-      },
-    ],
-  };
+
+  const [videoData, setVideoData] = useState({});
+
+  const [loading, setLoading] = useState(true);
+
   const [currentStartTime, setCurrentStartTime] = React.useState(null);
   const player = React.useRef(null);
   const [playing, setPlaying] = React.useState(false);
@@ -153,6 +39,25 @@ function Preview() {
     startFraction: 0,
     endFraction: 1,
   });
+
+  React.useEffect(() => {
+    axios
+      .get(VIDEOS_API + "/6" + "/published")
+      .then((response) => {
+        setVideoData(response.data);
+      })
+      .catch((error) => {
+        dispatch(addErrorNotification(error.message));
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return <Skeleton />;
+  }
+  if (!videoData.video) {
+    return <Result />;
+  }
 
   const updateFormState = (data) => {
     setPlayed(data.end_time_fraction);
@@ -207,7 +112,7 @@ function Preview() {
     if (!acc[claim.rating.name]) {
       acc[claim.rating.name] = {
         count: 0,
-        color: ratingColor[claim.rating.numeric_value],
+        color: ratingColor[claim.rating.id],
       };
     }
     acc[claim.rating.name].count += 1;
@@ -314,7 +219,7 @@ function Preview() {
           alignItems: "center",
           justifyContent: "space-around",
           width: "70%",
-          height: "360px",
+          height: "400px",
           marginTop: "20px",
           marginLeft: "auto",
           marginRight: "auto",
@@ -359,6 +264,7 @@ function Preview() {
                 borderColor: ratingColor[currentClaim.rating.numeric_value],
                 backgroundColor: "#fff",
                 padding: "20px",
+                minHeight: "240px",
               }}
             >
               <div
@@ -417,6 +323,32 @@ function Preview() {
           </div>
         )}
       </div>
+      <div
+        style={{
+          width: "70%",
+          marginLeft: "auto",
+          marginRight: "auto",
+          marginTop: "60px",
+        }}
+        dangerouslySetInnerHTML={{
+          __html: videoData.analysis[currentClaimIndex].html,
+        }}
+      />
+      {videoData.analysis[currentClaimIndex].review_sources ? (
+        <div
+          style={{
+            width: "70%",
+            marginLeft: "auto",
+            marginRight: "auto",
+            marginTop: "60px",
+            backgroundColor: "#ccc",
+            padding: 5,
+          }}
+        >
+          <h4>Review sources</h4>
+          {videoData.analysis[currentClaimIndex].review_sources}
+        </div>
+      ) : null}
     </div>
   );
 }

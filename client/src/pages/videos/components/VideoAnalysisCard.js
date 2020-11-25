@@ -53,6 +53,9 @@ function VideoAnalysisCard({ data }) {
             {data.video.summary}
           </Typography.Paragraph>
           <div style={{ marginBottom: "auto" }}>
+            <Button onClick={() => history.push(`/preview/${data.video.id}`)}>
+              Preview
+            </Button>
             <Button
               onClick={() => history.push(`/videos/${data.video.id}/edit`)}
             >

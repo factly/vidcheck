@@ -59,12 +59,12 @@ func publishedDetails(w http.ResponseWriter, r *http.Request) {
 
 	for index, each := range analysisBlocks {
 
-		arrByte, _ := each.Description.MarshalJSON()
+		arrByte, err := each.Description.MarshalJSON()
 
 		desc := make(map[string]interface{})
-		err := json.Unmarshal(arrByte, &desc)
+		err = json.Unmarshal(arrByte, &desc)
 
-		if err != nil {
+		if err == nil {
 			html, _ := editorx.EditorjsToHTML(desc)
 			analysisBlocks[index].HTML = html
 		}

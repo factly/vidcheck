@@ -53,7 +53,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		Title:     videoAnalysisData.Video.Title,
 		Summary:   videoAnalysisData.Video.Summary,
 		VideoType: videoAnalysisData.Video.VideoType,
-		Status:    videoAnalysisData.Video.Status,
+		Status:    "published", // status is set to published videoAnalysisData.Video.Status
 		SpaceID:   uint(sID),
 	}
 	err = tx.Create(&videoObj).Error
