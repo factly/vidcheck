@@ -1,7 +1,7 @@
 import React from "react";
 import VideoCreateForm from "./components/VideoAnalysisForm";
 import { useDispatch } from "react-redux";
-import { addVideo } from "../../actions/videos";
+import { addVideo, getVideos } from "../../actions/videos";
 import { useHistory } from "react-router-dom";
 
 function CreateVideo() {
@@ -9,7 +9,7 @@ function CreateVideo() {
 
   const dispatch = useDispatch();
   const onCreate = (values) => {
-    dispatch(addVideo(values)).then(() => history.push("/"));
+    dispatch(addVideo(values)).then(() => dispatch(getVideos()));
   };
   return <VideoCreateForm onSubmit={onCreate} />;
 }

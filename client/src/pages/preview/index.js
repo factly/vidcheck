@@ -12,15 +12,18 @@ import { VIDEOS_API } from "../../constants/videos";
 import { addErrorNotification } from "../../actions/notifications";
 import { Result, Skeleton } from "antd";
 import { useDispatch } from "react-redux";
+import { useParams } from "react-router-dom";
 
-function Preview({ id }) {
+function Preview() {
+  const { id } = useParams();
+
   const dispatch = useDispatch();
   const ratingColor = {
-    1: "#19b346",
-    2: "#8bb38d",
+    5: "#19b346",
+    4: "#8bb38d",
     3: "#b3b3b3",
-    4: "#b36d7e",
-    5: "#b30a25",
+    2: "#b36d7e",
+    1: "#b30a25",
   };
 
   const [videoData, setVideoData] = useState({});
@@ -42,12 +45,14 @@ function Preview({ id }) {
 
   React.useEffect(() => {
     axios
-      .get(VIDEOS_API + "/6" + "/published")
+      .get(VIDEOS_API + "/" + id + "/published")
       .then((response) => {
         setVideoData(response.data);
       })
       .catch((error) => {
-        dispatch(addErrorNotification(error.message));
+        if (id > 0) {
+          dispatch(addErrorNotification(error.message));
+        }
       })
       .finally(() => setLoading(false));
   }, []);
@@ -219,11 +224,11 @@ function Preview({ id }) {
           alignItems: "center",
           justifyContent: "space-around",
           width: "70%",
-          height: "400px",
+          height: "450px",
           marginTop: "20px",
           marginLeft: "auto",
           marginRight: "auto",
-          backgroundColor: "#ccc",
+          backgroundColor: "#e9ecec",
           marginTop: -120,
         }}
       >
@@ -291,6 +296,7 @@ function Preview({ id }) {
                 <h4>Claim:</h4>
                 {currentClaim.claim}
               </div>
+              <br />
               <div stle={{ height: "40%", margin: 10, overflowX: "auto" }}>
                 <h4>Fact:</h4>
                 <div
@@ -341,8 +347,8 @@ function Preview({ id }) {
             marginLeft: "auto",
             marginRight: "auto",
             marginTop: "60px",
-            backgroundColor: "#ccc",
-            padding: 5,
+            backgroundColor: "#e9ecec",
+            padding: 12,
           }}
         >
           <h4>Review sources</h4>

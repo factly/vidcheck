@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom";
 
 import { transformVideoAnalysisdetails } from "../../analysis/utilities/analysis";
 import { useDispatch } from "react-redux";
-import { deleteVideo } from "../../../actions/videos";
+import { deleteVideo, getVideos } from "../../../actions/videos";
 import { HorizontalTimelineBar } from "../../analysis/components/AnalysisTimelineBar/AnalysisTimelineBar";
 
 function VideoAnalysisCard({ data }) {
@@ -64,7 +64,7 @@ function VideoAnalysisCard({ data }) {
             <Button
               onClick={() =>
                 dispatch(deleteVideo(data.video.id)).then(() =>
-                  history.push("/")
+                  dispatch(getVideos())
                 )
               }
             >

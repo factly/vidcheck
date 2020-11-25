@@ -25,3 +25,7 @@ code {
   height: 36px;
   width: 36px;
 }
+
+.ant-form {
+  max-width: 1200px !important;
+}

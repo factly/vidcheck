@@ -93,9 +93,6 @@ function VerticalTimelineBar({
                   <div style={{ "font-weight": "bold" }}>
                     {`${ratingValue[factcheckElem.rating]} `}
                   </div>
-                  <div>{`${
-                    factcheckElem.claimed ? factcheckElem.claimed : ""
-                  }`}</div>
                 </div>
               </div>
             </Timeline.Item>

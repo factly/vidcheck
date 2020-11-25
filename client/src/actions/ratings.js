@@ -17,14 +17,14 @@ export const addDefaultRatings = (query) => {
       .then((response) => {
         dispatch(
           addRatingsList(
-            response.data.nodes.map((rating) => {
-              return { ...rating, medium: rating.medium?.id };
+            response.data.map((rating) => {
+              return rating;
             })
           )
         );
         dispatch(
           addRatingsRequest({
-            data: response.data.nodes.map((item) => item.id),
+            data: response.data.map((item) => item.id),
             query: query,
             total: response.data.total,
           })

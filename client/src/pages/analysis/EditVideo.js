@@ -2,7 +2,7 @@ import React from "react";
 import VideoEditForm from "./components/VideoAnalysisForm";
 import { useDispatch, useSelector } from "react-redux";
 import { Skeleton } from "antd";
-import { updateVideo, getVideo } from "../../actions/videos";
+import { updateVideo, getVideo, addVideos } from "../../actions/videos";
 import { useHistory } from "react-router-dom";
 import { useParams } from "react-router-dom";
 
@@ -31,7 +31,7 @@ function EditVideo() {
         video: { ...data.video, ...values.video },
         analysis: values.analysis,
       })
-    ).then(() => history.push("/"));
+    ).then(() => dispatch(addVideos()));
   };
 
   return <VideoEditForm data={data} onSubmit={onUpdate} />;

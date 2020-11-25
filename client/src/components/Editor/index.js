@@ -53,8 +53,6 @@ function Editor({ value, onChange }) {
       ref={editor_block}
       style={{
         backgroundColor: "white",
-        maxHeight: "250px",
-        overflow: "scroll",
       }}
     ></div>
   );

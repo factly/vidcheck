@@ -17,6 +17,7 @@ function AnalysisForm({
   totalDuration,
   player,
   currentStartTime,
+  setCurrent,
 }) {
   const dispatch = useDispatch();
   const [filters, setFilters] = React.useState({
@@ -129,7 +130,6 @@ function AnalysisForm({
         claimed: review.claimed,
         factCheckDetail: review.factCheckDetail,
         start_time: review.start_time,
-        end_time: review.end_time,
       });
     }
   }
@@ -206,12 +206,13 @@ function AnalysisForm({
       <Form.Item name="factCheckDetail" label="Fact check">
         <Input.TextArea />
       </Form.Item>
-      <Form.Item name={"description"} label={"Description"}>
-        <Editor />
-      </Form.Item>
       <Form.Item name={"review_sources"} label={"Review Sources"}>
         <Input.TextArea />
       </Form.Item>
+      <Form.Item name={"description"} label={"Description"}>
+        <Editor />
+      </Form.Item>
+
       <Form.Item>
         <div style={{ "justify-content": "flex-start", display: "flex" }}>
           <Button

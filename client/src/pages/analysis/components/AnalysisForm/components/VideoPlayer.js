@@ -2,6 +2,8 @@ import React, { useState } from "react";
 
 import ReactPlayer from "react-player";
 import { VideoInfoParentWrapper } from "../../../../../StyledComponents";
+import { recomputeAnalysisArray } from "../../../utilities/analysis";
+import { VerticalTimelineBar } from "../../AnalysisTimelineBar/AnalysisTimelineBar";
 import InfoDetails from "../../InfoDetails";
 
 function VideoPlayer({
@@ -13,6 +15,8 @@ function VideoPlayer({
   player,
   factCheckReview,
   videoUrl,
+  updateFormState,
+  setfactCheckReview,
 }) {
   const [playing, setPlaying] = useState(true);
   const [loopDetails, setLoopDetails] = useState({
@@ -20,6 +24,12 @@ function VideoPlayer({
     startFraction: 0,
     endFraction: 1,
   });
+
+  const onDeleteFactCheckReview = (removeIndex) => {
+    setfactCheckReview((factCheckReview) =>
+      recomputeAnalysisArray(factCheckReview, removeIndex)
+    );
+  };
 
   function handleProgress() {
     const currentPlayedTime = player.current.getCurrentTime();
@@ -69,13 +79,10 @@ function VideoPlayer({
         onProgress={handleProgress}
         onDuration={setTotalDuration}
       />
-      <InfoDetails
-        videoUrl={videoUrl}
-        played={played}
-        setPlaying={setPlaying}
-        playing={playing}
-        handleSeekChange={handleSeekChange}
-        totalDuration={totalDuration}
+      <VerticalTimelineBar
+        factCheckReview={factCheckReview}
+        setCurrentFormData={updateFormState}
+        onDeleteFactCheckReview={onDeleteFactCheckReview}
       />
     </VideoInfoParentWrapper>
   );

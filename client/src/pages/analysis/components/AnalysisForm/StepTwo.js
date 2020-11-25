@@ -38,11 +38,6 @@ function StepTwo({ current, data = {}, onSubmit, summary, setCurrent }) {
     );
     setCurrentFormData(data);
   };
-  const onDeleteFactCheckReview = (removeIndex) => {
-    setfactCheckReview((factCheckReview) =>
-      recomputeAnalysisArray(factCheckReview, removeIndex)
-    );
-  };
 
   const getHostname = (url) => {
     // use URL constructor and return hostname
@@ -62,6 +57,7 @@ function StepTwo({ current, data = {}, onSubmit, summary, setCurrent }) {
     };
 
     onSubmit(transformToServerCompatibleDate(data));
+    setCurrent(2);
   };
 
   return (
@@ -75,6 +71,8 @@ function StepTwo({ current, data = {}, onSubmit, summary, setCurrent }) {
         setCurrentStartTime={setCurrentStartTime}
         factCheckReview={factCheckReview}
         videoUrl={summary.url}
+        updateFormState={updateFormState}
+        setfactCheckReview={setfactCheckReview}
       />
       <div>
         <div style={{ width: "80%" }}>
@@ -88,7 +86,7 @@ function StepTwo({ current, data = {}, onSubmit, summary, setCurrent }) {
         <FactCheckReviewWrapper>
           <div
             style={{
-              width: "50%",
+              width: "100%",
               padding: 10,
               margin: 5,
               background: "azure",
@@ -101,24 +99,11 @@ function StepTwo({ current, data = {}, onSubmit, summary, setCurrent }) {
               totalDuration={totalDuration}
               currentStartTime={currentStartTime}
               player={player}
-            />
-          </div>
-
-          <div style={{ width: "50%" }}>
-            <VerticalTimelineBar
-              factCheckReview={factCheckReview}
-              setCurrentFormData={updateFormState}
-              onDeleteFactCheckReview={onDeleteFactCheckReview}
+              setCurrent={setCurrent}
             />
           </div>
         </FactCheckReviewWrapper>
       </div>
-      <div style={{ display: "flex", "justify-content": "flex-end" }}>
-        <Button type="primary" onClick={submitFactcheck}>
-          Submit Fact Check
-        </Button>
-      </div>
-
       <div
         style={{
           display: "flex",
@@ -133,11 +118,7 @@ function StepTwo({ current, data = {}, onSubmit, summary, setCurrent }) {
         >
           Previous
         </Button>
-        <Button
-          type="primary"
-          onClick={() => setCurrent(2)}
-          style={{ margin: 5 }}
-        >
+        <Button type="primary" onClick={submitFactcheck} style={{ margin: 5 }}>
           Next
         </Button>
       </div>

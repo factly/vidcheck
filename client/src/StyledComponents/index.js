@@ -52,8 +52,7 @@ export const VideoInfoParentWrapper = styled.div`
 `;
 
 export const FactCheckReviewWrapper = styled.div`
-  padding: 20px;
-  width: 80%;
+  width: 100%;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
