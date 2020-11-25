@@ -8,24 +8,22 @@ import {
   VideoLengthPart,
 } from "../../../../StyledComponents";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+const ratingColor = {
+  1: "#19b346",
+  2: "#8bb38d",
+  3: "#b3b3b3",
+  4: "#b36d7e",
+  5: "#b30a25",
+};
 
+const ratingValue = {
+  1: "True",
+  2: "Partly True",
+  3: "Misleading",
+  4: "Partly False",
+  5: "False",
+};
 function HorizontalTimelineBar({ factCheckReview, setCurrentFormData }) {
-  const ratingColor = {
-    1: "#19b346",
-    2: "#8bb38d",
-    3: "#b3b3b3",
-    4: "#b36d7e",
-    5: "#b30a25",
-  };
-
-  const ratingValue = {
-    1: "True",
-    2: "Partly True",
-    3: "Neutral",
-    4: "Partly False",
-    5: "False",
-  };
-
   return (
     <VideoAnalysisTimelineBarWrapper>
       <VideoLengthBar>
@@ -86,9 +84,11 @@ function VerticalTimelineBar({
                 />
                 <div>
                   <div style={{ "font-weight": "bold" }}>
-                    {`${factcheckElem.rating}`}
+                    {`${ratingValue[factcheckElem.rating]} `}
                   </div>
-                  <div>{`${factcheckElem.claimed}`}</div>
+                  <div>{`${
+                    factcheckElem.claimed ? factcheckElem.claimed : ""
+                  }`}</div>
                 </div>
               </div>
             </Timeline.Item>

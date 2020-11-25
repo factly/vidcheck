@@ -62,6 +62,11 @@ const routes = [
     Component: EditVideo,
     title: "Edit Video",
   },
+  {
+    path: "/preview/:id",
+    Component: Preview,
+    title: "Preview",
+  },
 ];
 
 export default routes;

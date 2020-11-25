@@ -37,13 +37,22 @@ function Sidebar() {
         dispatch(toggleSider());
       }}
     >
-      <div className="menu-header" style={{ backgroundColor: "#1890ff" }}>
-        <img
-          alt="logo"
-          src={"https://degacms.com/img/dega.svg"}
-          style={{ width: "40%" }}
-        />
-      </div>
+      <Link to="/">
+        <div className="menu-header" style={{ backgroundColor: "#eae3e3" }}>
+          <img
+            alt="logo"
+            hidden={!collapsed}
+            className="menu-logo"
+            src={require("../../assets/vidcheck_logo.png")}
+          />
+          <img
+            alt="logo"
+            hidden={collapsed}
+            src={require("../../assets/vidcheck.png")}
+            style={{ width: "70%" }}
+          />
+        </div>
+      </Link>
       <Menu theme={navTheme} mode="inline" className="slider-menu">
         {resource.map((each) => (
           <Menu.Item key={each.title} icon={<each.Icon />}>

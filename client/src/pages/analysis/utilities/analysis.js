@@ -1,12 +1,8 @@
 export function transformVideoAnalysisdetails(resp) {
   if (!resp || !resp.analysis) {
-    return {};
+    return [];
   }
-  const video = {
-    url: resp.video.Url,
-    summary: resp.video.Summary,
-    title: resp.video.Title,
-  };
+
   const analysis = resp.analysis.map((analysisData) => {
     return {
       id: analysisData.id,
@@ -15,11 +11,16 @@ export function transformVideoAnalysisdetails(resp) {
       end_time_fraction: analysisData.end_time_fraction,
       start_time: convertSecondsToTimeString(analysisData.start_time),
       end_time: convertSecondsToTimeString(analysisData.end_time),
-      rating: analysisData.rating_id,
+      description: analysisData.description,
+      review_sources: analysisData.review_sources,
+      rating:
+        analysisData.rating && analysisData.rating.id
+          ? analysisData.rating.id
+          : analysisData.rating,
     };
   });
   return {
-    video: video,
+    video: resp.video,
     analysis: recomputeAnalysisArray(analysis),
   };
 }
@@ -52,6 +53,8 @@ export function transformToServerCompatibleDate(data) {
       claim: analysisData.claimed,
       rating_id: analysisData.rating,
       fact: analysisData.factCheckDetail,
+      description: analysisData.description,
+      review_sources: analysisData.review_sources,
       start_time: convertTimeStringToSeconds(analysisData.start_time),
       end_time: convertTimeStringToSeconds(analysisData.end_time),
 

@@ -2,25 +2,30 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Button, Form, Input } from "antd";
 
-function SummaryForm({ data, updateSummaryData }) {
+function SummaryForm({ summary, setSummary }) {
   const [form] = Form.useForm();
 
   React.useEffect(() => {
-    form.setFieldsValue({ ...data });
-  }, [data]);
+    form.setFieldsValue({ ...summary });
+  }, [summary]);
 
-  const onUpdateSummaryFormData = (data) => {
-    updateSummaryData(data);
+  const onUpdateSummaryFormData = (summary) => {
+    setSummary(summary);
   };
   const layout = {
-    labelCol: { span: 8 },
-    wrapperCol: { span: 16 },
+    labelCol: {
+      span: 8,
+    },
+    wrapperCol: {
+      span: 16,
+    },
   };
+
   const tailLayout = {
     wrapperCol: { offset: 8, span: 16 },
   };
   return (
-    <div style={{ width: "80%" }}>
+    <div style={{ width: "80%", justifyContent: "center", marginTop: "40px" }}>
       <Form
         {...layout}
         form={form}
@@ -33,6 +38,9 @@ function SummaryForm({ data, updateSummaryData }) {
         <Form.Item name="summary" label="Summary" rules={[{ required: true }]}>
           <Input.TextArea />
         </Form.Item>
+        <Form.Item name="url" label="Link" rules={[{ required: true }]}>
+          <Input />
+        </Form.Item>
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit">
             Save
@@ -44,7 +52,7 @@ function SummaryForm({ data, updateSummaryData }) {
 }
 
 SummaryForm.protoTypes = {
-  data: PropTypes.object.isRequired,
+  summary: PropTypes.object.isRequired,
   updateSummaryData: PropTypes.func.isRequired,
 };
 export default SummaryForm;

@@ -1,6 +1,7 @@
 import React from "react";
 import { Button, Form, Input, Space, InputNumber } from "antd";
 import { maker, checker } from "../../../utils/sluger";
+import ColorPicker from "./ColorPicker";
 
 const { TextArea } = Input;
 
@@ -87,6 +88,10 @@ const RatingForm = ({ onCreate, data = {} }) => {
         ]}
       >
         <InputNumber min={1} max={5} />
+      </Form.Item>
+
+      <Form.Item name="colour" label="Colour">
+        <ColorPicker />
       </Form.Item>
 
       <Form.Item {...tailLayout}>

@@ -1,6 +1,5 @@
 import React from "react";
-import { Button, Form, Input, Select } from "antd";
-import PropTypes from "prop-types";
+import { Button, Checkbox, Form, Input, Select, Steps } from "antd";
 import { FactCheckReviewFormWrapper } from "../../../../StyledComponents";
 import {
   convertSecondsToTimeString,
@@ -10,6 +9,7 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { getRatings } from "../../../../actions/ratings";
 import deepEqual from "deep-equal";
+import Editor from "../../../../components/Editor";
 
 function AnalysisForm({
   formData,
@@ -47,18 +47,16 @@ function AnalysisForm({
   };
 
   const [form] = Form.useForm();
-  const tailLayout = {
-    wrapperCol: { offset: 8, span: 16 },
-  };
+
   React.useEffect(() => {
     form.resetFields();
     form.setFieldsValue({ ...formData });
   }, [form, formData]);
 
   React.useEffect(() => {
-    if (form.getFieldValue("id")) {
-      return;
-    }
+    // if (form.getFieldValue("id")) {
+    //   return;
+    // }
     form.setFieldsValue({
       ...form.getFieldsValue(),
       start_time: currentStartTime,
@@ -97,15 +95,18 @@ function AnalysisForm({
       } else {
         newData = [...newData, values];
       }
+
       return recomputeAnalysisArray(newData);
     });
+
     onReset();
   };
 
   const onReset = () => {
-    const startTime = form.getFieldValue("start_time");
+    const start_time = form.getFieldValue("start_time");
     form.resetFields();
-    form.setFieldsValue({ startTime });
+
+    form.setFieldsValue({ start_time });
   };
 
   const fillCurrentTime = () => {
@@ -117,16 +118,30 @@ function AnalysisForm({
   };
   const layout = {
     labelCol: { span: 8 },
-    wrapperCol: { span: 16 },
+    wrapperCol: { span: 24 },
   };
 
+  const initialValues = {};
+
+  if (factCheckReview && factCheckReview.length > 0) {
+    initialValues.rating = factCheckReview[0].rating.id;
+    initialValues.claimed = factCheckReview[0].claimed;
+    initialValues.factCheckDetail = factCheckReview[0].factCheckDetail;
+    initialValues.start_time = factCheckReview[0].start_time;
+    initialValues.end_time = factCheckReview[0].end_time;
+  }
+
   return (
-    <FactCheckReviewFormWrapper>
+    <>
       <Form
+        // initialValues={{
+        //   ...initialValues,
+        // }}
         {...layout}
         form={form}
         name="control-hooks"
         onFinish={onAddNewFactCheckReview}
+        layout={"vertical"}
       >
         <Form.Item
           style={{
@@ -191,11 +206,14 @@ function AnalysisForm({
         <Form.Item name="factCheckDetail" label="Fact check">
           <Input.TextArea />
         </Form.Item>
-        <Form.Item name="id" hidden={true}>
+        <Form.Item name={"description"} label={"Description"}>
+          <Editor />
+        </Form.Item>
+        <Form.Item name={"review_sources"} label={"Review Sources"}>
           <Input.TextArea />
         </Form.Item>
-        <Form.Item {...tailLayout}>
-          <div style={{ "justify-content": "flex-end", display: "flex" }}>
+        <Form.Item>
+          <div style={{ "justify-content": "flex-start", display: "flex" }}>
             <Button
               type="primary"
               htmlType="submit"
@@ -209,17 +227,8 @@ function AnalysisForm({
           </div>
         </Form.Item>
       </Form>
-    </FactCheckReviewFormWrapper>
+    </>
   );
 }
 
-AnalysisForm.protoTypes = {
-  factCheckReview: PropTypes.array.isRequired,
-  formData: PropTypes.object,
-  setfactCheckReview: PropTypes.func.isRequired,
-  totalDuration: PropTypes.number.isRequired,
-  currentStartTime: PropTypes.string.isRequired,
-  player: PropTypes.object.isRequired,
-  ratings: PropTypes.object.isRequired,
-};
 export default AnalysisForm;
