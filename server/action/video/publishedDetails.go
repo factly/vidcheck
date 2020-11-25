@@ -1,11 +1,13 @@
 package video
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
+	"github.com/factly/x/editorx"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/renderx"
@@ -54,6 +56,20 @@ func publishedDetails(w http.ResponseWriter, r *http.Request) {
 	}
 
 	model.DB.Model(&model.Analysis{}).Preload("Rating").Order("start_time").Where("video_id = ?", uint(id)).Find(&analysisBlocks)
+
+	for index, each := range analysisBlocks {
+
+		arrByte, _ := each.Description.MarshalJSON()
+
+		desc := make(map[string]interface{})
+		err := json.Unmarshal(arrByte, &desc)
+
+		if err != nil {
+			html, _ := editorx.EditorjsToHTML(desc)
+			analysisBlocks[index].HTML = html
+		}
+
+	}
 
 	result := videoanalysisData{
 		Video:    *videoObj,

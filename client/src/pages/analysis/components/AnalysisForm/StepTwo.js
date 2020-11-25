@@ -56,6 +56,7 @@ function StepTwo({ current, data = {}, onSubmit, summary, setCurrent }) {
       video: {
         video_type: video_type,
         ...summary,
+        status: "published",
       },
       analysis: factCheckReview,
     };

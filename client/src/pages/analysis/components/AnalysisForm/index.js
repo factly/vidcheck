@@ -163,9 +163,7 @@ function AnalysisForm({
             rules={[
               {
                 required: true,
-                pattern: new RegExp(
-                  /^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/
-                ),
+                pattern: new RegExp(/^[0-2]?[0-9]?[0-9]:[0-5][0-9]$/),
                 message: "Wrong format! (mm:ss)",
               },
             ]}

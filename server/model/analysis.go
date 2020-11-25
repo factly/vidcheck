@@ -1,6 +1,8 @@
 package model
 
-import "github.com/jinzhu/gorm/dialects/postgres"
+import (
+	"github.com/jinzhu/gorm/dialects/postgres"
+)
 
 // Analysis model
 type Analysis struct {
@@ -16,4 +18,5 @@ type Analysis struct {
 	EndTime         int            `json:"end_time"`
 	StartTime       int            `json:"start_time"`
 	EndTimeFraction float64        `json:"end_time_fraction"`
+	HTML            string         `json:"html"`
 }
