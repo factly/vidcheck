@@ -1,6 +1,5 @@
 import React from "react";
-import { Button, Checkbox, Form, Input, Select, Steps } from "antd";
-import { FactCheckReviewFormWrapper } from "../../../../StyledComponents";
+import { Button, Form, Input, Select } from "antd";
 import {
   convertSecondsToTimeString,
   convertTimeStringToSeconds,
@@ -54,9 +53,6 @@ function AnalysisForm({
   }, [form, formData]);
 
   React.useEffect(() => {
-    // if (form.getFieldValue("id")) {
-    //   return;
-    // }
     form.setFieldsValue({
       ...form.getFieldsValue(),
       start_time: currentStartTime,
@@ -124,108 +120,113 @@ function AnalysisForm({
   const initialValues = {};
 
   if (factCheckReview && factCheckReview.length > 0) {
-    initialValues.rating = factCheckReview[0].rating.id;
-    initialValues.claimed = factCheckReview[0].claimed;
-    initialValues.factCheckDetail = factCheckReview[0].factCheckDetail;
-    initialValues.start_time = factCheckReview[0].start_time;
-    initialValues.end_time = factCheckReview[0].end_time;
+    const review = factCheckReview.find(
+      (each) => each.start_time === currentStartTime
+    );
+    if (review) {
+      form.setFieldsValue({
+        rating: review.rating,
+        claimed: review.claimed,
+        factCheckDetail: review.factCheckDetail,
+        start_time: review.start_time,
+        end_time: review.end_time,
+      });
+    }
   }
 
   return (
-    <>
-      <Form
-        // initialValues={{
-        //   ...initialValues,
-        // }}
-        {...layout}
-        form={form}
-        name="control-hooks"
-        onFinish={onAddNewFactCheckReview}
-        layout={"vertical"}
+    <Form
+      initialValues={{
+        ...initialValues,
+      }}
+      {...layout}
+      form={form}
+      name="control-hooks"
+      onFinish={onAddNewFactCheckReview}
+      layout={"vertical"}
+    >
+      <Form.Item
+        style={{
+          marginBottom: 0,
+          display: "flex",
+          "justify-content": "flex-end",
+        }}
       >
         <Form.Item
+          name="start_time"
+          label="Start time"
+          style={{ display: "inline-block", width: "50%" }}
+        >
+          <Input disabled />
+        </Form.Item>
+        <Form.Item
+          name="end_time"
+          label="End time"
+          rules={[
+            {
+              required: true,
+              pattern: new RegExp(/^[0-2]?[0-9]?[0-9]:[0-5][0-9]$/),
+              message: "Wrong format! (mm:ss)",
+            },
+          ]}
+          style={{ display: "inline-block", width: "50%" }}
+        >
+          <Input />
+        </Form.Item>
+        <span
           style={{
-            marginBottom: 0,
-            display: "flex",
-            "justify-content": "flex-end",
+            display: "inline-block",
+            width: "12px",
+            position: "absolute",
+            right: "16px",
           }}
         >
-          <Form.Item
-            name="start_time"
-            label="Start time"
-            style={{ display: "inline-block", width: "50%" }}
-          >
-            <Input disabled />
-          </Form.Item>
-          <Form.Item
-            name="end_time"
-            label="End time"
-            rules={[
-              {
-                required: true,
-                pattern: new RegExp(/^[0-2]?[0-9]?[0-9]:[0-5][0-9]$/),
-                message: "Wrong format! (mm:ss)",
-              },
-            ]}
-            style={{ display: "inline-block", width: "50%" }}
-          >
-            <Input />
-          </Form.Item>
-          <span
-            style={{
-              display: "inline-block",
-              width: "24px",
-              position: "absolute",
-              right: "16px",
-            }}
-          >
-            <Button type="link" onClick={fillCurrentTime}>
-              now
-            </Button>
-          </span>
-        </Form.Item>
-        <Form.Item name="rating" label="Rating" rules={[{ required: true }]}>
-          <Select
-            placeholder="Select a rating of the claim"
-            allowClear
-            loading={loading}
-          >
-            {ratings.map((rating) => (
-              <Select.Option value={rating.id} key={rating.name + rating.id}>
-                {rating["name"]}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
+          <Button type="link" onClick={fillCurrentTime}>
+            now
+          </Button>
+        </span>
+      </Form.Item>
+      <Form.Item name="rating" label="Rating" rules={[{ required: true }]}>
+        <Select
+          placeholder="Select a rating of the claim"
+          allowClear
+          loading={loading}
+        >
+          {ratings.map((rating) => (
+            <Select.Option value={rating.id} key={rating.name + rating.id}>
+              {rating["name"]}
+            </Select.Option>
+          ))}
+        </Select>
+      </Form.Item>
 
-        <Form.Item name="claimed" label="Claimed">
-          <Input.TextArea />
-        </Form.Item>
-        <Form.Item name="factCheckDetail" label="Fact check">
-          <Input.TextArea />
-        </Form.Item>
-        <Form.Item name={"description"} label={"Description"}>
-          <Editor />
-        </Form.Item>
-        <Form.Item name={"review_sources"} label={"Review Sources"}>
-          <Input.TextArea />
-        </Form.Item>
-        <Form.Item>
-          <div style={{ "justify-content": "flex-start", display: "flex" }}>
-            <Button
-              type="primary"
-              htmlType="submit"
-              style={{ "margin-right": "15px" }}
-            >
-              {form.getFieldValue("id") ? "Update" : "Add"}
-            </Button>
-            <Button htmlType="button" onClick={onReset}>
-              Reset
-            </Button>
-          </div>
-        </Form.Item>
-      </Form>
-    </>
+      <Form.Item name="claimed" label="Claimed">
+        <Input.TextArea />
+      </Form.Item>
+      <Form.Item name="factCheckDetail" label="Fact check">
+        <Input.TextArea />
+      </Form.Item>
+      <Form.Item name={"description"} label={"Description"}>
+        <Editor />
+      </Form.Item>
+      <Form.Item name={"review_sources"} label={"Review Sources"}>
+        <Input.TextArea />
+      </Form.Item>
+      <Form.Item>
+        <div style={{ "justify-content": "flex-start", display: "flex" }}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            style={{ "margin-right": "15px" }}
+          >
+            {form.getFieldValue("id") ? "Update" : "Add"}
+          </Button>
+          <Button htmlType="button" onClick={onReset}>
+            Reset
+          </Button>
+        </div>
+      </Form.Item>
+    </Form>
   );
 }
 

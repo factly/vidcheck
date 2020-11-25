@@ -77,15 +77,18 @@ function StepTwo({ current, data = {}, onSubmit, summary, setCurrent }) {
         videoUrl={summary.url}
       />
       <div>
-        <HorizontalTimelineBar
-          factCheckReview={factCheckReview}
-          setCurrentFormData={updateFormState}
-        />
+        <div style={{ width: "80%" }}>
+          <HorizontalTimelineBar
+            factCheckReview={factCheckReview}
+            setCurrentFormData={updateFormState}
+            height={"24px"}
+          />
+        </div>
 
         <FactCheckReviewWrapper>
           <div
             style={{
-              width: "100%",
+              width: "50%",
               padding: 10,
               margin: 5,
               background: "azure",
@@ -101,7 +104,7 @@ function StepTwo({ current, data = {}, onSubmit, summary, setCurrent }) {
             />
           </div>
 
-          <div style={{ width: "100%" }}>
+          <div style={{ width: "50%" }}>
             <VerticalTimelineBar
               factCheckReview={factCheckReview}
               setCurrentFormData={updateFormState}

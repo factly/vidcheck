@@ -23,7 +23,12 @@ const ratingValue = {
   4: "Partly False",
   5: "False",
 };
-function HorizontalTimelineBar({ factCheckReview, setCurrentFormData }) {
+function HorizontalTimelineBar({
+  factCheckReview,
+  currentFormdata = {},
+  setCurrentFormData = () => {},
+  height,
+}) {
   return (
     <VideoAnalysisTimelineBarWrapper>
       <VideoLengthBar>
@@ -33,14 +38,14 @@ function HorizontalTimelineBar({ factCheckReview, setCurrentFormData }) {
             key={index}
           >
             <VideoLengthPart
+              height={height}
               width={`${review.widthPercentage}%`}
+              showBorder={currentFormdata.id === review.id}
               backgroundColor={ratingColor[review.rating]}
-              onClick={() => setCurrentFormData(review)}
-            >
-              <p style={{ margin: "0px", padding: "5px", "font-size": "10px" }}>
-                {ratingValue[review.rating]}
-              </p>
-            </VideoLengthPart>
+              onClick={() => {
+                setCurrentFormData(review);
+              }}
+            ></VideoLengthPart>
           </Tooltip>
         ))}
       </VideoLengthBar>
@@ -60,7 +65,7 @@ function VerticalTimelineBar({
 }) {
   return (
     <FactCheckReviewListWrapper>
-      <Timeline mode={"left"} style={{ "margin-left": "-20%" }}>
+      <Timeline mode={"left"}>
         {factCheckReview &&
           factCheckReview.map((factcheckElem, index) => (
             <Timeline.Item

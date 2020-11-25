@@ -6,8 +6,7 @@ import {
   transformVideoAnalysisdetails,
 } from "../analysis/utilities/analysis";
 
-import { Tooltip } from "antd";
-import styled from "styled-components";
+import { HorizontalTimelineBar } from "../analysis/components/AnalysisTimelineBar/AnalysisTimelineBar";
 
 function Preview() {
   const ratingColor = {
@@ -279,7 +278,6 @@ function Preview() {
           </div>
           <HorizontalTimelineBar
             factCheckReview={factCheckReview}
-            disabled={true}
             height={"12px"}
           />
           <div
@@ -424,79 +422,3 @@ function Preview() {
 }
 
 export default Preview;
-
-function HorizontalTimelineBar({
-  factCheckReview,
-  currentFormdata = {},
-  setCurrentFormData,
-  disabled,
-  height,
-}) {
-  const ratingColor = {
-    1: "#19b346",
-    2: "#8bb38d",
-    3: "#ef6805",
-    4: "#b36d7e",
-    5: "#b30a25",
-  };
-
-  const ratingValue = {
-    1: "True",
-    2: "Partly True",
-    3: "Neutral",
-    4: "Partly False",
-    5: "False",
-  };
-
-  return (
-    <VideoAnalysisTimelineBarWrapper>
-      <VideoLengthBar>
-        {factCheckReview.map((review, index) => (
-          <Tooltip
-            title={review.start_time + "-" + review.end_time}
-            key={index}
-            disabled={disabled}
-            disable={disabled}
-          >
-            <VideoLengthPart
-              height={height}
-              width={`${review.widthPercentage}%`}
-              showBorder={currentFormdata.id === review.id}
-              backgroundColor={ratingColor[review.rating]}
-              onClick={() => {
-                !disabled && setCurrentFormData(review);
-              }}
-            ></VideoLengthPart>
-          </Tooltip>
-        ))}
-      </VideoLengthBar>
-    </VideoAnalysisTimelineBarWrapper>
-  );
-}
-
-/** Timeline bar */
-const VideoAnalysisTimelineBarWrapper = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-`;
-
-const VideoLengthBar = styled.div`
-  width: 100%;
-  color: white;
-  text-align: center;
-  display: flex;
-`;
-
-const VideoLengthPart = styled.div`
-  flex: ${(props) => props.width};
-  height: ${({ height }) => height || "40px"};
-  border: solid;
-  border-color: #052c5c;
-  border-width: ${({ showBorder }) => (showBorder ? "4px" : 0)};
-  background-color: ${(props) => props.backgroundColor};
-  float: left;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;

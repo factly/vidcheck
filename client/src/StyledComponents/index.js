@@ -1,26 +1,30 @@
 import styled from "styled-components";
 
 /** Timeline bar */
+/** Timeline bar */
 export const VideoAnalysisTimelineBarWrapper = styled.div`
+  width: 100%;
   display: flex;
   justify-content: center;
 `;
 
 export const VideoLengthBar = styled.div`
-  width: 65%;
+  width: 100%;
   color: white;
   text-align: center;
   display: flex;
 `;
 
 export const VideoLengthPart = styled.div`
-  width: ${(props) => props.width};
-  height: 100%;
+  flex: ${(props) => props.width};
+  height: ${({ height }) => height || "40px"};
+  border: solid;
+  border-color: #052c5c;
+  border-width: ${({ showBorder }) => (showBorder ? "4px" : 0)};
   background-color: ${(props) => props.backgroundColor};
   float: left;
   display: flex;
   align-items: center;
-  border-radius: 8px;
   justify-content: center;
 `;
 
@@ -48,7 +52,7 @@ export const VideoInfoParentWrapper = styled.div`
 
 export const FactCheckReviewWrapper = styled.div`
   padding: 20px;
-  width: 1200px;
+  width: 80%;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
