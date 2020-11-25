@@ -40,7 +40,9 @@ function HorizontalTimelineBar({
             <VideoLengthPart
               height={height}
               width={`${review.widthPercentage}%`}
-              showBorder={currentFormdata.id === review.id}
+              showBorder={
+                currentFormdata.id && currentFormdata.id === review.id
+              }
               backgroundColor={ratingColor[review.rating]}
               onClick={() => {
                 setCurrentFormData(review);

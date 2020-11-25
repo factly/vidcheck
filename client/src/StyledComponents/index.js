@@ -13,10 +13,11 @@ export const VideoLengthBar = styled.div`
   color: white;
   text-align: center;
   display: flex;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAABZJREFUeNpi2r9//38gYGAEESAAEGAAasgJOgzOKCoAAAAASUVORK5CYII=);
 `;
 
 export const VideoLengthPart = styled.div`
-  flex: ${(props) => props.width};
+  width: ${(props) => props.width};
   height: ${({ height }) => height || "40px"};
   border: solid;
   border-color: #052c5c;
