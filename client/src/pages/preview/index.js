@@ -14,8 +14,12 @@ import { Result, Skeleton } from "antd";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 
-function Preview() {
+function Preview({ vid }) {
   const { id } = useParams();
+  let videoID = id;
+  if (vid > 0) {
+    videoID = vid;
+  }
 
   const dispatch = useDispatch();
   const ratingColor = {
@@ -45,7 +49,7 @@ function Preview() {
 
   React.useEffect(() => {
     axios
-      .get(VIDEOS_API + "/" + id + "/published")
+      .get(VIDEOS_API + "/" + videoID + "/published")
       .then((response) => {
         setVideoData(response.data);
       })

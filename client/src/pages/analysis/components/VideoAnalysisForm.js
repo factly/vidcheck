@@ -7,7 +7,7 @@ import StepOne from "./AnalysisForm/StepOne";
 import StepTwo from "./AnalysisForm/StepTwo";
 import Preview from "../../preview";
 
-function VideoAnalysisForm({ data, onSubmit }) {
+function VideoAnalysisForm({ data, onSubmit, vid }) {
   const [current, setCurrent] = React.useState(0);
   const [summary, setSummary] = React.useState({
     title: data?.video?.title || "",
@@ -36,7 +36,7 @@ function VideoAnalysisForm({ data, onSubmit }) {
         data={data}
       />
       <div style={current === 2 ? { display: "block" } : { display: "none" }}>
-        <Preview />
+        <Preview vid={vid} />
         <div style={{ display: "flex", "justify-content": "flex-end" }}>
           <Button type="primary" onClick={() => setCurrent(1)}>
             Previous

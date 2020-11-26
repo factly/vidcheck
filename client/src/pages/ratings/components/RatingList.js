@@ -35,7 +35,7 @@ function RatingList() {
   React.useEffect(() => {
     fetchRatings();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters]);
+  }, [filters, dispatch]);
 
   const fetchRatings = () => {
     dispatch(getRatings(filters));
@@ -94,7 +94,9 @@ function RatingList() {
       {ratings.length === 0 ? (
         <Button
           onClick={() => {
-            dispatch(addDefaultRatings()).then(() => history.push("/ratings"));
+            dispatch(addDefaultRatings()).then(() =>
+              dispatch(getRatings(filters))
+            );
           }}
         >
           <PlusOutlined /> Create Ratings

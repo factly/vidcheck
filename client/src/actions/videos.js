@@ -53,9 +53,10 @@ export const addVideo = (data) => {
     dispatch(loadingVideos());
     return axios
       .post(VIDEOS_API, data)
-      .then(() => {
+      .then((res) => {
         dispatch(resetVideos());
         dispatch(addSuccessNotification("Video added"));
+        return res.data;
       })
       .catch((error) => {
         dispatch(addErrorNotification(error.message));

@@ -91,7 +91,7 @@ function VerticalTimelineBar({
                 />
                 <div>
                   <div style={{ "font-weight": "bold" }}>
-                    {`${ratingValue[factcheckElem.rating]} `}
+                    {`CLAIM ${index + 1} `}
                   </div>
                 </div>
               </div>

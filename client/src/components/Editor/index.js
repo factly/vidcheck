@@ -38,7 +38,6 @@ function Editor({ value, onChange }) {
           class: Embed,
         },
       },
-      placeholder: "Let`s write an awesome story!",
       onChange: (value) =>
         value.saver.save().then((value) => {
           onChange(value);
