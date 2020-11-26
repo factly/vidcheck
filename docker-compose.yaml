@@ -19,6 +19,92 @@ services:
       - intranet
 
   ###########################################################################
+  #######                        MINIO                                #######
+  ###########################################################################
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+    volumes:
+      - ~/factly/vidcheck/minio/data:/export
+      - ~/factly/vidcheck/minio/config:/root/.minio
+    environment:
+      - MINIO_ACCESS_KEY=miniokey
+      - MINIO_SECRET_KEY=miniosecret
+    networks:
+      - intranet
+    command: server /export
+
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      - minio
+    volumes:
+      - ./wait-for-it.sh:/usr/local/bin/wait-for-it.sh
+    networks:
+      - intranet
+    entrypoint: >
+      /bin/sh -c "
+      apk add --no-cache bash;
+      wait-for-it.sh minio:9000 -- echo 'Minio is up. Creating the bucket!!';
+      /usr/bin/mc config host add myminio http://minio:9000 miniokey miniosecret;
+      /usr/bin/mc mb myminio/vidcheck;
+      /usr/bin/mc policy set download myminio/vidcheck;
+      exit 0;
+      "
+
+
+  ###########################################################################
+  #######                         IMGPROXY                            #######
+  ###########################################################################
+  imgproxy:
+    image: darthsim/imgproxy:v2.15.0
+    ports:
+      - 8080:8080
+    environment:
+      - IMGPROXY_BASE_URL=http://minio:9000/
+      - IMGPROXY_TTL=31536000
+    networks:
+      - intranet
+
+  ###########################################################################
+  #######                         IFRAMELY                            #######
+  ###########################################################################
+  iframely:
+    image: factly/iframely:v1.5.0-102820
+    ports:
+      - "8061:8061" 
+    volumes:
+      - ./iframely/config.local.js:/iframely/config.local.js
+    networks:
+      - intranet
+
+  ###########################################################################
+  #######                            NGINX                            #######
+  ###########################################################################
+  nginx:
+    image: nginx:1.19.0-alpine
+    ports:
+      - 7001:80
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    restart: unless-stopped
+    depends_on:
+      - imgproxy
+    networks:
+      - intranet
+
+  ###########################################################################
+  #######             UPLOAD SERVICES                                 #######
+  ###########################################################################
+  companion:
+    image: transloadit/companion:latest
+    ports:
+      - "3020:3020"
+    env_file:
+      - ./companion/.env
+
+  ###########################################################################
   #######               KRATOS AND OATHKEEPER                         #######
   ###########################################################################
   keto-migrate:
@@ -46,7 +132,7 @@ services:
   kratos-migrate:
     depends_on:
       - postgres
-    image: oryd/kratos:v0.3.0-alpha.1
+    image: oryd/kratos:v0.5.0-alpha.1-sqlite
     environment:
       - DSN=postgres://postgres:postgres@postgres:5432/kratos?sslmode=disable
     volumes:
@@ -56,7 +142,7 @@ services:
       - type: bind
         source: ./kratos/config
         target: /etc/config/kratos
-    command: -c /etc/config/kratos/.kratos.yml migrate sql -e --yes
+    command: -c /etc/config/kratos/kratos.yml migrate sql -e --yes
     restart: on-failure
     networks:
       - intranet
@@ -64,7 +150,7 @@ services:
   kratos:
     depends_on:
       - kratos-migrate
-    image: oryd/kratos:v0.3.0-alpha.1
+    image: oryd/kratos:v0.5.0-alpha.1-sqlite
     ports:
       - "4433:4433" # public
       - "4434:4434" # admin
@@ -77,7 +163,7 @@ services:
       - type: bind
         source: ./kratos/config
         target: /etc/config/kratos
-    command: serve -c /etc/config/kratos/.kratos.yml --dev
+    command: serve -c /etc/config/kratos/kratos.yml --dev
     restart: unless-stopped
     networks:
       - intranet
@@ -144,7 +230,7 @@ services:
     depends_on:
       - postgres
     ports:
-      - 8080:8080
+      - 8000:8000
     build:
       context: ./server
       dockerfile: Dockerfile

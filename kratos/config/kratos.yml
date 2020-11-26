@@ -1,0 +1,91 @@
+version: v0.5.0-alpha.1
+
+dsn: postgres://postgres:postgres@postgres:5432/kratos?sslmode=disable
+
+serve:
+  public:
+    base_url: http://127.0.0.1:4455/.ory/kratos/public/
+    cors:
+      enabled: true
+  admin:
+    base_url: http://kratos:4434/
+
+selfservice:
+  default_browser_return_url: http://127.0.0.1:4455/.factly/kavach/web/organisation
+  whitelisted_return_urls:
+    - http://127.0.0.1:4455
+
+  methods:
+    password:
+      enabled: true
+    oidc:
+      enabled: true
+      config:
+        providers:
+        - id: github
+          provider: github
+          client_id: 1a910f37e7971b1d4654
+          client_secret: e4fb18dd76b84911d0d22553cf19828f787a6f35
+          mapper_url: file:///etc/config/kratos/oidc.github.jsonnet
+          scope:
+            - user:email
+        - id: google
+          provider: google
+          client_id: 225949666356-67jer0i80gjfgf07ck93q1ci64hkj33t.apps.googleusercontent.com
+          client_secret: jQP33jffrdB1Rqhw9A_1H1Sz
+          mapper_url: file:///etc/config/kratos/oidc.google.jsonnet
+          scope:
+            - openid
+            - email
+
+  flows:
+    error:
+      ui_url: http://127.0.0.1:4455/.factly/kavach/web/error
+
+    settings:
+      ui_url: http://127.0.0.1:4455/.factly/kavach/web/password
+      privileged_session_max_age: 15m
+
+    logout:
+      after:
+        default_browser_return_url: http://127.0.0.1:4455/.factly/kavach/web/auth/login
+
+    login:
+      ui_url: http://127.0.0.1:4455/.factly/kavach/web/auth/login
+      lifespan: 10m
+
+    registration:
+      lifespan: 10m
+      ui_url: http://127.0.0.1:4455/.factly/kavach/web/auth/registration
+      after:
+        password:
+          hooks:
+            -
+              hook: session
+        oidc:
+          hooks:
+            - hook: session
+
+log:
+  level: debug
+  format: text
+  leak_sensitive_values: true
+
+secrets:
+  cookie:
+    - PLEASE-CHANGE-ME-I-AM-VERY-INSECURE
+
+hashers:
+  argon2:
+    parallelism: 1
+    memory: 131072
+    iterations: 2
+    salt_length: 16
+    key_length: 16
+
+identity:
+  default_schema_url: file:///etc/config/kratos/identity.schema.json
+
+courier:
+  smtp:
+    connection_uri: smtps://test:test@mailslurper:1025/?skip_ssl_verify=true
