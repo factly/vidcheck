@@ -9,19 +9,21 @@ import {
 } from "../../../../StyledComponents";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 const ratingColor = {
-  1: "#19b346",
-  2: "#8bb38d",
-  3: "#b3b3b3",
-  4: "#b36d7e",
-  5: "#b30a25",
+  1: "#108040",
+  2: "#A5C239",
+  3: "#ECA124",
+  4: "#749990",
+  5: "#E82728",
+  6: "#f9f9fa",
 };
 
 const ratingValue = {
   1: "True",
   2: "Partly True",
-  3: "Misleading",
-  4: "Partly False",
+  3: "Unverfied",
+  4: "Misleading",
   5: "False",
+  6: "not a claim",
 };
 function HorizontalTimelineBar({
   factCheckReview,

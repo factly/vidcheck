@@ -1,5 +1,5 @@
 import React from "react";
-import { Popconfirm, Button, Typography, Table } from "antd";
+import { Popconfirm, Button, Typography, Table, Tag } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -15,7 +15,7 @@ function RatingList() {
   const history = useHistory();
   const [filters, setFilters] = React.useState({
     page: 1,
-    limit: 5,
+    limit: 10,
   });
 
   const { ratings, total, loading } = useSelector((state) => {
@@ -48,7 +48,7 @@ function RatingList() {
       title: "Description",
       dataIndex: "description",
       key: "description",
-      width: "50%",
+      width: "40%",
       render: (_, record) => {
         return (
           <Typography.Paragraph ellipsis={{ rows: 2 }}>
@@ -58,6 +58,17 @@ function RatingList() {
       },
     },
     { title: "Rating Value", dataIndex: "numeric_value", key: "numeric_value" },
+    {
+      title: "Colour",
+      dataIndex: "colour",
+      key: "colour",
+      width: "10%",
+      render: (_, record) => {
+        return record.colour && record.colour.hex ? (
+          <Tag color={record.colour.hex}>{record.colour.hex}</Tag>
+        ) : null;
+      },
+    },
     {
       title: "Action",
       dataIndex: "operation",

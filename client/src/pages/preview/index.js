@@ -23,11 +23,12 @@ function Preview({ vid }) {
 
   const dispatch = useDispatch();
   const ratingColor = {
-    5: "#19b346",
-    4: "#8bb38d",
-    3: "#b3b3b3",
-    2: "#b36d7e",
-    1: "#b30a25",
+    1: "#108040",
+    2: "#A5C239",
+    3: "#ECA124",
+    4: "#749990",
+    5: "#E82728",
+    6: "#f9f9fa",
   };
 
   const [videoData, setVideoData] = useState({});
@@ -48,23 +49,24 @@ function Preview({ vid }) {
   });
 
   React.useEffect(() => {
-    axios
-      .get(VIDEOS_API + "/" + videoID + "/published")
-      .then((response) => {
-        setVideoData(response.data);
-      })
-      .catch((error) => {
-        if (id > 0) {
-          dispatch(addErrorNotification(error.message));
-        }
-      })
-      .finally(() => setLoading(false));
-  }, []);
+    if (videoID > 0)
+      axios
+        .get(VIDEOS_API + "/" + videoID + "/published")
+        .then((response) => {
+          setVideoData(response.data);
+        })
+        .catch((error) => {
+          if (id > 0) {
+            dispatch(addErrorNotification(error.message));
+          }
+        })
+        .finally(() => setLoading(false));
+  }, [vid]);
 
   if (loading) {
     return <Skeleton />;
   }
-  if (!videoData.video) {
+  if (!videoData.video && videoData > 0) {
     return <Result />;
   }
 
@@ -270,7 +272,7 @@ function Preview({ vid }) {
                 borderStyle: "solid",
                 borderWidth: "2px",
                 borderRadius: "6px",
-                borderColor: ratingColor[currentClaim.rating.numeric_value],
+                borderColor: ratingColor[currentClaim.rating.id],
                 backgroundColor: "#fff",
                 padding: "20px",
                 minHeight: "240px",
@@ -290,7 +292,7 @@ function Preview({ vid }) {
                   style={{
                     fontSize: "14px",
                     textTransform: "uppercase",
-                    color: ratingColor[currentClaim.rating.numeric_value],
+                    color: ratingColor[currentClaim.rating.id],
                   }}
                 >
                   {currentClaim.rating.name}
@@ -305,7 +307,7 @@ function Preview({ vid }) {
                 <h4>Fact:</h4>
                 <div
                   style={{
-                    color: ratingColor[currentClaim.rating.numeric_value],
+                    color: ratingColor[currentClaim.rating.id],
                   }}
                 >
                   {currentClaim.fact}

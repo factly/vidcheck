@@ -6,8 +6,10 @@ import { Steps, Button } from "antd";
 import StepOne from "./AnalysisForm/StepOne";
 import StepTwo from "./AnalysisForm/StepTwo";
 import Preview from "../../preview";
+import { useHistory } from "react-router-dom";
 
 function VideoAnalysisForm({ data, onSubmit, vid }) {
+  const history = useHistory();
   const [current, setCurrent] = React.useState(0);
   const [summary, setSummary] = React.useState({
     title: data?.video?.title || "",
@@ -38,8 +40,16 @@ function VideoAnalysisForm({ data, onSubmit, vid }) {
       <div style={current === 2 ? { display: "block" } : { display: "none" }}>
         <Preview vid={vid} />
         <div style={{ display: "flex", "justify-content": "flex-end" }}>
-          <Button type="primary" onClick={() => setCurrent(1)}>
+          <Button
+            type="primary"
+            onClick={() => setCurrent(1)}
+            style={{ marginRight: 5 }}
+          >
             Previous
+          </Button>
+
+          <Button type="primary" onClick={() => history.push("/")}>
+            Publish
           </Button>
         </div>
       </div>

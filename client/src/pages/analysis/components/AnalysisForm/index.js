@@ -22,7 +22,7 @@ function AnalysisForm({
   const dispatch = useDispatch();
   const [filters, setFilters] = React.useState({
     page: 1,
-    limit: 5,
+    limit: 10,
   });
   const { ratings, loading } = useSelector((state) => {
     const node = state.ratings.req.find((item) => {
