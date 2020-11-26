@@ -13,7 +13,6 @@ function StepOne({ current, summary, setSummary, setCurrent }) {
         />
       </div>
       <div style={{ marginTop: 16, width: "70%", display: "flex" }}>
-        {/* <div className="ant-input-group-addon">Summary</div> */}
         <div
           style={{
             border: "1px solid #d9d9d9",
@@ -24,7 +23,7 @@ function StepOne({ current, summary, setSummary, setCurrent }) {
             backgroundColor: "#fafafa",
           }}
         >
-          <p>Summary</p>
+          Summary
         </div>
         <Input.TextArea
           addonBefore={"Summary"}
