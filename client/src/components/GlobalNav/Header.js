@@ -13,16 +13,22 @@ function Header() {
 
   return (
     <Layout.Header className="layout-header">
-      <Space direction="horizontal" size={48}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          alignItems: "center",
+        }}
+      >
         <MenuFoldComponent
-          style={{ fontSize: "16px" }}
+          style={{ fontSize: "16px", marginRight: "auto" }}
           onClick={() => dispatch(toggleSider())}
         />
 
         <SpaceSelector />
 
         <AccountMenu />
-      </Space>
+      </div>
     </Layout.Header>
   );
 }

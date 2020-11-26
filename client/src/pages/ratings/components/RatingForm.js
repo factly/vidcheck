@@ -87,7 +87,7 @@ const RatingForm = ({ onCreate, data = {} }) => {
           },
         ]}
       >
-        <InputNumber min={1} max={5} />
+        <InputNumber min={1} max={100} />
       </Form.Item>
 
       <Form.Item name="colour" label="Colour">

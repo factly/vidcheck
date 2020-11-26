@@ -200,7 +200,7 @@ function AnalysisForm({
         </Select>
       </Form.Item>
 
-      <Form.Item name="claimed" label="Claimed">
+      <Form.Item name="claimed" label="Claim">
         <Input.TextArea />
       </Form.Item>
       <Form.Item name="factCheckDetail" label="Fact check">
@@ -220,10 +220,10 @@ function AnalysisForm({
             htmlType="submit"
             style={{ "margin-right": "15px" }}
           >
-            {form.getFieldValue("id") ? "Update" : "Add"}
+            {form.getFieldValue("id") ? "Update Claim" : "Add Claim"}
           </Button>
           <Button htmlType="button" onClick={onReset}>
-            Reset
+            Reset Claim
           </Button>
         </div>
       </Form.Item>
