@@ -52,7 +52,7 @@ var Dummy_OrgList = []map[string]interface{}{
 }
 
 func KavachGock() {
-	gock.New(viper.GetString("kavach.url") + "/organisations/my").
+	gock.New(viper.GetString("kavach_url") + "/organisations/my").
 		Persist().
 		Reply(http.StatusOK).
 		JSON(Dummy_OrgList)
@@ -91,7 +91,7 @@ func DegaGock() {
 		"nodes": Dummy_RatingList,
 	}
 
-	gock.New(viper.GetString("dega.url")).
+	gock.New(viper.GetString("dega_url")).
 		Get("/fact-check/ratings").
 		MatchParam("all", "true").
 		Persist().
@@ -125,7 +125,7 @@ func DegaSpaceGock() {
 		DummyOwner_Org,
 	}
 
-	gock.New(viper.GetString("dega.url")).
+	gock.New(viper.GetString("dega_url")).
 		Get("/core/spaces").
 		Persist().
 		Reply(http.StatusOK).

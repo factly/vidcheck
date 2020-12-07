@@ -9,7 +9,7 @@ import (
 
 // KavachChecker checks if Kavach is ready
 func KavachChecker() error {
-	return GetRequest(viper.GetString("kavach.url") + "/health/ready")
+	return GetRequest(viper.GetString("kavach_url") + "/health/ready")
 }
 
 // GetRequest returns error if error in status code
