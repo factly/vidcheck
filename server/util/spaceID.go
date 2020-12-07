@@ -102,7 +102,7 @@ func GetDegaSpace(ctx context.Context) (*model.Space, error) {
 	}
 
 	if spaceID != nil {
-		url := fmt.Sprint(viper.GetString("dega.url"), "/core/spaces")
+		url := fmt.Sprint(viper.GetString("dega_url"), "/core/spaces")
 		req, _ := http.NewRequest("GET", url, nil)
 
 		req.Header.Set("Content-Type", "application/json")

@@ -69,3 +69,18 @@ Once the application is up and running you should be able to access it using the
   REACT_APP_BASE_API_URL=http://127.0.0.1:4455/.factly/vid-check/server/
   REACT_APP_PUBLIC_URL=http://127.0.0.1:4455/.factly/vid-check/web/
   ```
+
+- Create config file with name config (and extension .env, .yml, .json) in `server/` and add cnofig variables (eg. below)
+```
+DATABASE_HOST=postgres 
+DATABASE_USER=postgres
+DATABASE_PASSWORD=postgres
+DATABASE_NAME=vidcheck 
+DATABASE_PORT=5432 
+DATABASE_SSL_MODE=disable
+
+KAVACH_URL=http://kavach-server:8000
+
+DEGA_INTEGRATION=false
+DEGA_URL=http://dega-server:8000
+```

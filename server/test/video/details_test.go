@@ -59,7 +59,7 @@ func TestVideoDetails(t *testing.T) {
 			WithPath("video_id", "invalid").
 			WithHeaders(headers).
 			Expect().
-			Status(http.StatusNotFound)
+			Status(http.StatusBadRequest)
 		test.ExpectationsMet(t, mock)
 	})
 
@@ -78,7 +78,7 @@ func TestVideoDetails(t *testing.T) {
 	})
 
 	t.Run("get video details when dega integrated", func(t *testing.T) {
-		viper.Set("dega.integration", true)
+		viper.Set("dega_integration", true)
 
 		SelectQuery(mock, 1, 1)
 
@@ -94,17 +94,17 @@ func TestVideoDetails(t *testing.T) {
 
 		checkResponse(res)
 		test.ExpectationsMet(t, mock)
-		viper.Set("dega.integration", false)
+		viper.Set("dega_integration", false)
 	})
 
 	t.Run("dega returns invalid response", func(t *testing.T) {
-		viper.Set("dega.integration", true)
+		viper.Set("dega_integration", true)
 		gock.Off()
 
 		gock.New(testServer.URL).EnableNetworking().Persist()
 		defer gock.Off()
 		test.DegaSpaceGock()
-		gock.New(viper.GetString("dega.url")).
+		gock.New(viper.GetString("dega_url")).
 			Get("/fact-check/ratings").
 			MatchParam("all", "true").
 			Persist().
@@ -121,6 +121,6 @@ func TestVideoDetails(t *testing.T) {
 			Status(http.StatusInternalServerError)
 
 		test.ExpectationsMet(t, mock)
-		viper.Set("dega.integration", false)
+		viper.Set("dega_integration", false)
 	})
 }

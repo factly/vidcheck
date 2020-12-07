@@ -28,8 +28,8 @@ func (a AnyTime) Match(v driver.Value) bool {
 // SetupMockDB setups the mock sql db
 func SetupMockDB() sqlmock.Sqlmock {
 
-	viper.Set("kavach.url", "http://kavach:6620")
-	viper.Set("dega.url", "http://dega:8000")
+	viper.Set("kavach_url", "http://kavach:6620")
+	viper.Set("dega_url", "http://dega:8000")
 
 	db, mock, err := sqlmock.New()
 	if err != nil {

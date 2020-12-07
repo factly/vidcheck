@@ -135,7 +135,7 @@ func TestVideoCreate(t *testing.T) {
 	})
 
 	t.Run("create a video with analysis when integrated with dega", func(t *testing.T) {
-		viper.Set("dega.integration", true)
+		viper.Set("dega_integration", true)
 
 		mock.ExpectBegin()
 		mock.ExpectQuery(`INSERT INTO "video"`).
@@ -165,18 +165,18 @@ func TestVideoCreate(t *testing.T) {
 
 		checkResponse(res)
 		test.ExpectationsMet(t, mock)
-		viper.Set("dega.integration", false)
+		viper.Set("dega_integration", false)
 	})
 
 	t.Run("dega returns invalid response", func(t *testing.T) {
-		viper.Set("dega.integration", true)
+		viper.Set("dega_integration", true)
 
 		gock.Off()
 
 		gock.New(testServer.URL).EnableNetworking().Persist()
 		defer gock.Off()
 		test.DegaSpaceGock()
-		gock.New(viper.GetString("dega.url")).
+		gock.New(viper.GetString("dega_url")).
 			Get("/fact-check/ratings").
 			MatchParam("all", "true").
 			Persist().
@@ -197,18 +197,18 @@ func TestVideoCreate(t *testing.T) {
 			Expect().
 			Status(http.StatusInternalServerError)
 		test.ExpectationsMet(t, mock)
-		viper.Set("dega.integration", false)
+		viper.Set("dega_integration", false)
 	})
 
 	t.Run("ratings not in dega server", func(t *testing.T) {
-		viper.Set("dega.integration", true)
+		viper.Set("dega_integration", true)
 
 		gock.Off()
 
 		gock.New(testServer.URL).EnableNetworking().Persist()
 		defer gock.Off()
 		test.DegaSpaceGock()
-		gock.New(viper.GetString("dega.url")).
+		gock.New(viper.GetString("dega_url")).
 			Get("/fact-check/ratings").
 			MatchParam("all", "true").
 			Persist().
@@ -235,7 +235,7 @@ func TestVideoCreate(t *testing.T) {
 			Expect().
 			Status(http.StatusInternalServerError)
 		test.ExpectationsMet(t, mock)
-		viper.Set("dega.integration", false)
+		viper.Set("dega_integration", false)
 	})
 
 }

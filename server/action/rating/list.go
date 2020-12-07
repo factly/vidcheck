@@ -61,7 +61,7 @@ func list(w http.ResponseWriter, r *http.Request) {
 
 //GetDegaRatings fetches all the ratings from dega-server
 func GetDegaRatings(uID, sID int) (map[uint]model.Rating, error) {
-	url := fmt.Sprint(viper.GetString("dega.url"), "/fact-check/ratings?all=true")
+	url := fmt.Sprint(viper.GetString("dega_url"), "/fact-check/ratings?all=true")
 	req, _ := http.NewRequest("GET", url, nil)
 
 	req.Header.Set("Content-Type", "application/json")
