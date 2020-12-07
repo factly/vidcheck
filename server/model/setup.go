@@ -2,9 +2,11 @@ package model
 
 import (
 	"log"
+	"time"
 
 	"gorm.io/gorm/logger"
 
+	"github.com/factly/x/loggerx"
 	"github.com/spf13/viper"
 	"gorm.io/gorm/schema"
 
@@ -22,7 +24,11 @@ func SetupDB(DSN interface{}) {
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},
-		Logger: logger.Default.LogMode(logger.Info),
+		Logger: loggerx.NewGormLogger(logger.Config{
+			SlowThreshold: 200 * time.Millisecond,
+			LogLevel:      logger.Info,
+			Colorful:      true,
+		}),
 	})
 
 	if err != nil {
