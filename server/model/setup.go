@@ -19,7 +19,7 @@ import (
 var DB *gorm.DB
 
 // SetupDB is database setup
-func SetupDB(DSN interface{}) {
+func SetupDB() {
 	var err error
 
 	dbString := fmt.Sprint("host=", viper.GetString("database_host"), " ",
