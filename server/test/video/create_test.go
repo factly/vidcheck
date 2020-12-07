@@ -11,6 +11,8 @@ import (
 	"github.com/factly/vidcheck/test"
 	"github.com/factly/vidcheck/test/rating"
 	"github.com/gavv/httpexpect"
+	"github.com/spf13/viper"
+	"gopkg.in/h2non/gock.v1"
 )
 
 func TestVideoCreate(t *testing.T) {
@@ -19,6 +21,10 @@ func TestVideoCreate(t *testing.T) {
 
 	testServer := httptest.NewServer(action.RegisterRoutes())
 	defer testServer.Close()
+
+	test.DegaGock()
+	gock.New(testServer.URL).EnableNetworking().Persist()
+	defer gock.Off()
 
 	// create httpexpect instance
 	e := httpexpect.New(t, testServer.URL)
@@ -55,6 +61,9 @@ func TestVideoCreate(t *testing.T) {
 			WillReturnRows(sqlmock.
 				NewRows([]string{"id"}).
 				AddRow(1))
+
+		rating.SelectWithoutSpace(mock)
+		rating.SelectWithoutSpace(mock)
 
 		second := requestData["analysis"].([]map[string]interface{})[1]
 		mock.ExpectQuery(`INSERT INTO "analysis"`).
@@ -108,6 +117,9 @@ func TestVideoCreate(t *testing.T) {
 				NewRows([]string{"id"}).
 				AddRow(1))
 
+		rating.SelectWithoutSpace(mock)
+		rating.SelectWithoutSpace(mock)
+
 		second := requestData["analysis"].([]map[string]interface{})[1]
 		mock.ExpectQuery(`INSERT INTO "analysis"`).
 			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, analysisData["video_id"], analysisData["rating_id"], analysisData["claim"], analysisData["fact"], analysisData["end_time"], analysisData["start_time"], analysisData["end_time_fraction"], test.AnyTime{}, test.AnyTime{}, nil, second["video_id"], second["rating_id"], second["claim"], second["fact"], second["end_time"], second["start_time"], second["end_time_fraction"]).
@@ -121,4 +133,109 @@ func TestVideoCreate(t *testing.T) {
 			Status(http.StatusInternalServerError)
 		test.ExpectationsMet(t, mock)
 	})
+
+	t.Run("create a video with analysis when integrated with dega", func(t *testing.T) {
+		viper.Set("dega.integration", true)
+
+		mock.ExpectBegin()
+		mock.ExpectQuery(`INSERT INTO "video"`).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, Data["url"], Data["title"], Data["summary"], Data["video_type"], Data["space_id"]).
+			WillReturnRows(sqlmock.
+				NewRows([]string{"id"}).
+				AddRow(1))
+
+		second := requestData["analysis"].([]map[string]interface{})[1]
+		mock.ExpectQuery(`INSERT INTO "analysis"`).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, analysisData["video_id"], analysisData["rating_id"], analysisData["claim"], analysisData["fact"], analysisData["end_time"], analysisData["start_time"], analysisData["end_time_fraction"], test.AnyTime{}, test.AnyTime{}, nil, second["video_id"], second["rating_id"], second["claim"], second["fact"], second["end_time"], second["start_time"], second["end_time_fraction"]).
+			WillReturnRows(sqlmock.
+				NewRows([]string{"id"}).
+				AddRow(1))
+
+		analysisSelectQuery(mock, 1)
+
+		mock.ExpectCommit()
+
+		res := e.POST(basePath).
+			WithHeaders(headers).
+			WithJSON(requestData).
+			Expect().
+			Status(http.StatusCreated).
+			JSON().
+			Object()
+
+		checkResponse(res)
+		test.ExpectationsMet(t, mock)
+		viper.Set("dega.integration", false)
+	})
+
+	t.Run("dega returns invalid response", func(t *testing.T) {
+		viper.Set("dega.integration", true)
+
+		gock.Off()
+
+		gock.New(testServer.URL).EnableNetworking().Persist()
+		defer gock.Off()
+		test.DegaSpaceGock()
+		gock.New(viper.GetString("dega.url")).
+			Get("/fact-check/ratings").
+			MatchParam("all", "true").
+			Persist().
+			Reply(http.StatusInternalServerError)
+
+		mock.ExpectBegin()
+		mock.ExpectQuery(`INSERT INTO "video"`).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, Data["url"], Data["title"], Data["summary"], Data["video_type"], Data["space_id"]).
+			WillReturnRows(sqlmock.
+				NewRows([]string{"id"}).
+				AddRow(1))
+
+		mock.ExpectRollback()
+
+		e.POST(basePath).
+			WithHeaders(headers).
+			WithJSON(requestData).
+			Expect().
+			Status(http.StatusInternalServerError)
+		test.ExpectationsMet(t, mock)
+		viper.Set("dega.integration", false)
+	})
+
+	t.Run("ratings not in dega server", func(t *testing.T) {
+		viper.Set("dega.integration", true)
+
+		gock.Off()
+
+		gock.New(testServer.URL).EnableNetworking().Persist()
+		defer gock.Off()
+		test.DegaSpaceGock()
+		gock.New(viper.GetString("dega.url")).
+			Get("/fact-check/ratings").
+			MatchParam("all", "true").
+			Persist().
+			Reply(http.StatusOK).
+			JSON(map[string]interface{}{
+				"total": 1,
+				"nodes": []map[string]interface{}{
+					test.AnotherRating,
+				},
+			})
+
+		mock.ExpectBegin()
+		mock.ExpectQuery(`INSERT INTO "video"`).
+			WithArgs(test.AnyTime{}, test.AnyTime{}, nil, Data["url"], Data["title"], Data["summary"], Data["video_type"], Data["space_id"]).
+			WillReturnRows(sqlmock.
+				NewRows([]string{"id"}).
+				AddRow(1))
+
+		mock.ExpectRollback()
+
+		e.POST(basePath).
+			WithHeaders(headers).
+			WithJSON(requestData).
+			Expect().
+			Status(http.StatusInternalServerError)
+		test.ExpectationsMet(t, mock)
+		viper.Set("dega.integration", false)
+	})
+
 }

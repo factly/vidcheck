@@ -3,6 +3,9 @@ package video
 import (
 	"net/http"
 
+	"github.com/factly/vidcheck/action/rating"
+	"github.com/factly/vidcheck/config"
+
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
@@ -37,6 +40,13 @@ func list(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	uID, err := util.GetUser(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
 	result := paging{}
 	result.Nodes = make([]videoanalysisData, 0)
 
@@ -47,10 +57,31 @@ func list(w http.ResponseWriter, r *http.Request) {
 		SpaceID: uint(sID),
 	}).Count(&result.Total).Offset(offset).Limit(limit).Find(&videos)
 
+	var ratingMap map[uint]model.Rating
+
+	if config.DegaIntegrated() {
+		ratingMap, err = rating.GetDegaRatings(uID, sID)
+		if err != nil {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+			return
+		}
+	}
+
 	for _, video := range videos {
 		var analysisData videoanalysisData
 		analysisData.Video = video
-		model.DB.Model(&model.Analysis{}).Preload("Rating").Order("start_time").Where("video_id = ?", video.ID).Find(&analysisData.Analysis)
+		stmt := model.DB.Model(&model.Analysis{}).Order("start_time").Where("video_id = ?", video.ID)
+
+		if !config.DegaIntegrated() {
+			stmt.Preload("Rating")
+		}
+
+		stmt.Find(&analysisData.Analysis)
+
+		if config.DegaIntegrated() {
+			analysisData.Analysis = AddDegaRatings(uID, sID, analysisData.Analysis, ratingMap)
+		}
 
 		result.Nodes = append(result.Nodes, analysisData)
 	}

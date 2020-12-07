@@ -1,6 +1,7 @@
 package video
 
 import (
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"regexp"
@@ -57,6 +58,10 @@ func TestVideoDelete(t *testing.T) {
 		mock.ExpectExec(regexp.QuoteMeta(`UPDATE "video"`)).
 			WithArgs(test.AnyTime{}, 1).
 			WillReturnResult(sqlmock.NewResult(1, 1))
+
+		mock.ExpectExec(regexp.QuoteMeta(`UPDATE "analysis"`)).
+			WithArgs(test.AnyTime{}, 1).
+			WillReturnResult(sqlmock.NewResult(1, 1))
 		mock.ExpectCommit()
 
 		e.DELETE(path).
@@ -64,6 +69,48 @@ func TestVideoDelete(t *testing.T) {
 			WithHeaders(headers).
 			Expect().
 			Status(http.StatusOK)
+		test.ExpectationsMet(t, mock)
+	})
+
+	t.Run("deleting video fails", func(t *testing.T) {
+		test.CheckSpaceMock(mock)
+
+		SelectQuery(mock, 1, 1)
+
+		mock.ExpectBegin()
+		mock.ExpectExec(regexp.QuoteMeta(`UPDATE "video"`)).
+			WithArgs(test.AnyTime{}, 1).
+			WillReturnError(errors.New(`deleting video fails`))
+		mock.ExpectRollback()
+
+		e.DELETE(path).
+			WithPath("video_id", "1").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusInternalServerError)
+		test.ExpectationsMet(t, mock)
+	})
+
+	t.Run("deleting analysis fails", func(t *testing.T) {
+		test.CheckSpaceMock(mock)
+
+		SelectQuery(mock, 1, 1)
+
+		mock.ExpectBegin()
+		mock.ExpectExec(regexp.QuoteMeta(`UPDATE "video"`)).
+			WithArgs(test.AnyTime{}, 1).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+
+		mock.ExpectExec(regexp.QuoteMeta(`UPDATE "analysis"`)).
+			WithArgs(test.AnyTime{}, 1).
+			WillReturnError(errors.New(`deleting video analysis fails`))
+		mock.ExpectRollback()
+
+		e.DELETE(path).
+			WithPath("video_id", "1").
+			WithHeaders(headers).
+			Expect().
+			Status(http.StatusInternalServerError)
 		test.ExpectationsMet(t, mock)
 	})
 }

@@ -32,16 +32,12 @@ func SetupDB(DSN interface{}) {
 	log.Println("connected to database ...")
 
 	// Migrating schema.
-	if err = DB.AutoMigrate(&Video{}); err != nil {
-		log.Fatal(err)
-	}
-	if err = DB.AutoMigrate(&Analysis{}); err != nil {
-		log.Fatal(err)
-	}
-	if err = DB.AutoMigrate(&Rating{}); err != nil {
-		log.Fatal(err)
-	}
-	if err = DB.AutoMigrate(&Space{}); err != nil {
-		log.Fatal(err)
-	}
+	_ = DB.AutoMigrate(
+		&Video{},
+		&Analysis{},
+		&Rating{},
+		&Space{},
+	)
+
+	_ = DB.Migrator().DropConstraint(&Analysis{}, "fk_analysis_rating")
 }
