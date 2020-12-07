@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/factly/vidcheck/model"
+
 	"github.com/factly/vidcheck/config"
 
 	"github.com/factly/vidcheck/action/rating"
@@ -13,6 +15,7 @@ import (
 
 	"github.com/factly/vidcheck/action/video"
 	"github.com/factly/vidcheck/util"
+	"github.com/factly/x/healthx"
 	"github.com/factly/x/loggerx"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -46,6 +49,12 @@ func RegisterRoutes() http.Handler {
 		r.Get("/swagger/*", httpSwagger.WrapHandler)
 		fmt.Println("swagger-ui http://localhost:8080/swagger/index.html")
 	}
+
+	sqlDB, _ := model.DB.DB()
+	healthx.RegisterRoutes(r, healthx.ReadyCheckers{
+		"database": sqlDB.Ping,
+		"kavach":   util.KavachChecker,
+	})
 
 	r.With(util.GormRequestID, util.CheckUser, util.CheckSpace).Group(func(r chi.Router) {
 		r.Mount("/analysis", videoanalysis.Router())
