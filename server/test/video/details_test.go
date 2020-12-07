@@ -59,7 +59,7 @@ func TestVideoDetails(t *testing.T) {
 			WithPath("video_id", "invalid").
 			WithHeaders(headers).
 			Expect().
-			Status(http.StatusNotFound)
+			Status(http.StatusBadRequest)
 		test.ExpectationsMet(t, mock)
 	})
 

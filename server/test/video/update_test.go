@@ -86,7 +86,7 @@ func TestVideoUpdate(t *testing.T) {
 			WithHeaders(headers).
 			WithJSON(requestData).
 			Expect().
-			Status(http.StatusNotFound)
+			Status(http.StatusBadRequest)
 		test.ExpectationsMet(t, mock)
 	})
 
