@@ -105,6 +105,6 @@ sketch
 kavach/
 
 ### Vid check server ###
-server/vid-check-server.yml
+server/config.*
 
 # End of https://www.toptal.com/developers/gitignore/api/code,intellij,go,react
