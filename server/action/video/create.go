@@ -114,7 +114,13 @@ func create(w http.ResponseWriter, r *http.Request) {
 			VideoID:         videoObj.ID,
 			RatingID:        analysisBlock.RatingID,
 			Claim:           analysisBlock.Claim,
+			ClaimDate:       analysisBlock.ClaimDate,
+			CheckedDate:     analysisBlock.CheckedDate,
+			IsClaim:         analysisBlock.IsClaim,
 			Fact:            analysisBlock.Fact,
+			ClaimantID:      analysisBlock.ClaimantID,
+			ReviewSources:   analysisBlock.ReviewSources,
+			ClaimSources:    analysisBlock.ClaimSources,
 			StartTime:       analysisBlock.StartTime,
 			EndTime:         analysisBlock.EndTime,
 			EndTimeFraction: analysisBlock.EndTimeFraction,
@@ -130,7 +136,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	stmt := tx.Model(&model.Analysis{}).Order("start_time").Where("video_id = ?", videoObj.ID)
+	stmt := tx.Model(&model.Analysis{}).Order("start_time").Where("video_id = ?", videoObj.ID).Preload("Claimant")
 
 	if !config.DegaIntegrated() {
 		stmt.Preload("Rating")

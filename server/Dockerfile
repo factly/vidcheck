@@ -12,6 +12,4 @@ RUN go get github.com/githubnemo/CompileDaemon
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.7.3/wait /wait
 RUN chmod +x /wait
 
-ENV CONFIG_FILE $CONFIG_FILE
-
-ENTRYPOINT /wait && CompileDaemon -exclude-dir=.git -exclude-dir=docs --build="go build main.go" --command="./main -config=${CONFIG_FILE}"
+ENTRYPOINT /wait && CompileDaemon -exclude-dir=.git -exclude-dir=docs --build="go build main.go" --command="./main"

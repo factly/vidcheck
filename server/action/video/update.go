@@ -127,10 +127,16 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 			analysisBlockObj := &model.Analysis{}
 			analysisBlockObj.ID = uint(analysisBlock.ID)
+			tx.Model(&analysisBlock).Select("IsClaim").Updates(model.Analysis{IsClaim: analysisBlock.IsClaim})
 			tx.Model(&analysisBlockObj).Updates(model.Analysis{
 				RatingID:        analysisBlock.RatingID,
 				Claim:           analysisBlock.Claim,
+				ClaimDate:       analysisBlock.ClaimDate,
+				CheckedDate:     analysisBlock.CheckedDate,
 				Fact:            analysisBlock.Fact,
+				ClaimantID:      analysisBlock.ClaimantID,
+				ReviewSources:   analysisBlock.ReviewSources,
+				ClaimSources:    analysisBlock.ClaimSources,
 				StartTime:       analysisBlock.StartTime,
 				EndTime:         analysisBlock.EndTime,
 				EndTimeFraction: analysisBlock.EndTimeFraction,
@@ -187,7 +193,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	// Get all video analysisBlocks.
 	analysisBlocks := []model.Analysis{}
-	stmt := model.DB.Model(&model.Analysis{}).Order("start_time").Where("video_id = ?", uint(id))
+	stmt := model.DB.Model(&model.Analysis{}).Order("start_time").Where("video_id = ?", uint(id)).Preload("Claimant")
 
 	if !config.DegaIntegrated() {
 		stmt.Preload("Rating")
