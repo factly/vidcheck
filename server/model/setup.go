@@ -52,6 +52,7 @@ func SetupDB() {
 		&Analysis{},
 		&Rating{},
 		&Space{},
+		&Claimant{},
 	)
 
 	_ = DB.Migrator().DropConstraint(&Analysis{}, "fk_analysis_rating")

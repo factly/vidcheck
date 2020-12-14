@@ -21,7 +21,7 @@ type videoAnalysis struct {
 	ClaimDate       time.Time      `json:"claim_date"`
 	CheckedDate     time.Time      `json:"checked_date"`
 	IsClaim         bool           `json:"is_claim"`
-	Fact            postgres.Jsonb `json:"fact"`
+	Fact            postgres.Jsonb `json:"fact" swaggertype:"primitive,string"`
 	ReviewSources   postgres.Jsonb `json:"review_sources" swaggertype:"primitive,string"`
 	ClaimSources    postgres.Jsonb `json:"claim_sources" swaggertype:"primitive,string"`
 	StartTime       int            `json:"start_time"`
