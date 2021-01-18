@@ -49,12 +49,13 @@ func create(w http.ResponseWriter, r *http.Request) {
 	tx := model.DB.Begin()
 	videoObj := model.Video{}
 	videoObj = model.Video{
-		URL:       videoAnalysisData.Video.URL,
-		Title:     videoAnalysisData.Video.Title,
-		Summary:   videoAnalysisData.Video.Summary,
-		VideoType: videoAnalysisData.Video.VideoType,
-		Status:    "published", // status is set to published videoAnalysisData.Video.Status
-		SpaceID:   uint(sID),
+		URL:           videoAnalysisData.Video.URL,
+		Title:         videoAnalysisData.Video.Title,
+		Summary:       videoAnalysisData.Video.Summary,
+		VideoType:     videoAnalysisData.Video.VideoType,
+		Status:        "published", // status is set to published videoAnalysisData.Video.Status
+		SpaceID:       uint(sID),
+		TotalDuration: videoAnalysisData.Video.TotalDuration,
 	}
 	err = tx.Create(&videoObj).Error
 	if err != nil {

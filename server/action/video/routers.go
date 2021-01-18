@@ -7,11 +7,12 @@ import (
 )
 
 type video struct {
-	URL       string `json:"url" validate:"required"`
-	Title     string `json:"title" validate:"required"`
-	Summary   string `json:"summary"`
-	VideoType string `json:"video_type" validate:"required"`
-	Status    string `json:"status"`
+	URL           string `json:"url" validate:"required"`
+	Title         string `json:"title" validate:"required"`
+	Summary       string `json:"summary"`
+	VideoType     string `json:"video_type" validate:"required"`
+	Status        string `json:"status"`
+	TotalDuration int64  `json:"total_duration"`
 }
 
 type videoanalysis struct {

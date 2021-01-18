@@ -75,10 +75,11 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	tx := model.DB.Begin()
 	tx.Model(&videoObj).Updates(model.Video{
-		Title:     videoAnalysisData.Video.Title,
-		Summary:   videoAnalysisData.Video.Summary,
-		VideoType: videoAnalysisData.Video.VideoType,
-		Status:    videoAnalysisData.Video.Status,
+		Title:         videoAnalysisData.Video.Title,
+		Summary:       videoAnalysisData.Video.Summary,
+		VideoType:     videoAnalysisData.Video.VideoType,
+		Status:        videoAnalysisData.Video.Status,
+		TotalDuration: videoAnalysisData.Video.TotalDuration,
 	}).First(&videoObj)
 
 	var updatedOrCreatedVideoBlock []uint
