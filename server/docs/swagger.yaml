@@ -1,9 +1,41 @@
 basePath: /
 definitions:
+  claimant.claimant:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      slug:
+        type: string
+      tag_line:
+        type: string
+    required:
+    - name
+    type: object
+  claimant.paging:
+    properties:
+      nodes:
+        items:
+          $ref: '#/definitions/model.Claimant'
+        type: array
+      total:
+        type: integer
+    type: object
   model.Analysis:
     properties:
+      checked_date:
+        type: string
       claim:
         type: string
+      claim_date:
+        type: string
+      claim_sources:
+        type: string
+      claimant:
+        $ref: '#/definitions/model.Claimant'
+      claimant_id:
+        type: integer
       created_at:
         type: string
       deleted_at:
@@ -16,20 +48,43 @@ definitions:
         type: string
       id:
         type: integer
+      is_claim:
+        type: boolean
       rating:
         $ref: '#/definitions/model.Rating'
-        type: object
       rating_id:
         type: integer
+      review_sources:
+        type: string
       start_time:
         type: integer
       updated_at:
         type: string
       video:
         $ref: '#/definitions/model.Video'
-        type: object
       video_id:
         type: integer
+    type: object
+  model.Claimant:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      slug:
+        type: string
+      space_id:
+        type: integer
+      tag_line:
+        type: string
+      updated_at:
+        type: string
     type: object
   model.Rating:
     properties:
@@ -137,7 +192,6 @@ definitions:
         type: integer
       permission:
         $ref: '#/definitions/space.organisationUser'
-        type: object
       slug:
         type: string
       spaces:
@@ -214,8 +268,16 @@ definitions:
     type: object
   video.videoanalysis:
     properties:
+      checked_date:
+        type: string
       claim:
         type: string
+      claim_date:
+        type: string
+      claim_sources:
+        type: string
+      claimant_id:
+        type: integer
       end_time:
         type: integer
       end_time_fraction:
@@ -224,11 +286,16 @@ definitions:
         type: string
       id:
         type: integer
+      is_claim:
+        type: boolean
       rating_id:
         type: integer
+      review_sources:
+        type: string
       start_time:
         type: integer
     required:
+    - claimant_id
     - end_time
     - end_time_fraction
     - rating_id
@@ -241,7 +308,6 @@ definitions:
         type: array
       video:
         $ref: '#/definitions/model.Video'
-        type: object
     type: object
   video.videoanalysisReqData:
     properties:
@@ -251,7 +317,6 @@ definitions:
         type: array
       video:
         $ref: '#/definitions/video.video'
-        type: object
     required:
     - analysis
     - video
@@ -282,7 +347,13 @@ definitions:
     type: object
   videoanalysis.videoAnalysis:
     properties:
+      checked_date:
+        type: string
       claim:
+        type: string
+      claim_date:
+        type: string
+      claim_sources:
         type: string
       end_time:
         type: integer
@@ -290,8 +361,14 @@ definitions:
         type: number
       fact:
         type: string
+      id:
+        type: integer
+      is_claim:
+        type: boolean
       rating_id:
         type: integer
+      review_sources:
+        type: string
       start_time:
         type: integer
     required:
@@ -307,7 +384,6 @@ definitions:
         type: array
       video:
         $ref: '#/definitions/videoanalysis.video'
-        type: object
     required:
     - analysis
     - video
@@ -517,6 +593,163 @@ paths:
       summary: Show all video analysis
       tags:
       - VideoAnalysis
+  /claimants:
+    get:
+      description: Get all claimants
+      operationId: get-all-claimants
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: limit per page
+        in: query
+        name: limit
+        type: string
+      - description: page number
+        in: query
+        name: page
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/claimant.paging'
+      summary: Show all claimants
+      tags:
+      - Claimant
+    post:
+      description: Create claimant
+      operationId: add-claimant
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Claimant Object
+        in: body
+        name: Claimant
+        required: true
+        schema:
+          $ref: '#/definitions/claimant.claimant'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Claimant'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Create claimant
+      tags:
+      - Claimant
+  /claimants/{claimant_id}:
+    delete:
+      description: Delete claimant by ID
+      operationId: delete-claimant-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Claimant ID
+        in: path
+        name: claimant_id
+        required: true
+        type: string
+      responses:
+        "200": {}
+      summary: Delete a claimant
+      tags:
+      - Claimant
+    get:
+      description: Get claimant by ID
+      operationId: get-claimant-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Claimant ID
+        in: path
+        name: claimant_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Claimant'
+      summary: Show a claimant by id
+      tags:
+      - Claimant
+    put:
+      description: Update claimant by ID
+      operationId: update-claimant-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Claimant ID
+        in: path
+        name: claimant_id
+        required: true
+        type: string
+      - description: Claimant
+        in: body
+        name: Claimant
+        schema:
+          $ref: '#/definitions/claimant.claimant'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Claimant'
+      summary: Update a claimant by id
+      tags:
+      - Claimant
   /ratings:
     get:
       description: Get all ratings

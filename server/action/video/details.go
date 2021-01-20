@@ -63,7 +63,7 @@ func details(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	stmt := model.DB.Model(&model.Analysis{}).Order("start_time").Where("video_id = ?", uint(id))
+	stmt := model.DB.Model(&model.Analysis{}).Order("start_time").Where("video_id = ?", uint(id)).Preload("Claimant")
 
 	if !config.DegaIntegrated() {
 		stmt.Preload("Rating")

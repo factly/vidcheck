@@ -71,7 +71,7 @@ func list(w http.ResponseWriter, r *http.Request) {
 	for _, video := range videos {
 		var analysisData videoanalysisData
 		analysisData.Video = video
-		stmt := model.DB.Model(&model.Analysis{}).Order("start_time").Where("video_id = ?", video.ID)
+		stmt := model.DB.Model(&model.Analysis{}).Order("start_time").Where("video_id = ?", video.ID).Preload("Claimant")
 
 		if !config.DegaIntegrated() {
 			stmt.Preload("Rating")

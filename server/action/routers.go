@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/factly/vidcheck/action/claimant"
+
 	"github.com/factly/vidcheck/model"
 
 	"github.com/factly/vidcheck/config"
@@ -59,6 +61,7 @@ func RegisterRoutes() http.Handler {
 	r.With(util.GormRequestID, util.CheckUser, util.CheckSpace).Group(func(r chi.Router) {
 		r.Mount("/analysis", videoanalysis.Router())
 		r.Mount("/videos", video.Router())
+		r.Mount("/claimants", claimant.Router())
 		if !config.DegaIntegrated() {
 			r.Mount("/spaces", space.Router())
 			r.Mount("/ratings", rating.Router())

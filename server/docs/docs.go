@@ -313,6 +313,236 @@ var doc = `{
                 }
             }
         },
+        "/claimants": {
+            "get": {
+                "description": "Get all claimants",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Claimant"
+                ],
+                "summary": "Show all claimants",
+                "operationId": "get-all-claimants",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "limit per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "page number",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/claimant.paging"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create claimant",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Claimant"
+                ],
+                "summary": "Create claimant",
+                "operationId": "add-claimant",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Claimant Object",
+                        "name": "Claimant",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/claimant.claimant"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Claimant"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/claimants/{claimant_id}": {
+            "get": {
+                "description": "Get claimant by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Claimant"
+                ],
+                "summary": "Show a claimant by id",
+                "operationId": "get-claimant-by-id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Claimant ID",
+                        "name": "claimant_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Claimant"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update claimant by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Claimant"
+                ],
+                "summary": "Update a claimant by id",
+                "operationId": "update-claimant-by-id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Claimant ID",
+                        "name": "claimant_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Claimant",
+                        "name": "Claimant",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/claimant.claimant"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Claimant"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete claimant by ID",
+                "tags": [
+                    "Claimant"
+                ],
+                "summary": "Delete a claimant",
+                "operationId": "delete-claimant-by-id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Claimant ID",
+                        "name": "claimant_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {}
+                }
+            }
+        },
         "/ratings": {
             "get": {
                 "description": "Get all ratings",
@@ -1005,11 +1235,60 @@ var doc = `{
         }
     },
     "definitions": {
+        "claimant.claimant": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "tag_line": {
+                    "type": "string"
+                }
+            }
+        },
+        "claimant.paging": {
+            "type": "object",
+            "properties": {
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Claimant"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "model.Analysis": {
             "type": "object",
             "properties": {
+                "checked_date": {
+                    "type": "string"
+                },
                 "claim": {
                     "type": "string"
+                },
+                "claim_date": {
+                    "type": "string"
+                },
+                "claim_sources": {
+                    "type": "string"
+                },
+                "claimant": {
+                    "$ref": "#/definitions/model.Claimant"
+                },
+                "claimant_id": {
+                    "type": "integer"
                 },
                 "created_at": {
                     "type": "string"
@@ -1029,12 +1308,17 @@ var doc = `{
                 "id": {
                     "type": "integer"
                 },
+                "is_claim": {
+                    "type": "boolean"
+                },
                 "rating": {
-                    "type": "object",
                     "$ref": "#/definitions/model.Rating"
                 },
                 "rating_id": {
                     "type": "integer"
+                },
+                "review_sources": {
+                    "type": "string"
                 },
                 "start_time": {
                     "type": "integer"
@@ -1043,11 +1327,42 @@ var doc = `{
                     "type": "string"
                 },
                 "video": {
-                    "type": "object",
                     "$ref": "#/definitions/model.Video"
                 },
                 "video_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "model.Claimant": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "space_id": {
+                    "type": "integer"
+                },
+                "tag_line": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },
@@ -1210,7 +1525,6 @@ var doc = `{
                     "type": "integer"
                 },
                 "permission": {
-                    "type": "object",
                     "$ref": "#/definitions/space.organisationUser"
                 },
                 "slug": {
@@ -1328,13 +1642,26 @@ var doc = `{
         "video.videoanalysis": {
             "type": "object",
             "required": [
+                "claimant_id",
                 "end_time",
                 "end_time_fraction",
                 "rating_id"
             ],
             "properties": {
+                "checked_date": {
+                    "type": "string"
+                },
                 "claim": {
                     "type": "string"
+                },
+                "claim_date": {
+                    "type": "string"
+                },
+                "claim_sources": {
+                    "type": "string"
+                },
+                "claimant_id": {
+                    "type": "integer"
                 },
                 "end_time": {
                     "type": "integer"
@@ -1348,8 +1675,14 @@ var doc = `{
                 "id": {
                     "type": "integer"
                 },
+                "is_claim": {
+                    "type": "boolean"
+                },
                 "rating_id": {
                     "type": "integer"
+                },
+                "review_sources": {
+                    "type": "string"
                 },
                 "start_time": {
                     "type": "integer"
@@ -1366,7 +1699,6 @@ var doc = `{
                     }
                 },
                 "video": {
-                    "type": "object",
                     "$ref": "#/definitions/model.Video"
                 }
             }
@@ -1385,7 +1717,6 @@ var doc = `{
                     }
                 },
                 "video": {
-                    "type": "object",
                     "$ref": "#/definitions/video.video"
                 }
             }
@@ -1434,7 +1765,16 @@ var doc = `{
                 "rating_id"
             ],
             "properties": {
+                "checked_date": {
+                    "type": "string"
+                },
                 "claim": {
+                    "type": "string"
+                },
+                "claim_date": {
+                    "type": "string"
+                },
+                "claim_sources": {
                     "type": "string"
                 },
                 "end_time": {
@@ -1446,8 +1786,17 @@ var doc = `{
                 "fact": {
                     "type": "string"
                 },
+                "id": {
+                    "type": "integer"
+                },
+                "is_claim": {
+                    "type": "boolean"
+                },
                 "rating_id": {
                     "type": "integer"
+                },
+                "review_sources": {
+                    "type": "string"
                 },
                 "start_time": {
                     "type": "integer"
@@ -1468,7 +1817,6 @@ var doc = `{
                     }
                 },
                 "video": {
-                    "type": "object",
                     "$ref": "#/definitions/videoanalysis.video"
                 }
             }

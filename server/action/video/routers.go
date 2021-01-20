@@ -1,8 +1,11 @@
 package video
 
 import (
+	"time"
+
 	"github.com/factly/vidcheck/model"
 	"github.com/go-chi/chi"
+	"github.com/jinzhu/gorm/dialects/postgres"
 )
 
 type video struct {
@@ -13,13 +16,19 @@ type video struct {
 }
 
 type videoanalysis struct {
-	ID              uint    `json:"id"`
-	RatingID        uint    `json:"rating_id" validate:"required"`
-	Claim           string  `json:"claim"`
-	Fact            string  `json:"fact"`
-	StartTime       int     `json:"start_time"`
-	EndTime         int     `json:"end_time" validate:"required"`
-	EndTimeFraction float64 `json:"end_time_fraction" validate:"required"`
+	ID              uint           `json:"id"`
+	RatingID        uint           `json:"rating_id" validate:"required"`
+	Claim           postgres.Jsonb `json:"claim" swaggertype:"primitive,string"`
+	ClaimDate       time.Time      `json:"claim_date"`
+	CheckedDate     time.Time      `json:"checked_date"`
+	IsClaim         bool           `json:"is_claim"`
+	Fact            postgres.Jsonb `json:"fact" swaggertype:"primitive,string"`
+	ClaimantID      uint           `json:"claimant_id" validate:"required"`
+	ReviewSources   postgres.Jsonb `json:"review_sources" swaggertype:"primitive,string"`
+	ClaimSources    postgres.Jsonb `json:"claim_sources" swaggertype:"primitive,string"`
+	StartTime       int            `json:"start_time"`
+	EndTime         int            `json:"end_time" validate:"required"`
+	EndTimeFraction float64        `json:"end_time_fraction" validate:"required"`
 }
 
 type videoanalysisReqData struct {
