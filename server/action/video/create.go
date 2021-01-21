@@ -5,6 +5,10 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/factly/vidcheck/action/rating"
+
+	"github.com/factly/vidcheck/config"
+
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
@@ -26,6 +30,13 @@ import (
 // @Router /videos [post]
 func create(w http.ResponseWriter, r *http.Request) {
 	sID, err := util.GetSpace(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	uID, err := util.GetUser(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
@@ -66,18 +77,53 @@ func create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	analysisBlocks := []model.Analysis{}
+	ratingMap := make(map[float64]*model.Rating)
+	var degaRatingMap map[uint]model.Rating
+
+	if config.DegaIntegrated() {
+		degaRatingMap, err = rating.GetDegaRatings(uID, sID)
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+			return
+		}
+	}
 
 	for _, analysisBlock := range videoAnalysisData.Analysis {
 
-		// check if rating exist
+		// check if associated rating exist
+		if config.DegaIntegrated() {
+			if rat, found := degaRatingMap[analysisBlock.RatingID]; found {
+				ratingMap[analysisBlock.EndTimeFraction] = &rat
+			} else {
+				err = errors.New(`rating does not exist in dega`)
+			}
+		} else {
+			rat := model.Rating{}
+			rat.ID = analysisBlock.RatingID
+			err = tx.First(&rat).Error
+		}
+
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+			return
+		}
 
 		analysisBlockObj := model.Analysis{
 			VideoID:         videoObj.ID,
 			RatingID:        analysisBlock.RatingID,
 			Claim:           analysisBlock.Claim,
+			ClaimDate:       analysisBlock.ClaimDate,
+			CheckedDate:     analysisBlock.CheckedDate,
+			IsClaim:         analysisBlock.IsClaim,
 			Fact:            analysisBlock.Fact,
 			Description:     analysisBlock.Description,
+			ClaimantID:      analysisBlock.ClaimantID,
 			ReviewSources:   analysisBlock.ReviewSources,
+			ClaimSources:    analysisBlock.ClaimSources,
 			StartTime:       analysisBlock.StartTime,
 			EndTime:         analysisBlock.EndTime,
 			EndTimeFraction: analysisBlock.EndTimeFraction,
@@ -93,9 +139,21 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tx.Model(&model.Analysis{}).Preload("Rating").Order("start_time").Where("video_id = ?", videoObj.ID).Find(&analysisBlocks)
+	stmt := tx.Model(&model.Analysis{}).Order("start_time").Where("video_id = ?", videoObj.ID).Preload("Claimant")
+
+	if !config.DegaIntegrated() {
+		stmt.Preload("Rating")
+	}
+
+	stmt.Find(&analysisBlocks)
 
 	tx.Commit()
+
+	if config.DegaIntegrated() {
+		for i := range analysisBlocks {
+			analysisBlocks[i].Rating = ratingMap[analysisBlocks[i].EndTimeFraction]
+		}
+	}
 
 	result := videoanalysisData{
 		Video:    videoObj,

@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/factly/vidcheck/action/rating"
+	"github.com/factly/vidcheck/config"
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
@@ -31,6 +33,13 @@ import (
 // @Router /videos/{video_id} [put]
 func update(w http.ResponseWriter, r *http.Request) {
 	sID, err := util.GetSpace(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	uID, err := util.GetUser(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
@@ -73,6 +82,19 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var degaRatingMap map[uint]model.Rating
+
+	if config.DegaIntegrated() {
+		degaRatingMap, err = rating.GetDegaRatings(uID, sID)
+		if err != nil {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+			return
+		}
+	}
+
+	ratingMap := make(map[float64]*model.Rating)
+
 	tx := model.DB.Begin()
 	tx.Model(&videoObj).Updates(model.Video{
 		Title:         videoAnalysisData.Video.Title,
@@ -85,20 +107,65 @@ func update(w http.ResponseWriter, r *http.Request) {
 	var updatedOrCreatedVideoBlock []uint
 	for _, analysisBlock := range videoAnalysisData.Analysis {
 		if analysisBlock.ID != uint(0) {
+			// check if new rating exist
+			if config.DegaIntegrated() {
+				if rat, found := degaRatingMap[analysisBlock.RatingID]; found {
+					ratingMap[analysisBlock.EndTimeFraction] = &rat
+				} else {
+					err = errors.New(`rating does not exist in dega`)
+				}
+			} else {
+				rat := model.Rating{}
+				rat.ID = analysisBlock.RatingID
+				err = tx.First(&rat).Error
+			}
+
+			if err != nil {
+				tx.Rollback()
+				loggerx.Error(err)
+				errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+				return
+			}
+
 			analysisBlockObj := &model.Analysis{}
 			analysisBlockObj.ID = uint(analysisBlock.ID)
+			tx.Model(&analysisBlock).Select("IsClaim").Updates(model.Analysis{IsClaim: analysisBlock.IsClaim})
 			tx.Model(&analysisBlockObj).Updates(model.Analysis{
 				RatingID:        analysisBlock.RatingID,
 				Claim:           analysisBlock.Claim,
+				ClaimDate:       analysisBlock.ClaimDate,
+				CheckedDate:     analysisBlock.CheckedDate,
 				Fact:            analysisBlock.Fact,
 				Description:     analysisBlock.Description,
 				ReviewSources:   analysisBlock.ReviewSources,
+				ClaimantID:      analysisBlock.ClaimantID
+				ClaimSources:    analysisBlock.ClaimSources,
 				StartTime:       analysisBlock.StartTime,
 				EndTime:         analysisBlock.EndTime,
 				EndTimeFraction: analysisBlock.EndTimeFraction,
 			})
 			updatedOrCreatedVideoBlock = append(updatedOrCreatedVideoBlock, analysisBlockObj.ID)
 		} else {
+			// check if new rating exist
+			if config.DegaIntegrated() {
+				if rat, found := degaRatingMap[analysisBlock.RatingID]; found {
+					ratingMap[analysisBlock.EndTimeFraction] = &rat
+				} else {
+					err = errors.New(`rating does not exist in dega`)
+				}
+			} else {
+				rat := model.Rating{}
+				rat.ID = analysisBlock.RatingID
+				err = tx.First(&rat).Error
+			}
+
+			if err != nil {
+				tx.Rollback()
+				loggerx.Error(err)
+				errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+				return
+			}
+
 			analysisBlockObj := model.Analysis{}
 			analysisBlockObj = model.Analysis{
 				VideoID:         videoObj.ID,
@@ -131,7 +198,17 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	// Get all video analysisBlocks.
 	analysisBlocks := []model.Analysis{}
-	model.DB.Model(&model.Analysis{}).Preload("Rating").Order("start_time").Where("video_id = ?", uint(id)).Find(&analysisBlocks)
+	stmt := model.DB.Model(&model.Analysis{}).Order("start_time").Where("video_id = ?", uint(id)).Preload("Claimant")
+
+	if !config.DegaIntegrated() {
+		stmt.Preload("Rating")
+	}
+
+	stmt.Find(&analysisBlocks)
+
+	if config.DegaIntegrated() {
+		analysisBlocks = AddDegaRatings(uID, sID, analysisBlocks, degaRatingMap)
+	}
 
 	result := videoanalysisData{
 		Video:    *videoObj,

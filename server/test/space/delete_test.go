@@ -48,7 +48,7 @@ func TestSpaceDelete(t *testing.T) {
 			WithPath("space_id", "invalid").
 			WithHeader("X-User", "1").
 			Expect().
-			Status(http.StatusNotFound)
+			Status(http.StatusBadRequest)
 	})
 
 	t.Run("space record does not exist", func(t *testing.T) {

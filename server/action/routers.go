@@ -4,6 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/factly/vidcheck/action/claimant"
+
+	"github.com/factly/vidcheck/model"
+
+	"github.com/factly/vidcheck/config"
+
 	"github.com/factly/vidcheck/action/rating"
 	"github.com/factly/vidcheck/action/space"
 	"github.com/factly/vidcheck/action/videoanalysis"
@@ -11,6 +17,7 @@ import (
 
 	"github.com/factly/vidcheck/action/video"
 	"github.com/factly/vidcheck/util"
+	"github.com/factly/x/healthx"
 	"github.com/factly/x/loggerx"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -45,11 +52,20 @@ func RegisterRoutes() http.Handler {
 		fmt.Println("swagger-ui http://localhost:8000/swagger/index.html")
 	}
 
-	r.With(util.CheckUser, util.CheckSpace, util.CheckOrganisation).Group(func(r chi.Router) {
+	sqlDB, _ := model.DB.DB()
+	healthx.RegisterRoutes(r, healthx.ReadyCheckers{
+		"database": sqlDB.Ping,
+		"kavach":   util.KavachChecker,
+	})
+
+	r.With(util.GormRequestID, util.CheckUser, util.CheckSpace).Group(func(r chi.Router) {
 		r.Mount("/analysis", videoanalysis.Router())
 		r.Mount("/videos", video.Router())
-		r.Mount("/spaces", space.Router())
-		r.Mount("/ratings", rating.Router())
+		r.Mount("/claimants", claimant.Router())
+		if !config.DegaIntegrated() {
+			r.Mount("/spaces", space.Router())
+			r.Mount("/ratings", rating.Router())
+		}
 	})
 	return r
 }

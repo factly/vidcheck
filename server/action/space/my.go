@@ -85,7 +85,7 @@ func my(w http.ResponseWriter, r *http.Request) {
 
 func getMyOrganisations(uID int) ([]orgWithSpace, error) {
 	// Fetched all organisations of the user
-	req, err := http.NewRequest("GET", viper.GetString("kavach.url")+"/organisations/my", nil)
+	req, err := http.NewRequest("GET", viper.GetString("kavach_url")+"/organisations/my", nil)
 	if err != nil {
 		return nil, err
 	}

@@ -10,7 +10,6 @@ import (
 	"github.com/factly/vidcheck/config"
 	_ "github.com/factly/vidcheck/docs"
 	"github.com/factly/vidcheck/model"
-	"github.com/spf13/viper"
 )
 
 // @title VidCheck API
@@ -36,7 +35,7 @@ func main() {
 	config.SetupVars()
 
 	// db setup
-	model.SetupDB(viper.GetString("postgres.dsn"))
+	model.SetupDB()
 	fmt.Println("DB Migration Done...")
 
 	// register routes

@@ -198,13 +198,12 @@ services:
       context: ./kavach/kavach-server
       dockerfile: Dockerfile
     environment:
-      - CONFIG_FILE=kavach-server.yml
       - WAIT_HOSTS=postgres:5432
     volumes:
       - type: bind
         source: ./kavach/kavach-server
         target: /app
-    restart: always
+    restart: unless-stopped
     networks:
       - intranet
 
@@ -235,9 +234,8 @@ services:
       context: ./server
       dockerfile: Dockerfile
     environment:
-      - CONFIG_FILE=vid-check-server.yml
       - WAIT_HOSTS=postgres:5432
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./server:/app
     networks:
