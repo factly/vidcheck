@@ -44,7 +44,7 @@ func publishedDetails(w http.ResponseWriter, r *http.Request) {
 
 	videoObj := &model.Video{}
 	videoObj.ID = uint(id)
-	analysisBlocks := []model.Analysis{}
+	analysisBlocks := make([]model.Analysis, 0)
 	err = model.DB.Model(&model.Video{}).Where(&model.Video{
 		SpaceID: uint(sID),
 		Status:  "published",

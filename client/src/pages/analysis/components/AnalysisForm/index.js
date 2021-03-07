@@ -9,6 +9,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { getRatings } from "../../../../actions/ratings";
 import deepEqual from "deep-equal";
 import Editor from "../../../../components/Editor";
+import { getClaimants } from "../../../../actions/claimants";
 
 function AnalysisForm({
   formData,
@@ -17,14 +18,13 @@ function AnalysisForm({
   totalDuration,
   player,
   currentStartTime,
-  setCurrent,
 }) {
   const dispatch = useDispatch();
   const [filters, setFilters] = React.useState({
     page: 1,
     limit: 10,
   });
-  const { ratings, loading } = useSelector((state) => {
+  const { ratings, ratingloading } = useSelector((state) => {
     const node = state.ratings.req.find((item) => {
       return deepEqual(item.query, filters);
     });
@@ -32,25 +32,47 @@ function AnalysisForm({
     if (node)
       return {
         ratings: node.data.map((element) => state.ratings.details[element]),
-        loading: state.ratings.loading,
+        ratingloading: state.ratings.loading,
       };
-    return { ratings: [], loading: state.ratings.loading };
+    return { ratings: [], ratingloading: state.ratings.loading };
+  });
+
+  const { claimants, claimantloading } = useSelector((state) => {
+    const node = state.claimants.req.find((item) => {
+      return deepEqual(item.query, filters);
+    });
+
+    if (node)
+      return {
+        claimants: node.data.map((element) => state.claimants.details[element]),
+        claimantloading: state.claimants.loading,
+      };
+    return { claimants: [], claimantloading: state.claimants.loading };
   });
 
   React.useEffect(() => {
     fetchRatings();
+    fetchClaimants();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
   const fetchRatings = () => {
     dispatch(getRatings(filters));
   };
+  const fetchClaimants = () => {
+    dispatch(getClaimants(filters));
+  };
 
   const [form] = Form.useForm();
 
   React.useEffect(() => {
     form.resetFields();
-    form.setFieldsValue({ ...formData });
+    form.setFieldsValue({
+      ...formData,
+      end_time: formData.end_time
+        ? convertSecondsToTimeString(formData.end_time)
+        : null,
+    });
   }, [form, formData]);
 
   React.useEffect(() => {
@@ -60,40 +82,44 @@ function AnalysisForm({
     });
   }, [form, currentStartTime]);
 
-  const returnEndTimeFraction = (startTimeString, endTimeString) => {
-    const endTimeFraction =
-      convertTimeStringToSeconds(endTimeString) / totalDuration;
-    const startTimeFraction =
-      convertTimeStringToSeconds(startTimeString) / totalDuration;
-    if (endTimeFraction > 1) {
+  const isEndTimeValid = (startTime, endTime) => {
+    if (endTime > totalDuration) {
       alert("invalid end time");
       return;
     }
-    if (startTimeFraction > endTimeFraction) {
+    if (startTime > endTime) {
       alert(" start time greater than end time");
       return;
     }
-    return endTimeFraction;
+    return true;
   };
+
   const onAddNewFactCheckReview = (values) => {
-    const endTimeFraction = returnEndTimeFraction(
-      values["start_time"],
-      values["end_time"]
-    );
-    if (!endTimeFraction) {
+    const start_time = convertTimeStringToSeconds(values["start_time"]);
+    const end_time = convertTimeStringToSeconds(values["end_time"]);
+
+    const isValid = isEndTimeValid(start_time, end_time);
+    if (!isValid) {
       return;
     }
-    values["end_time_fraction"] = endTimeFraction;
 
-    setfactCheckReview((factCheckReview) => {
-      let newData = [...factCheckReview];
+    setfactCheckReview((factCheck) => {
+      let newData = [...factCheck];
+
+      const colour = ratings.find((each) => each.id === values.rating_id).colour
+        .hex;
+
       if (values.id) {
-        newData = newData.map((obj) => (values.id === obj.id ? values : obj));
+        newData = newData.map((obj) =>
+          values.id === obj.id
+            ? { ...values, start_time, end_time, colour }
+            : obj
+        );
       } else {
-        newData = [...newData, values];
+        newData = [...newData, { ...values, start_time, end_time, colour }];
       }
 
-      return recomputeAnalysisArray(newData);
+      return recomputeAnalysisArray(newData, totalDuration);
     });
 
     onReset();
@@ -122,15 +148,17 @@ function AnalysisForm({
 
   if (factCheckReview && factCheckReview.length > 0) {
     const review = factCheckReview.find(
-      (each) => each.start_time === currentStartTime
+      (each) => each.start_time === convertSecondsToTimeString(currentStartTime)
     );
     if (review) {
       form.setFieldsValue({
-        rating: review.rating,
-        claimed: review.claimed,
-        factCheckDetail: review.factCheckDetail,
+        end_time: convertSecondsToTimeString(review.end_time),
+        rating_id: review.rating_id,
+        claim: review.claim,
+        fact: review.fact,
         start_time: review.start_time,
       });
+      console.log(form.getFieldValue());
     }
   }
 
@@ -186,11 +214,11 @@ function AnalysisForm({
           </Button>
         </span>
       </Form.Item>
-      <Form.Item name="rating" label="Rating" rules={[{ required: true }]}>
+      <Form.Item name="rating_id" label="Rating" rules={[{ required: true }]}>
         <Select
           placeholder="Select a rating of the claim"
           allowClear
-          loading={loading}
+          loading={ratingloading}
         >
           {ratings.map((rating) => (
             <Select.Option value={rating.id} key={rating.name + rating.id}>
@@ -199,11 +227,31 @@ function AnalysisForm({
           ))}
         </Select>
       </Form.Item>
+      <Form.Item
+        name="Claimant_id"
+        label="Claimant"
+        rules={[{ required: true }]}
+      >
+        <Select
+          placeholder="Select a claimant of the claim"
+          allowClear
+          loading={claimantloading}
+        >
+          {claimants.map((claimant) => (
+            <Select.Option
+              value={claimant.id}
+              key={claimant.name + claimant.id}
+            >
+              {claimant["name"]}
+            </Select.Option>
+          ))}
+        </Select>
+      </Form.Item>
 
-      <Form.Item name="claimed" label="Claim">
+      <Form.Item name="claim" label="Claim">
         <Input.TextArea />
       </Form.Item>
-      <Form.Item name="factCheckDetail" label="Fact check">
+      <Form.Item name="fact" label="Fact">
         <Input.TextArea />
       </Form.Item>
       <Form.Item name={"review_sources"} label={"Review Sources"}>

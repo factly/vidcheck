@@ -3,39 +3,47 @@ export function transformVideoAnalysisdetails(resp) {
     return [];
   }
 
+  const totalDuration = resp.video.total_duration;
+
   const analysis = resp.analysis.map((analysisData) => {
     return {
       id: analysisData.id,
       claimed: analysisData.claim,
       factCheckDetail: analysisData.fact,
       end_time_fraction: analysisData.end_time_fraction,
-      start_time: convertSecondsToTimeString(analysisData.start_time),
-      end_time: convertSecondsToTimeString(analysisData.end_time),
+      start_time: analysisData.start_time,
+      end_time: analysisData.end_time,
       description: analysisData.description,
       review_sources: analysisData.review_sources,
-      rating:
+      rating_id:
         analysisData.rating && analysisData.rating.id
           ? analysisData.rating.id
           : analysisData.rating,
+
+      colour: analysisData.rating && analysisData.rating.colour.hex,
     };
   });
   return {
     video: resp.video,
-    analysis: recomputeAnalysisArray(analysis),
+    analysis: recomputeAnalysisArray(analysis, totalDuration),
   };
 }
 
-export function recomputeAnalysisArray(data, removeId = -1) {
+export function recomputeAnalysisArray(data, totalDuration, removeId = -1) {
   let analysisData = data.sort((a, b) => {
-    return a.end_time_fraction - b.end_time_fraction;
+    return a.end_time - b.end_time;
   });
 
-  let currentWidthSum = 0;
   let newData = analysisData.filter((element, index) => index !== removeId);
+  console.log({ newData, removeId });
   return newData.map((element, index) => {
-    element.start_time = index > 0 ? newData[index - 1]["end_time"] : "00:00";
-    element.widthPercentage = element.end_time_fraction * 100 - currentWidthSum;
-    currentWidthSum += element.widthPercentage;
+    element.widthPercentage =
+      ((element.end_time - element.start_time) / totalDuration) * 100;
+    element.end_time = convertSecondsToTimeString(element.end_time);
+    // element.start_time =
+    //   index > 0
+    //     ? convertSecondsToTimeString(newData[index - 1]["end_time"])
+    //     : "00:00";
     return element;
   });
 }
@@ -83,17 +91,4 @@ export function convertSecondsToTimeString(totalSecond) {
   return `${minutes > 9 ? minutes : "0" + minutes}:${
     seconds > 9 ? seconds : "0" + seconds
   }`;
-}
-
-export function ratingStrToInt(ratingStr) {
-  // return RATING_MAPPING[ratingStr];
-  return 1;
-}
-
-export function ratingIntToStr(ratingInt) {
-  const reverseRatingIntToStrMap = Object.entries("RATING_MAPPING").reduce(
-    (obj, [key, value]) => ({ ...obj, [value]: key }),
-    {}
-  );
-  return reverseRatingIntToStrMap[ratingInt];
 }

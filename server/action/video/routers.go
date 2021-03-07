@@ -28,6 +28,7 @@ type videoanalysis struct {
 	ClaimantID      uint           `json:"claimant_id" validate:"required"`
 	ReviewSources   postgres.Jsonb `json:"review_sources" swaggertype:"primitive,string"`
 	ClaimSources    postgres.Jsonb `json:"claim_sources" swaggertype:"primitive,string"`
+	Description     postgres.Jsonb `json:"description" swaggertype:"primitive,string"`
 	StartTime       int            `json:"start_time"`
 	EndTime         int            `json:"end_time" validate:"required"`
 	EndTimeFraction float64        `json:"end_time_fraction" validate:"required"`

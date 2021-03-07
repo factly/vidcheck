@@ -1,14 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 
 import ReactPlayer from "react-player";
 import { VideoInfoParentWrapper } from "../../../../../StyledComponents";
-import { recomputeAnalysisArray } from "../../../utilities/analysis";
+import {
+  convertSecondsToTimeString,
+  recomputeAnalysisArray,
+} from "../../../utilities/analysis";
 import { VerticalTimelineBar } from "../../AnalysisTimelineBar/AnalysisTimelineBar";
-import InfoDetails from "../../InfoDetails";
 
 function VideoPlayer({
-  played,
-  setPlayed,
   totalDuration,
   setTotalDuration,
   setCurrentStartTime,
@@ -18,36 +18,23 @@ function VideoPlayer({
   updateFormState,
   setfactCheckReview,
 }) {
-  const [playing, setPlaying] = useState(true);
-  const [loopDetails, setLoopDetails] = useState({
-    loopEnabled: false,
-    startFraction: 0,
-    endFraction: 1,
-  });
-
-  const onDeleteFactCheckReview = (removeIndex) => {
+  const onDeleteFactCheckReview = (removeIndex, totalDuration) => {
     setfactCheckReview((factCheckReview) =>
-      recomputeAnalysisArray(factCheckReview, removeIndex)
+      recomputeAnalysisArray(factCheckReview, totalDuration, removeIndex)
     );
   };
 
   function handleProgress() {
-    const currentPlayedTime = player.current.getCurrentTime();
-    const currentPlayed = currentPlayedTime / totalDuration;
-    if (
-      loopDetails.loopEnabled &&
-      (currentPlayed < loopDetails.startFraction ||
-        currentPlayed > loopDetails.endFraction)
-    ) {
-      player.current.seekTo(loopDetails.startFraction, "fraction");
-      setPlaying(false);
-    }
+    const currentPlayed = player.current.getCurrentTime();
+
     let index;
     let currentFormStartTime;
     for (index = 0; index < factCheckReview.length; ++index) {
-      if (currentPlayed < factCheckReview[index].end_time_fraction) {
+      if (currentPlayed < factCheckReview[index].end_time) {
         currentFormStartTime =
-          index > 0 ? factCheckReview[index - 1].end_time : "00:00";
+          index > 0
+            ? convertSecondsToTimeString(factCheckReview[index - 1].end_time)
+            : "00:00";
         break;
       }
     }
@@ -55,24 +42,19 @@ function VideoPlayer({
       if (factCheckReview.length === 0) {
         currentFormStartTime = "00:00";
       } else {
-        currentFormStartTime =
-          factCheckReview[factCheckReview.length - 1].end_time;
+        currentFormStartTime = convertSecondsToTimeString(
+          factCheckReview[factCheckReview.length - 1].end_time
+        );
       }
     }
     setCurrentStartTime(currentFormStartTime);
-    setPlayed(currentPlayed);
-  }
-
-  function handleSeekChange(e) {
-    setPlayed(e.target.value);
-    player.current.seekTo(e.target.value, "fraction");
   }
 
   return (
     <VideoInfoParentWrapper>
       <ReactPlayer
         url={videoUrl}
-        playing={playing}
+        playing={true}
         controls={true}
         ref={player}
         volume={0}
@@ -80,6 +62,7 @@ function VideoPlayer({
         onDuration={setTotalDuration}
       />
       <VerticalTimelineBar
+        totalDuration={totalDuration}
         factCheckReview={factCheckReview}
         setCurrentFormData={updateFormState}
         onDeleteFactCheckReview={onDeleteFactCheckReview}

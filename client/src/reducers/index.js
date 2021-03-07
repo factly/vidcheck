@@ -4,13 +4,15 @@ import ratings from "./ratingsReducer";
 import settings from "./settingsReducer";
 import spaces from "./spacesReducer";
 import videos from "./videosReducer";
+import claimants from "./claimantsReducer";
 
 const rootReducer = combineReducers({
-  notifications: notifications,
-  ratings: ratings,
-  settings: settings,
-  spaces: spaces,
-  videos: videos,
+  notifications,
+  ratings,
+  claimants,
+  settings,
+  spaces,
+  videos,
 });
 
 export default rootReducer;

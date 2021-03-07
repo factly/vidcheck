@@ -72,10 +72,7 @@ function Preview({ vid }) {
 
   const updateFormState = (data) => {
     setPlayed(data.end_time_fraction);
-    player.current.seekTo(
-      convertTimeStringToSeconds(data.start_time),
-      "seconds"
-    );
+    player.current.seekTo(data.start_time, "seconds");
     setCurrentFormData(data);
     const claimIndex = videoData.analysis.findIndex(
       (item) => item.id === data.id
@@ -84,7 +81,7 @@ function Preview({ vid }) {
   };
   const factCheckReview =
     videoData && videoData.analysis && videoData.analysis.length > 0
-      ? transformVideoAnalysisdetails(videoData).analysis
+      ? videoData.analysis
       : [];
 
   const handleProgress = () => {

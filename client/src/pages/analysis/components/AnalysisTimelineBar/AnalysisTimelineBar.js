@@ -8,23 +8,8 @@ import {
   VideoLengthPart,
 } from "../../../../StyledComponents";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-const ratingColor = {
-  1: "#108040",
-  2: "#A5C239",
-  3: "#ECA124",
-  4: "#749990",
-  5: "#E82728",
-  6: "#f9f9fa",
-};
+import { convertSecondsToTimeString } from "../../utilities/analysis";
 
-const ratingValue = {
-  1: "True",
-  2: "Partly True",
-  3: "Unverfied",
-  4: "Misleading",
-  5: "False",
-  6: "not a claim",
-};
 function HorizontalTimelineBar({
   factCheckReview,
   currentFormdata = {},
@@ -36,16 +21,21 @@ function HorizontalTimelineBar({
       <VideoLengthBar>
         {factCheckReview.map((review, index) => (
           <Tooltip
-            title={review.start_time + "-" + review.end_time}
+            title={
+              convertSecondsToTimeString(review.start_time) +
+              "-" +
+              review.widthPercentage +
+              convertSecondsToTimeString(review.end_time)
+            }
             key={index}
           >
             <VideoLengthPart
               height={height}
-              width={`${review.widthPercentage}%`}
+              width={`${25}%`}
               showBorder={
                 currentFormdata.id && currentFormdata.id === review.id
               }
-              backgroundColor={ratingColor[review.rating]}
+              backgroundColor={review.colour || review.rating.colour.hex}
               onClick={() => {
                 setCurrentFormData(review);
               }}
@@ -63,6 +53,7 @@ HorizontalTimelineBar.propTypes = {
 };
 
 function VerticalTimelineBar({
+  totalDuration,
   factCheckReview,
   setCurrentFormData,
   onDeleteFactCheckReview,
@@ -73,7 +64,9 @@ function VerticalTimelineBar({
         {factCheckReview &&
           factCheckReview.map((factcheckElem, index) => (
             <Timeline.Item
-              label={`${factcheckElem.start_time} - ${factcheckElem.end_time}`}
+              label={`${convertSecondsToTimeString(
+                factcheckElem.start_time
+              )} - ${convertSecondsToTimeString(factcheckElem.end_time)}`}
               key={index}
             >
               <div style={{ display: "flex" }}>
@@ -81,7 +74,7 @@ function VerticalTimelineBar({
                   type="primary"
                   shape="circle"
                   icon={<DeleteOutlined />}
-                  onClick={() => onDeleteFactCheckReview(index)}
+                  onClick={() => onDeleteFactCheckReview(index, totalDuration)}
                   style={{ margin: "0 10px 0 0" }}
                 />
                 <Button

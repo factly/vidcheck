@@ -5,6 +5,11 @@ import Ratings from "../pages/ratings";
 import CreateRating from "../pages/ratings/CreateRating";
 import EditRating from "../pages/ratings/EditRating";
 
+//Claimants
+import Claimants from "../pages/claimants";
+import CreateClaimant from "../pages/claimants/CreateClaimant";
+import EditClaimant from "../pages/claimants/EditClaimant";
+
 //Spaces
 import Spaces from "../pages/spaces";
 import CreateSpace from "../pages/spaces/CreateSpace";
@@ -36,6 +41,21 @@ const routes = [
     path: "/ratings/:id/edit",
     Component: EditRating,
     title: "Edit Rating",
+  },
+  {
+    path: "/claimants",
+    Component: Claimants,
+    title: "Claimants",
+  },
+  {
+    path: "/claimants/create",
+    Component: CreateClaimant,
+    title: "Create Claimant",
+  },
+  {
+    path: "/claimants/:id/edit",
+    Component: EditClaimant,
+    title: "Edit Claimant",
   },
   {
     path: "/spaces",

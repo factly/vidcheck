@@ -3,39 +3,23 @@ import { FactCheckReviewWrapper } from "../../../../StyledComponents";
 
 import AnalysisForm from "../AnalysisForm";
 import VideoPlayer from "./components/VideoPlayer";
-import {
-  HorizontalTimelineBar,
-  VerticalTimelineBar,
-} from "../AnalysisTimelineBar/AnalysisTimelineBar";
+import { HorizontalTimelineBar } from "../AnalysisTimelineBar/AnalysisTimelineBar";
 import { Button } from "antd";
 
-import {
-  convertTimeStringToSeconds,
-  recomputeAnalysisArray,
-  transformToServerCompatibleDate,
-  transformVideoAnalysisdetails,
-} from "../../utilities/analysis";
-
 function StepTwo({ current, data = {}, onSubmit, summary, setCurrent }) {
-  const [played, setPlayed] = useState(0);
-
   const [currentStartTime, setCurrentStartTime] = useState(null);
   const [totalDuration, setTotalDuration] = useState(0);
 
   const [factCheckReview, setfactCheckReview] = useState(
-    data && data.analysis && data.analysis.length > 0
-      ? transformVideoAnalysisdetails(data).analysis
-      : []
+    data && data.analysis ? data.analysis : []
   );
   const player = useRef(null);
-  const [currentFormdata, setCurrentFormData] = useState({});
+  const [currentFormdata, setCurrentFormData] = useState(
+    factCheckReview.length > 0 ? factCheckReview[0] : {}
+  );
 
   const updateFormState = (data) => {
-    setPlayed(data.end_time_fraction);
-    player.current.seekTo(
-      convertTimeStringToSeconds(data.start_time),
-      "seconds"
-    );
+    player.current.seekTo(data.start_time, "seconds");
     setCurrentFormData(data);
   };
 
@@ -55,8 +39,7 @@ function StepTwo({ current, data = {}, onSubmit, summary, setCurrent }) {
       },
       analysis: factCheckReview,
     };
-
-    onSubmit(transformToServerCompatibleDate(data));
+    onSubmit(data);
     setCurrent(2);
   };
 
@@ -64,8 +47,6 @@ function StepTwo({ current, data = {}, onSubmit, summary, setCurrent }) {
     <div style={current === 1 ? { display: "block" } : { display: "none" }}>
       <VideoPlayer
         player={player}
-        played={played}
-        setPlayed={setPlayed}
         totalDuration={totalDuration}
         setTotalDuration={setTotalDuration}
         setCurrentStartTime={setCurrentStartTime}

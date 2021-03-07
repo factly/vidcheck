@@ -8,6 +8,7 @@ import {
   VideoCameraOutlined,
   StarOutlined,
   TeamOutlined,
+  AuditOutlined,
 } from "@ant-design/icons";
 
 const { Sider } = Layout;
@@ -22,7 +23,8 @@ function Sidebar() {
   const resource = [
     { title: "Videos", path: "/", Icon: VideoCameraOutlined },
     { title: "Ratings", path: "/ratings", Icon: StarOutlined },
-    { title: "Space", path: "/spaces", Icon: TeamOutlined },
+    { title: "Claimants", path: "/claimants", Icon: TeamOutlined },
+    { title: "Space", path: "/spaces", Icon: AuditOutlined },
   ];
 
   return (

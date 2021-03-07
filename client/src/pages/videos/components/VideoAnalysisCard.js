@@ -2,7 +2,6 @@ import React from "react";
 import { Button, Row, Col, Typography } from "antd";
 import { useHistory } from "react-router-dom";
 
-import { transformVideoAnalysisdetails } from "../../analysis/utilities/analysis";
 import { useDispatch } from "react-redux";
 import { deleteVideo, getVideos } from "../../../actions/videos";
 import { HorizontalTimelineBar } from "../../analysis/components/AnalysisTimelineBar/AnalysisTimelineBar";
@@ -43,7 +42,7 @@ function VideoAnalysisCard({ data }) {
           <Typography>{`${data.analysis.length} CLAIMS IN TOTAL`}</Typography>
           <div style={{ width: "30%" }}>
             <HorizontalTimelineBar
-              factCheckReview={transformVideoAnalysisdetails(data).analysis}
+              factCheckReview={data.analysis}
               height={"12px"}
             />
           </div>
