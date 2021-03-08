@@ -13,7 +13,9 @@ type Analysis struct {
 	Video           *Video         `json:"video"`
 	RatingID        uint           `gorm:"column:rating_id" json:"rating_id"`
 	Rating          *Rating        `json:"rating"`
+	HTML            string         `gorm: "html" json:"html"`
 	Claim           postgres.Jsonb `gorm:"column:claim" json:"claim"  swaggertype:"primitive,string"`
+	Description     postgres.Jsonb `gorm:"column:description" json:"description" swaggertype:"primitive,string"`
 	ClaimDate       time.Time      `gorm:"column:claim_date" json:"claim_date" sql:"DEFAULT:NULL"`
 	CheckedDate     time.Time      `gorm:"column:checked_date" json:"checked_date" sql:"DEFAULT:NULL"`
 	IsClaim         bool           `gorm:"column:is_claim" json:"is_claim"`

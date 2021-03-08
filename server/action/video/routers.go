@@ -9,10 +9,12 @@ import (
 )
 
 type video struct {
-	URL       string `json:"url" validate:"required"`
-	Title     string `json:"title" validate:"required"`
-	Summary   string `json:"summary"`
-	VideoType string `json:"video_type" validate:"required"`
+	URL           string `json:"url" validate:"required"`
+	Title         string `json:"title" validate:"required"`
+	Summary       string `json:"summary"`
+	VideoType     string `json:"video_type" validate:"required"`
+	Status        string `json:"status"`
+	TotalDuration int64  `json:"total_duration"`
 }
 
 type videoanalysis struct {
@@ -26,6 +28,7 @@ type videoanalysis struct {
 	ClaimantID      uint           `json:"claimant_id" validate:"required"`
 	ReviewSources   postgres.Jsonb `json:"review_sources" swaggertype:"primitive,string"`
 	ClaimSources    postgres.Jsonb `json:"claim_sources" swaggertype:"primitive,string"`
+	Description     postgres.Jsonb `json:"description" swaggertype:"primitive,string"`
 	StartTime       int            `json:"start_time"`
 	EndTime         int            `json:"end_time" validate:"required"`
 	EndTimeFraction float64        `json:"end_time_fraction" validate:"required"`
@@ -48,6 +51,7 @@ func Router() chi.Router {
 	r.Get("/", list)    // GET /video - return list of videos.
 	r.Post("/", create) // POST /video - create a new video and persist it.
 	r.Route("/{video_id}", func(r chi.Router) {
+		r.Get("/published", publishedDetails)
 		r.Get("/", details)   // GET /videos/{video_id} - read a single video by :video_id
 		r.Put("/", update)    // PUT /videos/{video_id} - update a single video by :video_id
 		r.Delete("/", delete) // DELETE /videos/{video_id} - delete a single video by :video_id

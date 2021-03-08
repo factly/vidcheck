@@ -8,4 +8,5 @@ type Video struct {
 	Summary   string `gorm:"column:summary" json:"summary"`
 	VideoType string `gorm:"column:video_type" json:"video_type"`
 	SpaceID   uint   `gorm:"column:space_id" json:"space_id"`
+	Status    string `gorm:"status" json:"status"`
 }

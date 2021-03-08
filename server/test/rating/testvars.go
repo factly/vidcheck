@@ -19,6 +19,7 @@ var Data = map[string]interface{}{
 	"slug":          "true",
 	"description":   "article is validated",
 	"numeric_value": 5,
+	"colour":        "#ff0000",
 }
 
 var defaultData = []map[string]interface{}{
@@ -59,7 +60,7 @@ var invalidData = map[string]interface{}{
 	"numeric_value": 0,
 }
 
-var columns = []string{"id", "created_at", "updated_at", "deleted_at", "name", "slug", "description", "numeric_value", "space_id"}
+var columns = []string{"id", "created_at", "updated_at", "deleted_at", "name", "slug", "description", "numeric_value", "colour", "space_id"}
 
 var selectQuery = regexp.QuoteMeta(`SELECT * FROM "rating"`)
 var countQuery = regexp.QuoteMeta(`SELECT count(1) FROM "rating"`)
@@ -73,14 +74,14 @@ func SelectWithSpace(mock sqlmock.Sqlmock) {
 	mock.ExpectQuery(selectQuery).
 		WithArgs(1, 1).
 		WillReturnRows(sqlmock.NewRows(columns).
-			AddRow(1, time.Now(), time.Now(), nil, Data["name"], Data["slug"], Data["description"], Data["numeric_value"], 1))
+			AddRow(1, time.Now(), time.Now(), nil, Data["name"], Data["slug"], Data["description"], Data["numeric_value"], Data["colour"], 1))
 }
 
 func SelectWithoutSpace(mock sqlmock.Sqlmock) {
 	mock.ExpectQuery(selectQuery).
 		WithArgs(1).
 		WillReturnRows(sqlmock.NewRows(columns).
-			AddRow(1, time.Now(), time.Now(), nil, Data["name"], Data["slug"], Data["description"], Data["numeric_value"], 1))
+			AddRow(1, time.Now(), time.Now(), nil, Data["name"], Data["slug"], Data["description"], Data["numeric_value"], Data["colour"], 1))
 }
 
 func sameNameCount(mock sqlmock.Sqlmock, count int, name interface{}) {
@@ -92,7 +93,7 @@ func sameNameCount(mock sqlmock.Sqlmock, count int, name interface{}) {
 func ratingInsertMock(mock sqlmock.Sqlmock) {
 	mock.ExpectBegin()
 	mock.ExpectQuery(`INSERT INTO "rating"`).
-		WithArgs(test.AnyTime{}, test.AnyTime{}, nil, Data["name"], Data["slug"], Data["description"], Data["numeric_value"], 1).
+		WithArgs(test.AnyTime{}, test.AnyTime{}, nil, Data["name"], Data["slug"], Data["description"], Data["numeric_value"], Data["colour"], 1).
 		WillReturnRows(sqlmock.
 			NewRows([]string{"id"}).
 			AddRow(1))

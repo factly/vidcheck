@@ -49,7 +49,7 @@ func RegisterRoutes() http.Handler {
 
 	if viper.IsSet("mode") && viper.GetString("mode") == "development" {
 		r.Get("/swagger/*", httpSwagger.WrapHandler)
-		fmt.Println("swagger-ui http://localhost:8080/swagger/index.html")
+		fmt.Println("swagger-ui http://localhost:8000/swagger/index.html")
 	}
 
 	sqlDB, _ := model.DB.DB()

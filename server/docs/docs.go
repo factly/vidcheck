@@ -1077,6 +1077,55 @@ var doc = `{
                 }
             }
         },
+        "/videos/published": {
+            "get": {
+                "description": "Get all published videos",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "Show all published videos",
+                "operationId": "get-all-published-videos",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "limt per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "page number",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/video.paging"
+                        }
+                    }
+                }
+            }
+        },
         "/videos/{video_id}": {
             "get": {
                 "description": "Get video by ID",
@@ -1369,6 +1418,9 @@ var doc = `{
         "model.Rating": {
             "type": "object",
             "properties": {
+                "colour": {
+                    "type": "string"
+                },
                 "created_at": {
                     "type": "string"
                 },
@@ -1460,6 +1512,9 @@ var doc = `{
                 "space_id": {
                     "type": "integer"
                 },
+                "status": {
+                    "type": "string"
+                },
                 "summary": {
                     "type": "string"
                 },
@@ -1498,6 +1553,9 @@ var doc = `{
                 "numeric_value"
             ],
             "properties": {
+                "colour": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -1625,6 +1683,9 @@ var doc = `{
                 "video_type"
             ],
             "properties": {
+                "status": {
+                    "type": "string"
+                },
                 "summary": {
                     "type": "string"
                 },
@@ -1836,7 +1897,7 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
-	Host:        "localhost:8080",
+	Host:        "localhost:8000",
 	BasePath:    "/",
 	Schemes:     []string{},
 	Title:       "VidCheck API",

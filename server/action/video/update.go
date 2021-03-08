@@ -100,6 +100,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		Title:     videoAnalysisData.Video.Title,
 		Summary:   videoAnalysisData.Video.Summary,
 		VideoType: videoAnalysisData.Video.VideoType,
+		Status:    videoAnalysisData.Video.Status,
 	}).First(&videoObj)
 
 	var updatedOrCreatedVideoBlock []uint
@@ -134,8 +135,9 @@ func update(w http.ResponseWriter, r *http.Request) {
 				ClaimDate:       analysisBlock.ClaimDate,
 				CheckedDate:     analysisBlock.CheckedDate,
 				Fact:            analysisBlock.Fact,
-				ClaimantID:      analysisBlock.ClaimantID,
+				Description:     analysisBlock.Description,
 				ReviewSources:   analysisBlock.ReviewSources,
+				ClaimantID:      analysisBlock.ClaimantID,
 				ClaimSources:    analysisBlock.ClaimSources,
 				StartTime:       analysisBlock.StartTime,
 				EndTime:         analysisBlock.EndTime,
@@ -169,6 +171,8 @@ func update(w http.ResponseWriter, r *http.Request) {
 				RatingID:        analysisBlock.RatingID,
 				Claim:           analysisBlock.Claim,
 				Fact:            analysisBlock.Fact,
+				Description:     analysisBlock.Description,
+				ReviewSources:   analysisBlock.ReviewSources,
 				StartTime:       analysisBlock.StartTime,
 				EndTime:         analysisBlock.EndTime,
 				EndTimeFraction: analysisBlock.EndTimeFraction,

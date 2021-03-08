@@ -3,7 +3,7 @@
     "id": "vid-check:server:protected",
     "upstream": {
       "preserve_host": true,
-      "url": "http://vid-check-server:8080",
+      "url": "http://vid-check-server:8000",
       "strip_path": ".factly/vid-check/server"
     },
     "match": {

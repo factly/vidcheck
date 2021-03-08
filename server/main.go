@@ -23,12 +23,12 @@ import (
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host localhost:8080
+// @host localhost:8000
 // @BasePath /
 func main() {
 	port, ok := os.LookupEnv("PORT")
 	if !ok {
-		port = "8080"
+		port = "8000"
 	}
 	port = ":" + port
 

@@ -2,14 +2,16 @@ package rating
 
 import (
 	"github.com/go-chi/chi"
+	"github.com/jinzhu/gorm/dialects/postgres"
 )
 
 // rating model
 type rating struct {
-	Name         string `json:"name" validate:"required,min=3,max=50"`
-	Slug         string `json:"slug"`
-	Description  string `json:"description"`
-	NumericValue int    `json:"numeric_value" validate:"required"`
+	Name         string         `json:"name" validate:"required,min=3,max=50"`
+	Slug         string         `json:"slug"`
+	Description  string         `json:"description"`
+	NumericValue int            `json:"numeric_value" validate:"required"`
+	Colour       postgres.Jsonb `json:"colour" swaggertype:"primitive,string"`
 }
 
 // Router - Group of rating router

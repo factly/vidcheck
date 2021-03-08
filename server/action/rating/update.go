@@ -93,6 +93,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		Slug:         rating.Slug,
 		Description:  rating.Description,
 		NumericValue: rating.NumericValue,
+		Colour:       rating.Colour,
 	}).Error
 
 	if err != nil {
