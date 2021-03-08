@@ -187,23 +187,44 @@ services:
       - intranet
 
   ###########################################################################
-  #######                     KAVACH                                  #######
+  #######             KAVACH                                          #######
   ###########################################################################
   kavach-server:
     depends_on:
       - postgres
+      - keto
+      - kratos
+      - kavach-migrate
     ports:
       - 5000:8000
     build:
       context: ./kavach/kavach-server
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     environment:
-      - WAIT_HOSTS=postgres:5432
+      - CONFIG_FILE=kavach-server.yml
+      - WAIT_HOSTS=postgres:5432, kratos:4434 , keto:4466
     volumes:
       - type: bind
         source: ./kavach/kavach-server
         target: /app
-    restart: unless-stopped
+    restart: always
+    networks:
+      - intranet
+  
+  kavach-migrate:
+    depends_on:
+      - postgres
+      - keto
+      - kratos
+    build:
+      context: ./kavach/kavach-server
+      dockerfile: Dockerfile.migrate
+    environment:
+      - WAIT_HOSTS=postgres:5432, kratos:4434 , keto:4466
+    volumes:
+      - type: bind
+        source: ./kavach/kavach-server
+        target: /app
     networks:
       - intranet
 
@@ -213,6 +234,8 @@ services:
       dockerfile: Dockerfile
     environment:
       - PUBLIC_URL=http://127.0.0.1:4455/.factly/kavach/web
+      - REACT_APP_DEGA_PUBLIC_URL=http://127.0.0.1:4455/.factly/dega/studio
+      - REACT_APP_BINDU_PUBLIC_URL=http://127.0.0.1:4455/.factly/bindu/studio
     volumes:
       - type: bind
         source: ./kavach/kavach-web
@@ -229,13 +252,26 @@ services:
     depends_on:
       - postgres
     ports:
-      - 8000:8000
+      - 7740:8000
     build:
       context: ./server
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     environment:
       - WAIT_HOSTS=postgres:5432
     restart: unless-stopped
+    volumes:
+      - ./server:/app
+    networks:
+      - intranet
+
+  vid-check-migrate:
+    depends_on:
+      - postgres
+    build:
+      context: ./server
+      dockerfile: Dockerfile.migrate
+    environment:
+      - WAIT_HOSTS=postgres:5432
     volumes:
       - ./server:/app
     networks:
