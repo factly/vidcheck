@@ -40,11 +40,15 @@ definitions:
         type: string
       deleted_at:
         type: string
+      description:
+        type: string
       end_time:
         type: integer
       end_time_fraction:
         type: number
       fact:
+        type: string
+      html:
         type: string
       id:
         type: integer
@@ -265,6 +269,8 @@ definitions:
         type: string
       title:
         type: string
+      total_duration:
+        type: integer
       url:
         type: string
       video_type:
@@ -286,6 +292,8 @@ definitions:
         type: string
       claimant_id:
         type: integer
+      description:
+        type: string
       end_time:
         type: integer
       end_time_fraction:
@@ -396,7 +404,7 @@ definitions:
     - analysis
     - video
     type: object
-host: localhost:8000
+host: localhost:7740
 info:
   contact:
     email: support@swagger.io
@@ -472,7 +480,8 @@ paths:
         required: true
         type: string
       responses:
-        "200": {}
+        "200":
+          description: ""
         "400":
           description: Bad Request
           schema:
@@ -691,7 +700,8 @@ paths:
         required: true
         type: string
       responses:
-        "200": {}
+        "200":
+          description: ""
       summary: Delete a claimant
       tags:
       - Claimant
@@ -848,7 +858,8 @@ paths:
         required: true
         type: string
       responses:
-        "200": {}
+        "200":
+          description: ""
       summary: Delete a rating
       tags:
       - Rating
@@ -1020,7 +1031,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200": {}
+        "200":
+          description: ""
       summary: Delete space
       tags:
       - Space
@@ -1142,7 +1154,8 @@ paths:
         required: true
         type: string
       responses:
-        "200": {}
+        "200":
+          description: ""
         "400":
           description: Bad Request
           schema:
@@ -1228,10 +1241,10 @@ paths:
       summary: Update a video by id
       tags:
       - Videos
-  /videos/published:
+  /videos/{video_id}/published:
     get:
-      description: Get all published videos
-      operationId: get-all-published-videos
+      description: Get published video by ID
+      operationId: get-published-video-by-id
       parameters:
       - description: User ID
         in: header
@@ -1243,13 +1256,10 @@ paths:
         name: X-Space
         required: true
         type: string
-      - description: limt per page
-        in: query
-        name: limit
-        type: string
-      - description: page number
-        in: query
-        name: page
+      - description: Video ID
+        in: path
+        name: video_id
+        required: true
         type: string
       produces:
       - application/json
@@ -1257,8 +1267,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/video.paging'
-      summary: Show all published videos
+            $ref: '#/definitions/video.videoanalysisData'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Show a published video by id
       tags:
       - Videos
 swagger: "2.0"

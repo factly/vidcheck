@@ -11,17 +11,19 @@ require (
 	github.com/gavv/httpexpect/v2 v2.1.0
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/cors v1.1.1
-	github.com/go-openapi/spec v0.19.9 // indirect
+	github.com/go-openapi/spec v0.20.3 // indirect
 	github.com/jinzhu/gorm v1.9.16
-	github.com/mailru/easyjson v0.7.6 // indirect
+	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/moul/http2curl v1.0.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
 	github.com/swaggo/http-swagger v0.0.0-20200308142732-58ac5e232fba
-	github.com/swaggo/swag v1.6.7
-	golang.org/x/tools v0.0.0-20200903005429-2364a5e8fdcf // indirect
+	github.com/swaggo/swag v1.7.0
+	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110 // indirect
+	golang.org/x/sys v0.0.0-20210308170721-88b6017d0656 // indirect
+	golang.org/x/tools v0.1.0 // indirect
 	gopkg.in/h2non/gock.v1 v1.0.15
-	gopkg.in/yaml.v2 v2.3.0 // indirect
 	gorm.io/driver/postgres v1.0.5
 	gorm.io/gorm v1.20.7
 )
