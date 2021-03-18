@@ -45,7 +45,10 @@ func SetupDB() {
 	}
 
 	log.Println("connected to database ...")
+}
 
+// Migrate applies migrations
+func Migrate() {
 	// Migrating schema.
 	_ = DB.AutoMigrate(
 		&Video{},

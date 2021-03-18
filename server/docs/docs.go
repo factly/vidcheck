@@ -251,7 +251,9 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {},
+                    "200": {
+                        "description": ""
+                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -539,7 +541,9 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {}
+                    "200": {
+                        "description": ""
+                    }
                 }
             }
         },
@@ -818,7 +822,9 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {}
+                    "200": {
+                        "description": ""
+                    }
                 }
             }
         },
@@ -974,7 +980,9 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {}
+                    "200": {
+                        "description": ""
+                    }
                 }
             }
         },
@@ -1072,55 +1080,6 @@ var doc = `{
                             "items": {
                                 "type": "string"
                             }
-                        }
-                    }
-                }
-            }
-        },
-        "/videos/published": {
-            "get": {
-                "description": "Get all published videos",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Videos"
-                ],
-                "summary": "Show all published videos",
-                "operationId": "get-all-published-videos",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "X-User",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Space ID",
-                        "name": "X-Space",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "limt per page",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "page number",
-                        "name": "page",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/video.paging"
                         }
                     }
                 }
@@ -1269,7 +1228,62 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {},
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/videos/{video_id}/published": {
+            "get": {
+                "description": "Get published video by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "Show a published video by id",
+                "operationId": "get-published-video-by-id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Video ID",
+                        "name": "video_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/video.videoanalysisData"
+                        }
+                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -1345,6 +1359,9 @@ var doc = `{
                 "deleted_at": {
                     "type": "string"
                 },
+                "description": {
+                    "type": "string"
+                },
                 "end_time": {
                     "type": "integer"
                 },
@@ -1352,6 +1369,9 @@ var doc = `{
                     "type": "number"
                 },
                 "fact": {
+                    "type": "string"
+                },
+                "html": {
                     "type": "string"
                 },
                 "id": {
@@ -1692,6 +1712,9 @@ var doc = `{
                 "title": {
                     "type": "string"
                 },
+                "total_duration": {
+                    "type": "integer"
+                },
                 "url": {
                     "type": "string"
                 },
@@ -1723,6 +1746,9 @@ var doc = `{
                 },
                 "claimant_id": {
                     "type": "integer"
+                },
+                "description": {
+                    "type": "string"
                 },
                 "end_time": {
                     "type": "integer"
@@ -1897,7 +1923,7 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
-	Host:        "localhost:8000",
+	Host:        "localhost:7740",
 	BasePath:    "/",
 	Schemes:     []string{},
 	Title:       "VidCheck API",
