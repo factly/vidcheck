@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button, Form, Input, Select } from "antd";
 import {
   convertSecondsToTimeString,
@@ -18,12 +18,14 @@ function AnalysisForm({
   totalDuration,
   player,
   currentStartTime,
+  setPlay,
 }) {
   const dispatch = useDispatch();
   const [filters, setFilters] = React.useState({
     page: 1,
-    limit: 10,
+    limit: 20,
   });
+
   const { ratings, ratingloading } = useSelector((state) => {
     const node = state.ratings.req.find((item) => {
       return deepEqual(item.query, filters);
@@ -69,6 +71,9 @@ function AnalysisForm({
     form.resetFields();
     form.setFieldsValue({
       ...formData,
+      start_time: formData.start_time
+        ? convertSecondsToTimeString(formData.start_time)
+        : "00:00",
       end_time: formData.end_time
         ? convertSecondsToTimeString(formData.end_time)
         : null,
@@ -76,8 +81,17 @@ function AnalysisForm({
   }, [form, formData]);
 
   React.useEffect(() => {
+    const start_time =
+      currentStartTime && convertTimeStringToSeconds(currentStartTime);
+
+    let obj = factCheckReview.find((each) => each.start_time === start_time);
+    if (obj) {
+      obj = { ...obj, end_time: convertSecondsToTimeString(obj.end_time) };
+    } else {
+      obj = {};
+    }
     form.setFieldsValue({
-      ...form.getFieldsValue(),
+      ...obj,
       start_time: currentStartTime,
     });
   }, [form, currentStartTime]);
@@ -109,24 +123,69 @@ function AnalysisForm({
       const colour = ratings.find((each) => each.id === values.rating_id).colour
         .hex;
 
-      if (values.id) {
-        newData = newData.map((obj) =>
-          values.id === obj.id
-            ? { ...values, start_time, end_time, colour }
-            : obj
-        );
+      const currentIndex = factCheck.findIndex(
+        (each) => each.start_time === formData.start_time
+      );
+
+      if (currentIndex > -1) {
+        if (formData.end_time < end_time) {
+          // this case handles when previous endtime moved towards right
+          const node = newData.find(
+            (each) => each.start_time >= formData.end_time
+          );
+
+          const leftIndex = newData.findIndex(
+            (each) => each.start_time >= formData.end_time
+          );
+
+          let rightIndex = newData.findIndex(
+            (each) => end_time <= each.end_time
+          );
+
+          if (rightIndex > -1) {
+            newData[rightIndex].start_time = end_time;
+          }
+          newData[currentIndex] = {
+            ...newData[currentIndex],
+            ...values,
+            start_time,
+            end_time,
+            colour,
+          };
+
+          if (rightIndex === -1) {
+            newData.splice(leftIndex, newData.length - leftIndex);
+          }
+          if (leftIndex < rightIndex) {
+            newData.splice(leftIndex, rightIndex - leftIndex);
+          }
+        } else if (formData.end_time > end_time) {
+          // this case handles when previous endtime moved towards left
+          const node = newData.find(
+            (each) => each.end_time === formData.end_time
+          );
+          node.start_time = end_time;
+          newData.push({ ...values, start_time, end_time, colour });
+        } else {
+          newData[currentIndex] = {
+            ...newData[currentIndex],
+            ...values,
+            start_time,
+            end_time,
+            colour,
+          };
+        }
       } else {
+        // this case handles when end_time is same & other values are updated
         newData = [...newData, { ...values, start_time, end_time, colour }];
       }
 
       return recomputeAnalysisArray(newData, totalDuration);
     });
-
-    onReset();
   };
 
   const onReset = () => {
-    const start_time = form.getFieldValue("start_time");
+    const start_time = form.getFieldValue("end_time");
     form.resetFields();
 
     form.setFieldsValue({ start_time });
@@ -158,7 +217,6 @@ function AnalysisForm({
         fact: review.fact,
         start_time: review.start_time,
       });
-      console.log(form.getFieldValue());
     }
   }
 
@@ -169,6 +227,7 @@ function AnalysisForm({
       }}
       {...layout}
       form={form}
+      onValuesChange={() => setPlay(false)}
       name="control-hooks"
       onFinish={onAddNewFactCheckReview}
       layout={"vertical"}
@@ -228,7 +287,7 @@ function AnalysisForm({
         </Select>
       </Form.Item>
       <Form.Item
-        name="Claimant_id"
+        name="claimant_id"
         label="Claimant"
         rules={[{ required: true }]}
       >

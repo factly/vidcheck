@@ -9,6 +9,9 @@ import { Button } from "antd";
 function StepTwo({ current, data = {}, onSubmit, summary, setCurrent }) {
   const [currentStartTime, setCurrentStartTime] = useState(null);
   const [totalDuration, setTotalDuration] = useState(0);
+  const [play, setPlay] = useState(true);
+
+  React.useEffect(() => {}, [play]);
 
   const [factCheckReview, setfactCheckReview] = useState(
     data && data.analysis ? data.analysis : []
@@ -36,6 +39,7 @@ function StepTwo({ current, data = {}, onSubmit, summary, setCurrent }) {
         video_type: video_type,
         ...summary,
         status: "published",
+        total_duration: totalDuration,
       },
       analysis: factCheckReview,
     };
@@ -46,6 +50,8 @@ function StepTwo({ current, data = {}, onSubmit, summary, setCurrent }) {
   return (
     <div style={current === 1 ? { display: "block" } : { display: "none" }}>
       <VideoPlayer
+        setPlay={setPlay}
+        play={play}
         player={player}
         totalDuration={totalDuration}
         setTotalDuration={setTotalDuration}
@@ -58,6 +64,7 @@ function StepTwo({ current, data = {}, onSubmit, summary, setCurrent }) {
       <div>
         <div style={{ width: "80%" }}>
           <HorizontalTimelineBar
+            totalDuration={totalDuration}
             factCheckReview={factCheckReview}
             setCurrentFormData={updateFormState}
             height={"24px"}
@@ -74,6 +81,7 @@ function StepTwo({ current, data = {}, onSubmit, summary, setCurrent }) {
             }}
           >
             <AnalysisForm
+              setPlay={setPlay}
               factCheckReview={factCheckReview}
               formData={currentFormdata}
               setfactCheckReview={setfactCheckReview}

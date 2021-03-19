@@ -42,6 +42,7 @@ function VideoAnalysisCard({ data }) {
           <Typography>{`${data.analysis.length} CLAIMS IN TOTAL`}</Typography>
           <div style={{ width: "30%" }}>
             <HorizontalTimelineBar
+              totalDuration={data.video.total_duration}
               factCheckReview={data.analysis}
               height={"12px"}
             />

@@ -34,49 +34,7 @@ export function recomputeAnalysisArray(data, totalDuration, removeId = -1) {
     return a.end_time - b.end_time;
   });
 
-  let newData = analysisData.filter((element, index) => index !== removeId);
-  console.log({ newData, removeId });
-  return newData.map((element, index) => {
-    element.widthPercentage =
-      ((element.end_time - element.start_time) / totalDuration) * 100;
-    element.end_time = convertSecondsToTimeString(element.end_time);
-    // element.start_time =
-    //   index > 0
-    //     ? convertSecondsToTimeString(newData[index - 1]["end_time"])
-    //     : "00:00";
-    return element;
-  });
-}
-
-export function transformToServerCompatibleDate(data) {
-  const videoData = {
-    url: data.video.url,
-    video_type: data.video.video_type,
-    summary: data.video.summary,
-    title: data.video.title,
-  };
-
-  const analysis = data.analysis.map((analysisData) => {
-    let analysis = {
-      claim: analysisData.claimed,
-      rating_id: analysisData.rating,
-      fact: analysisData.factCheckDetail,
-      description: analysisData.description,
-      review_sources: analysisData.review_sources,
-      start_time: convertTimeStringToSeconds(analysisData.start_time),
-      end_time: convertTimeStringToSeconds(analysisData.end_time),
-
-      end_time_fraction: analysisData.end_time_fraction,
-    };
-    if (typeof analysisData.id !== "undefined") {
-      analysis["id"] = analysisData.id;
-    }
-    return analysis;
-  });
-  return {
-    video: videoData,
-    analysis: analysis,
-  };
+  return analysisData.filter((element, index) => index !== removeId);
 }
 
 export function convertTimeStringToSeconds(timeString) {
@@ -86,8 +44,12 @@ export function convertTimeStringToSeconds(timeString) {
 }
 
 export function convertSecondsToTimeString(totalSecond) {
+  if (typeof totalSecond === "string") {
+    return totalSecond;
+  }
   const minutes = Math.floor(totalSecond / 60);
   const seconds = Math.floor(totalSecond % 60);
+
   return `${minutes > 9 ? minutes : "0" + minutes}:${
     seconds > 9 ? seconds : "0" + seconds
   }`;

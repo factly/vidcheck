@@ -16,7 +16,9 @@ function VideoPlayer({
   factCheckReview,
   videoUrl,
   updateFormState,
+  play,
   setfactCheckReview,
+  setPlay,
 }) {
   const onDeleteFactCheckReview = (removeIndex, totalDuration) => {
     setfactCheckReview((factCheckReview) =>
@@ -53,13 +55,15 @@ function VideoPlayer({
   return (
     <VideoInfoParentWrapper>
       <ReactPlayer
+        onPlay={setPlay(true)}
         url={videoUrl}
-        playing={true}
+        playing={play}
         controls={true}
         ref={player}
         volume={0}
         onProgress={handleProgress}
         onDuration={setTotalDuration}
+        visible={true}
       />
       <VerticalTimelineBar
         totalDuration={totalDuration}

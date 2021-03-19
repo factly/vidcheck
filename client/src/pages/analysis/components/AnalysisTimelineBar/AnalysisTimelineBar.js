@@ -15,6 +15,7 @@ function HorizontalTimelineBar({
   currentFormdata = {},
   setCurrentFormData = () => {},
   height,
+  totalDuration,
 }) {
   return (
     <VideoAnalysisTimelineBarWrapper>
@@ -24,14 +25,16 @@ function HorizontalTimelineBar({
             title={
               convertSecondsToTimeString(review.start_time) +
               "-" +
-              review.widthPercentage +
               convertSecondsToTimeString(review.end_time)
             }
             key={index}
+            visible={false}
           >
             <VideoLengthPart
               height={height}
-              width={`${25}%`}
+              width={`${
+                ((review.end_time - review.start_time) / totalDuration) * 100
+              }%`}
               showBorder={
                 currentFormdata.id && currentFormdata.id === review.id
               }
