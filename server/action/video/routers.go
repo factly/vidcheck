@@ -14,7 +14,7 @@ type video struct {
 	Summary       string `json:"summary"`
 	VideoType     string `json:"video_type" validate:"required"`
 	Status        string `json:"status"`
-	TotalDuration int64  `json:"total_duration"`
+	TotalDuration int    `json:"total_duration" validate:"required"`
 }
 
 type videoanalysis struct {

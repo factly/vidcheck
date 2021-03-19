@@ -58,7 +58,7 @@ func RegisterRoutes() http.Handler {
 		"kavach":   util.KavachChecker,
 	})
 
-	r.With(util.GormRequestID, util.CheckUser, util.CheckSpace).Group(func(r chi.Router) {
+	r.With(util.CheckUser, util.CheckSpace).Group(func(r chi.Router) {
 		r.Mount("/analysis", videoanalysis.Router())
 		r.Mount("/videos", video.Router())
 		r.Mount("/claimants", claimant.Router())
