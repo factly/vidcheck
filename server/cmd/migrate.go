@@ -15,6 +15,7 @@ var migrateCmd = &cobra.Command{
 	Use:   "migrate",
 	Short: "Applies DB migrations for vidcheck-server.",
 	Run: func(cmd *cobra.Command, args []string) {
+		model.SetupDB()
 		// db setup
 		model.Migrate()
 		fmt.Println("DB Migration Done...")
