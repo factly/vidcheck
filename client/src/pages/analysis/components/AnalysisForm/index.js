@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Button, Form, Input, Select } from "antd";
+import React from "react";
+import { Button, Form, Input, Select, Space, DatePicker } from "antd";
 import {
   convertSecondsToTimeString,
   convertTimeStringToSeconds,
@@ -10,6 +10,7 @@ import { getRatings } from "../../../../actions/ratings";
 import deepEqual from "deep-equal";
 import Editor from "../../../../components/Editor";
 import { getClaimants } from "../../../../actions/claimants";
+import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 
 function AnalysisForm({
   formData,
@@ -70,7 +71,6 @@ function AnalysisForm({
   React.useEffect(() => {
     form.resetFields();
     form.setFieldsValue({
-      ...formData,
       start_time: formData.start_time
         ? convertSecondsToTimeString(formData.start_time)
         : "00:00",
@@ -101,8 +101,8 @@ function AnalysisForm({
       alert("invalid end time");
       return;
     }
-    if (startTime > endTime) {
-      alert(" start time greater than end time");
+    if (startTime >= endTime) {
+      alert(" start time greater than or equal to end time");
       return;
     }
     return true;
@@ -182,6 +182,7 @@ function AnalysisForm({
 
       return recomputeAnalysisArray(newData, totalDuration);
     });
+    onReset();
   };
 
   const onReset = () => {
@@ -313,9 +314,61 @@ function AnalysisForm({
       <Form.Item name="fact" label="Fact">
         <Input.TextArea />
       </Form.Item>
-      <Form.Item name={"review_sources"} label={"Review Sources"}>
-        <Input.TextArea />
+      <Form.Item name="claim_date" label="Claim Date">
+        <DatePicker />
       </Form.Item>
+      <Form.Item name="checked_date" label="Checked Date">
+        <DatePicker />
+      </Form.Item>
+      <Form.Item name="claim_sources" label="Claim Sources" wrapperCol={24}>
+        <Editor placeholder="Enter Claim Sources..." />
+      </Form.Item>
+      <Form.Item name="review_tag_line" label="Review Tagline" wrapperCol={24}>
+        <Editor placeholder="Enter Taglines..." />
+      </Form.Item>
+      <Form.List name="review_sources" label="Review sources">
+        {(fields, { add, remove }) => (
+          <>
+            {fields.map((field) => (
+              <Space
+                key={field.key}
+                style={{ marginBottom: 8 }}
+                align="baseline"
+              >
+                <Form.Item
+                  {...field}
+                  name={[field.name, "url"]}
+                  fieldKey={[field.fieldKey, "url"]}
+                  rules={[{ required: true, message: "Url required" }]}
+                  wrapperCol={24}
+                >
+                  <Input placeholder="Enter url" />
+                </Form.Item>
+                <Form.Item
+                  {...field}
+                  name={[field.name, "description"]}
+                  fieldKey={[field.fieldKey, "description"]}
+                  rules={[{ required: true, message: "Description required" }]}
+                  wrapperCol={24}
+                >
+                  <Input placeholder="Enter description" />
+                </Form.Item>
+                <MinusCircleOutlined onClick={() => remove(field.name)} />
+              </Space>
+            ))}
+            <Form.Item>
+              <Button
+                type="dashed"
+                onClick={() => add()}
+                block
+                icon={<PlusOutlined />}
+              >
+                Add Review sources
+              </Button>
+            </Form.Item>
+          </>
+        )}
+      </Form.List>
       <Form.Item name={"description"} label={"Description"}>
         <Editor />
       </Form.Item>
@@ -327,7 +380,14 @@ function AnalysisForm({
             htmlType="submit"
             style={{ "margin-right": "15px" }}
           >
-            {form.getFieldValue("id") ? "Update Claim" : "Add Claim"}
+            {form.getFieldValue("id") ||
+            factCheckReview.findIndex(
+              (each) =>
+                each.start_time ===
+                convertTimeStringToSeconds(form.getFieldValue("start_time"))
+            ) > -1
+              ? "Update Claim"
+              : "Add Claim"}
           </Button>
           <Button htmlType="button" onClick={onReset}>
             Reset Claim
