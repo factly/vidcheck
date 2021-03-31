@@ -64,19 +64,6 @@ function ClaimantList() {
       },
     },
     {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-      width: "30%",
-      render: (_, record) => {
-        return (
-          <Typography.Paragraph ellipsis={{ rows: 2 }}>
-            {record.description}
-          </Typography.Paragraph>
-        );
-      },
-    },
-    {
       title: "Action",
       dataIndex: "operation",
       render: (_, record) => {
