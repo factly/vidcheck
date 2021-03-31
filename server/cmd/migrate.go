@@ -17,6 +17,7 @@ var migrateCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		model.SetupDB()
 		// db setup
+		model.SetupDB()
 		model.Migrate()
 		fmt.Println("DB Migration Done...")
 	},

@@ -13,7 +13,8 @@ type Analysis struct {
 	Video           *Video         `json:"video"`
 	RatingID        uint           `gorm:"column:rating_id" json:"rating_id"`
 	Rating          *Rating        `json:"rating"`
-	HTML            string         `gorm: "html" json:"html"`
+	HTMLFact        string         `gorm:"column:html_fact" json:"html_fact,omitempty"`
+	HTMLDescription string         `gorm:"column:html_description" json:"html_description,omitempty"`
 	Claim           postgres.Jsonb `gorm:"column:claim" json:"claim"  swaggertype:"primitive,string"`
 	Description     postgres.Jsonb `gorm:"column:description" json:"description" swaggertype:"primitive,string"`
 	ClaimDate       time.Time      `gorm:"column:claim_date" json:"claim_date" sql:"DEFAULT:NULL"`
@@ -26,5 +27,4 @@ type Analysis struct {
 	ClaimSources    postgres.Jsonb `gorm:"column:claim_sources" json:"claim_sources" swaggertype:"primitive,string"`
 	EndTime         int            `gorm:"column:end_time" json:"end_time"`
 	StartTime       int            `gorm:"column:start_time" json:"start_time"`
-	EndTimeFraction float64        `gorm:"column:end_time_fraction" json:"end_time_fraction"`
 }

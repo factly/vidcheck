@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom";
 
 import { useDispatch } from "react-redux";
 import { deleteVideo, getVideos } from "../../../actions/videos";
-import { HorizontalTimelineBar } from "../../analysis/components/AnalysisTimelineBar/AnalysisTimelineBar";
+import HorizontalTimelineBar from "../components/AnalysisTimelineBar/HorizontalTimelineBar";
 
 function VideoAnalysisCard({ data }) {
   const history = useHistory();
@@ -42,6 +42,7 @@ function VideoAnalysisCard({ data }) {
           <Typography>{`${data.analysis.length} CLAIMS IN TOTAL`}</Typography>
           <div style={{ width: "30%" }}>
             <HorizontalTimelineBar
+              totalDuration={data.video.total_duration}
               factCheckReview={data.analysis}
               height={"12px"}
             />

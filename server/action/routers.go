@@ -12,7 +12,6 @@ import (
 
 	"github.com/factly/vidcheck/action/rating"
 	"github.com/factly/vidcheck/action/space"
-	"github.com/factly/vidcheck/action/videoanalysis"
 	"github.com/spf13/viper"
 
 	"github.com/factly/vidcheck/action/video"
@@ -58,8 +57,7 @@ func RegisterRoutes() http.Handler {
 		"kavach":   util.KavachChecker,
 	})
 
-	r.With(util.GormRequestID, util.CheckUser, util.CheckSpace).Group(func(r chi.Router) {
-		r.Mount("/analysis", videoanalysis.Router())
+	r.With(util.CheckUser, util.CheckSpace).Group(func(r chi.Router) {
 		r.Mount("/videos", video.Router())
 		r.Mount("/claimants", claimant.Router())
 		if !config.DegaIntegrated() {

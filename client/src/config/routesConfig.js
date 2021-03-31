@@ -16,8 +16,8 @@ import CreateSpace from "../pages/spaces/CreateSpace";
 import EditSpace from "../pages/spaces/EditSpace";
 
 //Videos
-import CreateVideo from "../pages/analysis/CreateVideo";
-import EditVideo from "../pages/analysis/EditVideo";
+import CreateVideo from "../pages/videos/CreateVideo";
+import EditVideo from "../pages/videos/EditVideo";
 
 import Preview from "../pages/preview";
 

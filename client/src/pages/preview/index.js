@@ -1,12 +1,8 @@
 import React, { useState } from "react";
 import { LeftCircleFilled, RightCircleFilled } from "@ant-design/icons";
 import ReactPlayer from "react-player";
-import {
-  convertTimeStringToSeconds,
-  transformVideoAnalysisdetails,
-} from "../analysis/utilities/analysis";
 
-import { HorizontalTimelineBar } from "../analysis/components/AnalysisTimelineBar/AnalysisTimelineBar";
+import HorizontalTimelineBar from "../videos/components/AnalysisTimelineBar/HorizontalTimelineBar";
 import axios from "axios";
 import { VIDEOS_API } from "../../constants/videos";
 import { addErrorNotification } from "../../actions/notifications";
@@ -162,6 +158,7 @@ function Preview({ vid }) {
             />
           </div>
           <HorizontalTimelineBar
+            totalDuration={videoData.video.total_duration}
             factCheckReview={factCheckReview}
             setCurrentFormData={updateFormState}
             currentFormdata={currentFormdata}
@@ -190,6 +187,7 @@ function Preview({ vid }) {
             {videoData.analysis.length} claims in total
           </div>
           <HorizontalTimelineBar
+            totalDuration={videoData.video.total_duration}
             factCheckReview={factCheckReview}
             height={"12px"}
           />
@@ -273,6 +271,8 @@ function Preview({ vid }) {
                 backgroundColor: "#fff",
                 padding: "20px",
                 minHeight: "240px",
+                maxHeight: "320px",
+                overflow: "auto",
               }}
             >
               <div
@@ -306,9 +306,10 @@ function Preview({ vid }) {
                   style={{
                     color: ratingColor[currentClaim.rating.id],
                   }}
-                >
-                  {currentClaim.fact}
-                </div>
+                  dangerouslySetInnerHTML={{
+                    __html: videoData.analysis[currentClaimIndex].html_fact,
+                  }}
+                />
               </div>
             </div>
             <div
@@ -340,7 +341,7 @@ function Preview({ vid }) {
           marginTop: "60px",
         }}
         dangerouslySetInnerHTML={{
-          __html: videoData.analysis[currentClaimIndex].html,
+          __html: videoData.analysis[currentClaimIndex].html_description,
         }}
       />
       {videoData.analysis[currentClaimIndex].review_sources ? (

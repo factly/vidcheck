@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes from "prop-types";
 import { Typography } from "antd";
 
 function Summary({ data }) {
@@ -12,7 +11,4 @@ function Summary({ data }) {
   );
 }
 
-Summary.protoTypes = {
-  data: PropTypes.object.isRequired,
-};
 export default Summary;

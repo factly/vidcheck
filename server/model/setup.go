@@ -58,5 +58,4 @@ func Migrate() {
 		&Claimant{},
 	)
 
-	_ = DB.Migrator().DropConstraint(&Analysis{}, "fk_analysis_rating")
 }

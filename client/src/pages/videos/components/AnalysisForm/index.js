@@ -1,15 +1,17 @@
 import React from "react";
-import { Button, Form, Input, Select } from "antd";
+import { Button, Form, Input, Select, Space, DatePicker } from "antd";
 import {
   convertSecondsToTimeString,
   convertTimeStringToSeconds,
   recomputeAnalysisArray,
-} from "../../utilities/analysis";
+} from "../../../../utils/analysis";
 import { useSelector, useDispatch } from "react-redux";
 import { getRatings } from "../../../../actions/ratings";
 import deepEqual from "deep-equal";
 import Editor from "../../../../components/Editor";
 import { getClaimants } from "../../../../actions/claimants";
+import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import moment from "moment";
 
 function AnalysisForm({
   formData,
@@ -18,12 +20,14 @@ function AnalysisForm({
   totalDuration,
   player,
   currentStartTime,
+  setPlay,
 }) {
   const dispatch = useDispatch();
   const [filters, setFilters] = React.useState({
     page: 1,
-    limit: 10,
+    limit: 20,
   });
+
   const { ratings, ratingloading } = useSelector((state) => {
     const node = state.ratings.req.find((item) => {
       return deepEqual(item.query, filters);
@@ -68,7 +72,9 @@ function AnalysisForm({
   React.useEffect(() => {
     form.resetFields();
     form.setFieldsValue({
-      ...formData,
+      start_time: formData.start_time
+        ? convertSecondsToTimeString(formData.start_time)
+        : "00:00",
       end_time: formData.end_time
         ? convertSecondsToTimeString(formData.end_time)
         : null,
@@ -76,8 +82,20 @@ function AnalysisForm({
   }, [form, formData]);
 
   React.useEffect(() => {
+    const start_time =
+      currentStartTime && convertTimeStringToSeconds(currentStartTime);
+
+    let obj = factCheckReview.find((each) => each.start_time === start_time);
+    if (obj) {
+      obj = { ...obj, end_time: convertSecondsToTimeString(obj.end_time) };
+    } else {
+      obj = {};
+    }
+
     form.setFieldsValue({
-      ...form.getFieldsValue(),
+      ...obj,
+      claim_date: obj.claim_date ? moment(obj.claim_date) : null,
+      checked_date: obj.checked_date ? moment(obj.checked_date) : null,
       start_time: currentStartTime,
     });
   }, [form, currentStartTime]);
@@ -87,8 +105,8 @@ function AnalysisForm({
       alert("invalid end time");
       return;
     }
-    if (startTime > endTime) {
-      alert(" start time greater than end time");
+    if (startTime >= endTime) {
+      alert(" start time greater than or equal to end time");
       return;
     }
     return true;
@@ -109,24 +127,70 @@ function AnalysisForm({
       const colour = ratings.find((each) => each.id === values.rating_id).colour
         .hex;
 
-      if (values.id) {
-        newData = newData.map((obj) =>
-          values.id === obj.id
-            ? { ...values, start_time, end_time, colour }
-            : obj
-        );
+      const currentIndex = factCheck.findIndex(
+        (each) => each.start_time === formData.start_time
+      );
+
+      if (currentIndex > -1) {
+        if (formData.end_time < end_time) {
+          // this case handles when previous endtime moved towards right
+          const node = newData.find(
+            (each) => each.start_time >= formData.end_time
+          );
+
+          const leftIndex = newData.findIndex(
+            (each) => each.start_time >= formData.end_time
+          );
+
+          let rightIndex = newData.findIndex(
+            (each) => end_time <= each.end_time
+          );
+
+          if (rightIndex > -1) {
+            newData[rightIndex].start_time = end_time;
+          }
+          newData[currentIndex] = {
+            ...newData[currentIndex],
+            ...values,
+            start_time,
+            end_time,
+            colour,
+          };
+
+          if (rightIndex === -1) {
+            newData.splice(leftIndex, newData.length - leftIndex);
+          }
+          if (leftIndex < rightIndex) {
+            newData.splice(leftIndex, rightIndex - leftIndex);
+          }
+        } else if (formData.end_time > end_time) {
+          // this case handles when previous endtime moved towards left
+          const node = newData.find(
+            (each) => each.end_time === formData.end_time
+          );
+          node.start_time = end_time;
+          newData.push({ ...values, start_time, end_time, colour });
+        } else {
+          newData[currentIndex] = {
+            ...newData[currentIndex],
+            ...values,
+            start_time,
+            end_time,
+            colour,
+          };
+        }
       } else {
+        // this case handles when end_time is same & other values are updated
         newData = [...newData, { ...values, start_time, end_time, colour }];
       }
 
       return recomputeAnalysisArray(newData, totalDuration);
     });
-
     onReset();
   };
 
   const onReset = () => {
-    const start_time = form.getFieldValue("start_time");
+    const start_time = form.getFieldValue("end_time");
     form.resetFields();
 
     form.setFieldsValue({ start_time });
@@ -134,6 +198,7 @@ function AnalysisForm({
 
   const fillCurrentTime = () => {
     const currentPlayedTime = player.current.getCurrentTime();
+
     form.setFieldsValue({
       ...form.getFieldsValue(),
       end_time: convertSecondsToTimeString(currentPlayedTime),
@@ -144,11 +209,11 @@ function AnalysisForm({
     wrapperCol: { span: 24 },
   };
 
-  const initialValues = {};
-
   if (factCheckReview && factCheckReview.length > 0) {
     const review = factCheckReview.find(
-      (each) => each.start_time === convertSecondsToTimeString(currentStartTime)
+      (each) =>
+        convertSecondsToTimeString(each.start_time) ===
+        convertSecondsToTimeString(currentStartTime)
     );
     if (review) {
       form.setFieldsValue({
@@ -156,19 +221,16 @@ function AnalysisForm({
         rating_id: review.rating_id,
         claim: review.claim,
         fact: review.fact,
-        start_time: review.start_time,
+        start_time: convertSecondsToTimeString(review.start_time),
       });
-      console.log(form.getFieldValue());
     }
   }
 
   return (
     <Form
-      initialValues={{
-        ...initialValues,
-      }}
       {...layout}
       form={form}
+      onValuesChange={() => setPlay(false)}
       name="control-hooks"
       onFinish={onAddNewFactCheckReview}
       layout={"vertical"}
@@ -228,7 +290,7 @@ function AnalysisForm({
         </Select>
       </Form.Item>
       <Form.Item
-        name="Claimant_id"
+        name="claimant_id"
         label="Claimant"
         rules={[{ required: true }]}
       >
@@ -252,14 +314,104 @@ function AnalysisForm({
         <Input.TextArea />
       </Form.Item>
       <Form.Item name="fact" label="Fact">
-        <Input.TextArea />
-      </Form.Item>
-      <Form.Item name={"review_sources"} label={"Review Sources"}>
-        <Input.TextArea />
+        <Editor />
       </Form.Item>
       <Form.Item name={"description"} label={"Description"}>
         <Editor />
       </Form.Item>
+      <Form.Item name="claim_date" label="Claim Date">
+        <DatePicker />
+      </Form.Item>
+      <Form.Item name="checked_date" label="Checked Date">
+        <DatePicker />
+      </Form.Item>
+      <Form.List name="claim_sources" label="Claim sources">
+        {(fields, { add, remove }) => (
+          <>
+            {fields.map((field) => (
+              <Space
+                key={field.key}
+                style={{ marginBottom: 8 }}
+                align="baseline"
+              >
+                <Form.Item
+                  {...field}
+                  name={[field.name, "url"]}
+                  fieldKey={[field.fieldKey, "url"]}
+                  rules={[{ required: true, message: "Url required" }]}
+                  wrapperCol={24}
+                >
+                  <Input placeholder="Enter url" />
+                </Form.Item>
+                <Form.Item
+                  {...field}
+                  name={[field.name, "description"]}
+                  fieldKey={[field.fieldKey, "description"]}
+                  rules={[{ required: true, message: "Description required" }]}
+                  wrapperCol={24}
+                >
+                  <Input placeholder="Enter description" />
+                </Form.Item>
+                <MinusCircleOutlined onClick={() => remove(field.name)} />
+              </Space>
+            ))}
+            <Form.Item>
+              <Button
+                type="dashed"
+                onClick={() => add()}
+                block
+                icon={<PlusOutlined />}
+              >
+                Add Claim sources
+              </Button>
+            </Form.Item>
+          </>
+        )}
+      </Form.List>
+
+      <Form.List name="review_sources" label="Review sources">
+        {(fields, { add, remove }) => (
+          <>
+            {fields.map((field) => (
+              <Space
+                key={field.key}
+                style={{ marginBottom: 8 }}
+                align="baseline"
+              >
+                <Form.Item
+                  {...field}
+                  name={[field.name, "url"]}
+                  fieldKey={[field.fieldKey, "url"]}
+                  rules={[{ required: true, message: "Url required" }]}
+                  wrapperCol={24}
+                >
+                  <Input placeholder="Enter url" />
+                </Form.Item>
+                <Form.Item
+                  {...field}
+                  name={[field.name, "description"]}
+                  fieldKey={[field.fieldKey, "description"]}
+                  rules={[{ required: true, message: "Description required" }]}
+                  wrapperCol={24}
+                >
+                  <Input placeholder="Enter description" />
+                </Form.Item>
+                <MinusCircleOutlined onClick={() => remove(field.name)} />
+              </Space>
+            ))}
+            <Form.Item>
+              <Button
+                type="dashed"
+                onClick={() => add()}
+                block
+                icon={<PlusOutlined />}
+              >
+                Add Review sources
+              </Button>
+            </Form.Item>
+          </>
+        )}
+      </Form.List>
 
       <Form.Item>
         <div style={{ "justify-content": "flex-start", display: "flex" }}>
@@ -268,7 +420,13 @@ function AnalysisForm({
             htmlType="submit"
             style={{ "margin-right": "15px" }}
           >
-            {form.getFieldValue("id") ? "Update Claim" : "Add Claim"}
+            {factCheckReview.findIndex(
+              (each) =>
+                each.start_time ===
+                convertTimeStringToSeconds(form.getFieldValue("start_time"))
+            ) > -1
+              ? "Update Claim"
+              : "Add Claim"}
           </Button>
           <Button htmlType="button" onClick={onReset}>
             Reset Claim

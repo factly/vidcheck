@@ -2,10 +2,8 @@ import React, { useState } from "react";
 import VideoCreateForm from "./components/VideoAnalysisForm";
 import { useDispatch } from "react-redux";
 import { addVideo, getVideos } from "../../actions/videos";
-import { useHistory } from "react-router-dom";
 
 function CreateVideo() {
-  const history = useHistory();
   const [vid, setVid] = useState(0);
 
   const dispatch = useDispatch();

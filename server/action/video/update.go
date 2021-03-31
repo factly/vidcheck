@@ -3,6 +3,7 @@ package video
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -93,7 +94,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	ratingMap := make(map[float64]*model.Rating)
+	ratingMap := make(map[int]*model.Rating)
 
 	tx := model.DB.Begin()
 	tx.Model(&videoObj).Updates(model.Video{
@@ -109,7 +110,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 			// check if new rating exist
 			if config.DegaIntegrated() {
 				if rat, found := degaRatingMap[analysisBlock.RatingID]; found {
-					ratingMap[analysisBlock.EndTimeFraction] = &rat
+					ratingMap[analysisBlock.EndTime] = &rat
 				} else {
 					err = errors.New(`rating does not exist in dega`)
 				}
@@ -117,6 +118,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 				rat := model.Rating{}
 				rat.ID = analysisBlock.RatingID
 				err = tx.First(&rat).Error
+				log.Print("rating error======>", err)
 			}
 
 			if err != nil {
@@ -128,27 +130,26 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 			analysisBlockObj := &model.Analysis{}
 			analysisBlockObj.ID = uint(analysisBlock.ID)
-			tx.Model(&analysisBlock).Select("IsClaim").Updates(model.Analysis{IsClaim: analysisBlock.IsClaim})
+			//tx.Model(&analysisBlock).Select("IsClaim").Updates(model.Analysis{IsClaim: analysisBlock.IsClaim})
 			tx.Model(&analysisBlockObj).Updates(model.Analysis{
-				RatingID:        analysisBlock.RatingID,
-				Claim:           analysisBlock.Claim,
-				ClaimDate:       analysisBlock.ClaimDate,
-				CheckedDate:     analysisBlock.CheckedDate,
-				Fact:            analysisBlock.Fact,
-				Description:     analysisBlock.Description,
-				ReviewSources:   analysisBlock.ReviewSources,
-				ClaimantID:      analysisBlock.ClaimantID,
-				ClaimSources:    analysisBlock.ClaimSources,
-				StartTime:       analysisBlock.StartTime,
-				EndTime:         analysisBlock.EndTime,
-				EndTimeFraction: analysisBlock.EndTimeFraction,
+				RatingID:      analysisBlock.RatingID,
+				Claim:         analysisBlock.Claim,
+				ClaimDate:     analysisBlock.ClaimDate,
+				CheckedDate:   analysisBlock.CheckedDate,
+				Fact:          analysisBlock.Fact,
+				Description:   analysisBlock.Description,
+				ReviewSources: analysisBlock.ReviewSources,
+				ClaimantID:    analysisBlock.ClaimantID,
+				ClaimSources:  analysisBlock.ClaimSources,
+				StartTime:     analysisBlock.StartTime,
+				EndTime:       analysisBlock.EndTime,
 			})
 			updatedOrCreatedVideoBlock = append(updatedOrCreatedVideoBlock, analysisBlockObj.ID)
 		} else {
 			// check if new rating exist
 			if config.DegaIntegrated() {
 				if rat, found := degaRatingMap[analysisBlock.RatingID]; found {
-					ratingMap[analysisBlock.EndTimeFraction] = &rat
+					ratingMap[analysisBlock.EndTime] = &rat
 				} else {
 					err = errors.New(`rating does not exist in dega`)
 				}
@@ -167,15 +168,14 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 			analysisBlockObj := model.Analysis{}
 			analysisBlockObj = model.Analysis{
-				VideoID:         videoObj.ID,
-				RatingID:        analysisBlock.RatingID,
-				Claim:           analysisBlock.Claim,
-				Fact:            analysisBlock.Fact,
-				Description:     analysisBlock.Description,
-				ReviewSources:   analysisBlock.ReviewSources,
-				StartTime:       analysisBlock.StartTime,
-				EndTime:         analysisBlock.EndTime,
-				EndTimeFraction: analysisBlock.EndTimeFraction,
+				VideoID:       videoObj.ID,
+				RatingID:      analysisBlock.RatingID,
+				Claim:         analysisBlock.Claim,
+				Fact:          analysisBlock.Fact,
+				Description:   analysisBlock.Description,
+				ReviewSources: analysisBlock.ReviewSources,
+				StartTime:     analysisBlock.StartTime,
+				EndTime:       analysisBlock.EndTime,
 			}
 			err = tx.Model(&model.Analysis{}).Create(&analysisBlockObj).Error
 			if err != nil {
