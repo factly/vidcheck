@@ -5,7 +5,6 @@ import {
   VideoInfoWrapper,
 } from "../../../../StyledComponents";
 import { Input } from "antd";
-import PropTypes from "prop-types";
 import Duration from "./Duration";
 
 function InfoDetails({
@@ -57,13 +56,4 @@ function InfoDetails({
   );
 }
 
-InfoDetails.protoTypes = {
-  videoUrl: PropTypes.string.isRequired,
-  updateVideoUrl: PropTypes.func.isRequired,
-  played: PropTypes.string.isRequired,
-  setPlaying: PropTypes.func.isRequired,
-  playing: PropTypes.bool.isRequired,
-  handleSeekChange: PropTypes.func.isRequired,
-  totalDuration: PropTypes.string.isRequired,
-};
 export default InfoDetails;

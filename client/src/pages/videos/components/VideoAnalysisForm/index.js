@@ -1,11 +1,11 @@
 import React from "react";
 
-import { PageWrapper } from "../../../StyledComponents";
+import { PageWrapper } from "../../../../StyledComponents";
 import { Steps, Button } from "antd";
 
-import StepOne from "./AnalysisForm/StepOne";
-import StepTwo from "./AnalysisForm/StepTwo";
-import Preview from "../../preview";
+import StepOne from "./StepOne";
+import StepTwo from "./StepTwo";
+import Preview from "../../../preview";
 import { useHistory } from "react-router-dom";
 
 function VideoAnalysisForm({ data, onSubmit, vid }) {

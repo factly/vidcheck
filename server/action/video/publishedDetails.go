@@ -66,7 +66,17 @@ func publishedDetails(w http.ResponseWriter, r *http.Request) {
 
 		if err == nil {
 			html, _ := editorx.EditorjsToHTML(desc)
-			analysisBlocks[index].HTML = html
+			analysisBlocks[index].HTMLDescription = html
+		}
+
+		claimArrByte, err := each.Fact.MarshalJSON()
+
+		fact := make(map[string]interface{})
+		err = json.Unmarshal(claimArrByte, &fact)
+
+		if err == nil {
+			html, _ := editorx.EditorjsToHTML(fact)
+			analysisBlocks[index].HTMLFact = html
 		}
 
 	}

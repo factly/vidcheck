@@ -7,12 +7,11 @@ import {
   deleteRating,
   addDefaultRatings,
 } from "../../../actions/ratings";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import deepEqual from "deep-equal";
 
 function RatingList() {
   const dispatch = useDispatch();
-  const history = useHistory();
   const [filters, setFilters] = React.useState({
     page: 1,
     limit: 10,

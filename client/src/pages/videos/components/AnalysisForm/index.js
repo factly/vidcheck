@@ -4,13 +4,14 @@ import {
   convertSecondsToTimeString,
   convertTimeStringToSeconds,
   recomputeAnalysisArray,
-} from "../../utilities/analysis";
+} from "../../../../utils/analysis";
 import { useSelector, useDispatch } from "react-redux";
 import { getRatings } from "../../../../actions/ratings";
 import deepEqual from "deep-equal";
 import Editor from "../../../../components/Editor";
 import { getClaimants } from "../../../../actions/claimants";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import moment from "moment";
 
 function AnalysisForm({
   formData,
@@ -90,8 +91,11 @@ function AnalysisForm({
     } else {
       obj = {};
     }
+
     form.setFieldsValue({
       ...obj,
+      claim_date: obj.claim_date ? moment(obj.claim_date) : null,
+      checked_date: obj.checked_date ? moment(obj.checked_date) : null,
       start_time: currentStartTime,
     });
   }, [form, currentStartTime]);
@@ -194,6 +198,7 @@ function AnalysisForm({
 
   const fillCurrentTime = () => {
     const currentPlayedTime = player.current.getCurrentTime();
+
     form.setFieldsValue({
       ...form.getFieldsValue(),
       end_time: convertSecondsToTimeString(currentPlayedTime),
@@ -204,11 +209,11 @@ function AnalysisForm({
     wrapperCol: { span: 24 },
   };
 
-  const initialValues = {};
-
   if (factCheckReview && factCheckReview.length > 0) {
     const review = factCheckReview.find(
-      (each) => each.start_time === convertSecondsToTimeString(currentStartTime)
+      (each) =>
+        convertSecondsToTimeString(each.start_time) ===
+        convertSecondsToTimeString(currentStartTime)
     );
     if (review) {
       form.setFieldsValue({
@@ -216,16 +221,13 @@ function AnalysisForm({
         rating_id: review.rating_id,
         claim: review.claim,
         fact: review.fact,
-        start_time: review.start_time,
+        start_time: convertSecondsToTimeString(review.start_time),
       });
     }
   }
 
   return (
     <Form
-      initialValues={{
-        ...initialValues,
-      }}
       {...layout}
       form={form}
       onValuesChange={() => setPlay(false)}
@@ -312,7 +314,7 @@ function AnalysisForm({
         <Input.TextArea />
       </Form.Item>
       <Form.Item name="fact" label="Fact">
-        <Input.TextArea />
+        <Editor />
       </Form.Item>
       <Form.Item name={"description"} label={"Description"}>
         <Editor />
@@ -418,8 +420,7 @@ function AnalysisForm({
             htmlType="submit"
             style={{ "margin-right": "15px" }}
           >
-            {form.getFieldValue("id") ||
-            factCheckReview.findIndex(
+            {factCheckReview.findIndex(
               (each) =>
                 each.start_time ===
                 convertTimeStringToSeconds(form.getFieldValue("start_time"))

@@ -2,8 +2,8 @@ import React, { useState, useRef } from "react";
 import { FactCheckReviewWrapper } from "../../../../StyledComponents";
 
 import AnalysisForm from "../AnalysisForm";
-import VideoPlayer from "./components/VideoPlayer";
-import { HorizontalTimelineBar } from "../AnalysisTimelineBar/AnalysisTimelineBar";
+import VideoPlayer from "../VideoPlayer";
+import HorizontalTimelineBar from "../AnalysisTimelineBar/HorizontalTimelineBar";
 import { Button } from "antd";
 
 function StepTwo({ current, data = {}, onSubmit, summary, setCurrent }) {

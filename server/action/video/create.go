@@ -77,7 +77,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	analysisBlocks := []model.Analysis{}
-	ratingMap := make(map[float64]*model.Rating)
+	ratingMap := make(map[int]*model.Rating)
 	var degaRatingMap map[uint]model.Rating
 
 	if config.DegaIntegrated() {
@@ -95,7 +95,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		// check if associated rating exist
 		if config.DegaIntegrated() {
 			if rat, found := degaRatingMap[analysisBlock.RatingID]; found {
-				ratingMap[analysisBlock.EndTimeFraction] = &rat
+				ratingMap[analysisBlock.EndTime] = &rat
 			} else {
 				err = errors.New(`rating does not exist in dega`)
 			}
@@ -113,20 +113,19 @@ func create(w http.ResponseWriter, r *http.Request) {
 		}
 
 		analysisBlockObj := model.Analysis{
-			VideoID:         videoObj.ID,
-			RatingID:        analysisBlock.RatingID,
-			Claim:           analysisBlock.Claim,
-			ClaimDate:       analysisBlock.ClaimDate,
-			CheckedDate:     analysisBlock.CheckedDate,
-			IsClaim:         analysisBlock.IsClaim,
-			Fact:            analysisBlock.Fact,
-			Description:     analysisBlock.Description,
-			ClaimantID:      analysisBlock.ClaimantID,
-			ReviewSources:   analysisBlock.ReviewSources,
-			ClaimSources:    analysisBlock.ClaimSources,
-			StartTime:       analysisBlock.StartTime,
-			EndTime:         analysisBlock.EndTime,
-			EndTimeFraction: analysisBlock.EndTimeFraction,
+			VideoID:       videoObj.ID,
+			RatingID:      analysisBlock.RatingID,
+			Claim:         analysisBlock.Claim,
+			ClaimDate:     analysisBlock.ClaimDate,
+			CheckedDate:   analysisBlock.CheckedDate,
+			IsClaim:       analysisBlock.IsClaim,
+			Fact:          analysisBlock.Fact,
+			Description:   analysisBlock.Description,
+			ClaimantID:    analysisBlock.ClaimantID,
+			ReviewSources: analysisBlock.ReviewSources,
+			ClaimSources:  analysisBlock.ClaimSources,
+			StartTime:     analysisBlock.StartTime,
+			EndTime:       analysisBlock.EndTime,
 		}
 		analysisBlocks = append(analysisBlocks, analysisBlockObj)
 	}
@@ -151,7 +150,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 
 	if config.DegaIntegrated() {
 		for i := range analysisBlocks {
-			analysisBlocks[i].Rating = ratingMap[analysisBlocks[i].EndTimeFraction]
+			analysisBlocks[i].Rating = ratingMap[analysisBlocks[i].EndTime]
 		}
 	}
 

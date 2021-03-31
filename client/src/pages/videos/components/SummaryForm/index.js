@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes from "prop-types";
 import { Button, Form, Input } from "antd";
 
 function SummaryForm({ summary, setSummary }) {
@@ -51,8 +50,4 @@ function SummaryForm({ summary, setSummary }) {
   );
 }
 
-SummaryForm.protoTypes = {
-  summary: PropTypes.object.isRequired,
-  updateSummaryData: PropTypes.func.isRequired,
-};
 export default SummaryForm;

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { LeftCircleFilled, RightCircleFilled } from "@ant-design/icons";
 import ReactPlayer from "react-player";
 
-import { HorizontalTimelineBar } from "../analysis/components/AnalysisTimelineBar/AnalysisTimelineBar";
+import HorizontalTimelineBar from "../videos/components/AnalysisTimelineBar/HorizontalTimelineBar";
 import axios from "axios";
 import { VIDEOS_API } from "../../constants/videos";
 import { addErrorNotification } from "../../actions/notifications";
@@ -306,9 +306,10 @@ function Preview({ vid }) {
                   style={{
                     color: ratingColor[currentClaim.rating.id],
                   }}
-                >
-                  {currentClaim.fact}
-                </div>
+                  dangerouslySetInnerHTML={{
+                    __html: videoData.analysis[currentClaimIndex].html_fact,
+                  }}
+                />
               </div>
             </div>
             <div
@@ -340,7 +341,7 @@ function Preview({ vid }) {
           marginTop: "60px",
         }}
         dangerouslySetInnerHTML={{
-          __html: videoData.analysis[currentClaimIndex].html,
+          __html: videoData.analysis[currentClaimIndex].html_description,
         }}
       />
       {videoData.analysis[currentClaimIndex].review_sources ? (

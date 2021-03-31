@@ -1,12 +1,12 @@
 import React from "react";
 
 import ReactPlayer from "react-player";
-import { VideoInfoParentWrapper } from "../../../../../StyledComponents";
+import { VideoInfoParentWrapper } from "../../../../StyledComponents";
 import {
   convertSecondsToTimeString,
   recomputeAnalysisArray,
-} from "../../../utilities/analysis";
-import { VerticalTimelineBar } from "../../AnalysisTimelineBar/AnalysisTimelineBar";
+} from "../../../../utils/analysis";
+import VerticalTimelineBar from "../AnalysisTimelineBar/VerticalTimelineBar";
 
 function VideoPlayer({
   totalDuration,
