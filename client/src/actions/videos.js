@@ -75,6 +75,7 @@ export const updateVideo = (data) => {
         dispatch(getVideoByID(response.data));
         dispatch(stopVideosLoading());
         dispatch(addSuccessNotification("Video updated"));
+        return response.data;
       })
       .catch((error) => {
         dispatch(addErrorNotification(error.message));

@@ -24,7 +24,9 @@ function EditAnalysis() {
   if (loading || !video.url) return <Skeleton />;
 
   const onUpdate = (values) => {
-    dispatch(updateVideo(values)).then(() => history.push("/"));
+    dispatch(updateVideo(values)).then((res) =>
+      history.push(`/preview/${res.video.id}`)
+    );
   };
 
   return <EditAnalysisForm onSubmit={onUpdate} />;

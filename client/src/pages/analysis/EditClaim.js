@@ -14,18 +14,18 @@ function ClaimForm() {
   const { video, claims } = useSelector(({ analysis }) => analysis);
 
   if (!video.url || !claims[id]) {
-    history.push("/analysis");
+    history.push("/analysis/create");
   }
 
-  const onCreate = (values) => {
+  const onUpdate = (values) => {
     dispatch(addClaim(values));
-    history.push("/analysis");
+    history.push("/analysis/create");
   };
 
   return (
     <EditClaimForm
       data={claims[id]}
-      onCreate={onCreate}
+      onCreate={onUpdate}
       startTime={
         claims.length > 0
           ? convertSecondsToTimeString(claims[claims.length - 1].end_time)
