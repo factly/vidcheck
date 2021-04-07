@@ -51,7 +51,7 @@ func list(w http.ResponseWriter, r *http.Request) {
 	for _, video := range videos {
 		var analysisData videoanalysisData
 		analysisData.Video = video
-		model.DB.Model(&model.Analysis{}).Order("start_time").Where("video_id = ?", video.ID).Preload("Claimant").Find(&analysisData.Analysis)
+		model.DB.Model(&model.Analysis{}).Order("start_time").Where("video_id = ?", video.ID).Preload("Claimant").Preload("Rating").Find(&analysisData.Analysis)
 
 		result.Nodes = append(result.Nodes, analysisData)
 	}

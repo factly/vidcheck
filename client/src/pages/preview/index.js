@@ -1,14 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import { LeftCircleFilled, RightCircleFilled } from "@ant-design/icons";
 import ReactPlayer from "react-player";
 
 import HorizontalTimelineBar from "../videos/components/AnalysisTimelineBar/HorizontalTimelineBar";
-import axios from "axios";
-import { VIDEOS_API } from "../../constants/videos";
-import { addErrorNotification } from "../../actions/notifications";
 import { Result, Skeleton } from "antd";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { getVideo } from "../../actions/videos";
 
 function Preview({ vid }) {
   const { id } = useParams();
@@ -27,10 +25,6 @@ function Preview({ vid }) {
     6: "#f9f9fa",
   };
 
-  const [videoData, setVideoData] = useState({});
-
-  const [loading, setLoading] = useState(true);
-
   const [currentStartTime, setCurrentStartTime] = React.useState(null);
   const player = React.useRef(null);
   const [playing, setPlaying] = React.useState(false);
@@ -44,25 +38,22 @@ function Preview({ vid }) {
     endFraction: 1,
   });
 
+  const { videoData, loading } = useSelector((state) => {
+    return {
+      videoData: state.videos.details[id] ? state.videos.details[id] : null,
+      loading: state.videos.loading,
+    };
+  });
+
   React.useEffect(() => {
-    if (videoID > 0)
-      axios
-        .get(VIDEOS_API + "/" + videoID + "/published")
-        .then((response) => {
-          setVideoData(response.data);
-        })
-        .catch((error) => {
-          if (id > 0) {
-            dispatch(addErrorNotification(error.message));
-          }
-        })
-        .finally(() => setLoading(false));
-  }, [vid]);
+    if (videoID > 0) dispatch(getVideo(videoID));
+  }, [videoID]);
 
   if (loading) {
     return <Skeleton />;
   }
-  if (!videoData.video && videoData > 0) {
+
+  if (!videoData.video) {
     return <Result />;
   }
 

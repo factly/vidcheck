@@ -5,8 +5,10 @@ import settings from "./settingsReducer";
 import spaces from "./spacesReducer";
 import videos from "./videosReducer";
 import claimants from "./claimantsReducer";
+import analysis from "./analysisReducer";
 
 const rootReducer = combineReducers({
+  analysis,
   notifications,
   ratings,
   claimants,

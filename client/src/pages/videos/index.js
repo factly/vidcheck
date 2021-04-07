@@ -6,7 +6,7 @@ import VideoList from "./components/VideoList";
 function Dashboard() {
   return (
     <Space direction="vertical">
-      <Link to="/videos/create">
+      <Link to="/analysis/create">
         <Button>Create New</Button>
       </Link>
       <VideoList />

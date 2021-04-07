@@ -55,7 +55,8 @@ function VideoPlayer({
   return (
     <VideoInfoParentWrapper>
       <ReactPlayer
-        onPlay={setPlay(true)}
+        light={true}
+        //onPlay={setPlay(true)}
         url={videoUrl}
         playing={play}
         controls={true}
