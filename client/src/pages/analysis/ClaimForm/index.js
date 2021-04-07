@@ -19,7 +19,7 @@ function ClaimForm() {
 
   const onCreate = (values) => {
     dispatch(addClaim(values));
-    history.push("/analysis");
+    history.push("/analysis/create");
   };
 
   return (

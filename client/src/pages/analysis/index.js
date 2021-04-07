@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 
 import { Button, Input, Form, Card, Popconfirm } from "antd";
 import ReactPlayer from "react-player";
@@ -6,7 +6,10 @@ import { useHistory } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { addVideo } from "../../actions/analysis";
 import parseEditorJsData from "../../utils/jsonToHTML";
-import { convertSecondsToTimeString } from "../../utils/analysis";
+import {
+  convertSecondsToTimeString,
+  convertTimeStringToSeconds,
+} from "../../utils/analysis";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { deleteVideo } from "../../actions/analysis";
@@ -17,6 +20,28 @@ function Analysis({ onSubmit }) {
 
   const { video, claims } = useSelector(({ analysis }) => analysis);
   const dispatch = useDispatch();
+
+  const player = useRef(null);
+
+  const fillCurrentTime = () => {
+    const currentPlayedTime = player.current.getCurrentTime();
+
+    form.setFieldsValue({
+      ...form.getFieldsValue(),
+      end_time: convertSecondsToTimeString(currentPlayedTime),
+    });
+  };
+
+  const isEndTimeValid = (startTime, endTime) => {
+    if (endTime > video.total_duration) {
+      alert("invalid end time");
+      return;
+    }
+    if (startTime >= endTime) {
+      alert(" start time greater than or equal to end time");
+      return;
+    }
+  };
 
   return (
     <>
@@ -99,7 +124,7 @@ function Analysis({ onSubmit }) {
               url={video.url}
               playing={true}
               controls={true}
-              //ref={player}
+              ref={player}
               volume={0}
               // onProgress={handleProgress}
               onDuration={(value) =>
@@ -152,10 +177,32 @@ function Analysis({ onSubmit }) {
               >
                 <Input />
               </Form.Item>
+              <span
+                style={{
+                  display: "inline-block",
+                  width: "12px",
+                  position: "absolute",
+                  right: "16px",
+                }}
+              >
+                <Button type="link" onClick={fillCurrentTime}>
+                  now
+                </Button>
+              </span>
             </Form.Item>
             <Form.Item>
               <Button
                 onClick={() => {
+                  isEndTimeValid(
+                    convertTimeStringToSeconds(
+                      claims.length > 0
+                        ? convertSecondsToTimeString(
+                            claims[claims.length - 1].end_time
+                          )
+                        : "00:00"
+                    ),
+                    convertTimeStringToSeconds(form.getFieldValue("end_time"))
+                  );
                   if (form.getFieldValue("end_time")) {
                     dispatch(
                       addVideo({

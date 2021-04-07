@@ -92,7 +92,9 @@ function Claim({ onCreate, startTime, data, video }) {
           ...values,
           colour: rating.colour.hex,
           slug: rating.slug,
-          start_time: convertTimeStringToSeconds(startTime),
+          start_time: values.start_time
+            ? convertTimeStringToSeconds(values.start_time)
+            : convertTimeStringToSeconds(startTime),
           end_time: convertTimeStringToSeconds(values["end_time"]),
         });
       }}
