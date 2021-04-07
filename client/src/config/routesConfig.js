@@ -21,7 +21,32 @@ import EditVideo from "../pages/videos/EditVideo";
 
 import Preview from "../pages/preview";
 
+import CreateAnalysis from "../pages/analysis/CreateAnalysis";
+import EditAnalysis from "../pages/analysis/EditAnalysis";
+import Claim from "../pages/analysis/ClaimForm";
+import EditClaim from "../pages/analysis/EditClaim";
+
 const routes = [
+  {
+    path: "/analysis/create",
+    Component: CreateAnalysis,
+    title: "Analysis",
+  },
+  {
+    path: "/analysis/:id/edit",
+    Component: EditAnalysis,
+    title: "Edit Analysis",
+  },
+  {
+    path: "/analysis/claim",
+    Component: Claim,
+    title: "Claim",
+  },
+  {
+    path: "/analysis/claim/:id",
+    Component: EditClaim,
+    title: "Edit Claim",
+  },
   {
     path: "/",
     Component: Videos,

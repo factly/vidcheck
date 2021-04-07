@@ -16,7 +16,7 @@ function Editor({ value, onChange }) {
   const editor_block = React.useRef(null);
 
   React.useEffect(() => {
-    new EditorJS({
+    const editorJS = new EditorJS({
       holder: editor_block.current,
       tools: {
         header: Header,
@@ -57,4 +57,4 @@ function Editor({ value, onChange }) {
   );
 }
 
-export default Editor;
+export default React.memo(Editor);

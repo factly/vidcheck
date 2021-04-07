@@ -57,7 +57,7 @@ function VideoAnalysisCard({ data }) {
               Preview
             </Button>
             <Button
-              onClick={() => history.push(`/videos/${data.video.id}/edit`)}
+              onClick={() => history.push(`/analysis/${data.video.id}/edit`)}
             >
               Edit
             </Button>

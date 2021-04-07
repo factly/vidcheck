@@ -41,6 +41,8 @@ export const getVideo = (id) => {
       .then((response) => {
         dispatch(getVideoByID(response.data));
         dispatch(stopVideosLoading());
+
+        return response.data;
       })
       .catch((error) => {
         dispatch(addErrorNotification(error.message));
