@@ -14,6 +14,7 @@ import (
 	"github.com/factly/vidcheck/action/space"
 	"github.com/spf13/viper"
 
+	ratingEmbed "github.com/factly/vidcheck/action/rating/embed"
 	"github.com/factly/vidcheck/action/video"
 	"github.com/factly/vidcheck/action/video/embed"
 	"github.com/factly/vidcheck/util"
@@ -56,5 +57,6 @@ func RegisterRoutes() http.Handler {
 	})
 
 	r.Mount("/videos/embed", embed.Router())
+	r.Mount("/ratings/embed", ratingEmbed.Router())
 	return r
 }
