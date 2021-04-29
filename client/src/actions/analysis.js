@@ -3,11 +3,16 @@ import {
   DELETE_CLAIM,
   ADD_VIDEO_DATA,
   ADD_ANALYSIS,
+  SET_ANALYSIS,
 } from "../constants/analysis";
 
 export const addClaim = (data) => ({
   type: ADD_CLAIM,
   payload: data,
+});
+
+export const resetClaim = () => ({
+  type: SET_ANALYSIS,
 });
 
 export const addAnalysis = (data) => {

@@ -1,6 +1,7 @@
 package video
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/factly/vidcheck/action/rating"
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
+	"github.com/factly/x/editorx"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/renderx"
@@ -80,6 +82,20 @@ func details(w http.ResponseWriter, r *http.Request) {
 		}
 
 		analysisBlocks = AddDegaRatings(uID, sID, analysisBlocks, ratingMap)
+	}
+
+	for index, each := range analysisBlocks {
+
+		arrByte, err := each.Description.MarshalJSON()
+
+		desc := make(map[string]interface{})
+		err = json.Unmarshal(arrByte, &desc)
+
+		if err == nil {
+			html, _ := editorx.EditorjsToHTML(desc)
+			analysisBlocks[index].HTMLDescription = html
+		}
+
 	}
 
 	result := videoanalysisData{

@@ -16,9 +16,11 @@ function EditAnalysis() {
   const { video } = useSelector(({ analysis }) => analysis);
 
   React.useEffect(() => {
-    dispatch(getVideo(id)).then((data) =>
-      dispatch(addAnalysis({ video: data.video, claims: data.analysis }))
-    );
+    if (!video.id) {
+      dispatch(getVideo(id)).then((data) =>
+        dispatch(addAnalysis({ video: data.video, claims: data.analysis }))
+      );
+    }
   }, [dispatch, id]);
 
   if (loading || !video.url) return <Skeleton />;

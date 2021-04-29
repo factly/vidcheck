@@ -297,10 +297,9 @@ function Preview({ vid }) {
                   style={{
                     color: ratingColor[currentClaim.rating.id],
                   }}
-                  dangerouslySetInnerHTML={{
-                    __html: videoData.analysis[currentClaimIndex].html_fact,
-                  }}
-                />
+                >
+                  {videoData.analysis[currentClaimIndex].fact}
+                </div>
               </div>
             </div>
             <div
@@ -347,7 +346,17 @@ function Preview({ vid }) {
           }}
         >
           <h4>Review sources</h4>
-          {videoData.analysis[currentClaimIndex].review_sources}
+          <ul>
+            {videoData.analysis[currentClaimIndex].review_sources.map(
+              (each) => (
+                <li>
+                  <a style={{ color: "inherit" }} href={each.url}>
+                    {each.description}
+                  </a>
+                </li>
+              )
+            )}
+          </ul>
         </div>
       ) : null}
     </div>
