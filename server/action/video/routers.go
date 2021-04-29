@@ -20,11 +20,11 @@ type video struct {
 type videoanalysis struct {
 	ID            uint           `json:"id"`
 	RatingID      uint           `json:"rating_id" validate:"required"`
-	Claim         postgres.Jsonb `json:"claim" swaggertype:"primitive,string"`
-	ClaimDate     time.Time      `json:"claim_date"`
-	CheckedDate   time.Time      `json:"checked_date"`
+	Claim         string         `json:"claim" swaggertype:"primitive,string"`
+	ClaimDate     *time.Time     `json:"claim_date"`
+	CheckedDate   *time.Time     `json:"checked_date"`
 	IsClaim       bool           `json:"is_claim"`
-	Fact          postgres.Jsonb `json:"fact" swaggertype:"primitive,string"`
+	Fact          string         `json:"fact" swaggertype:"primitive,string"`
 	ClaimantID    uint           `json:"claimant_id" validate:"required"`
 	ReviewSources postgres.Jsonb `json:"review_sources" swaggertype:"primitive,string"`
 	ClaimSources  postgres.Jsonb `json:"claim_sources" swaggertype:"primitive,string"`

@@ -170,6 +170,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 			analysisBlockObj = model.Analysis{
 				VideoID:       videoObj.ID,
 				RatingID:      analysisBlock.RatingID,
+				ClaimantID:    analysisBlock.ClaimantID,
 				Claim:         analysisBlock.Claim,
 				Fact:          analysisBlock.Fact,
 				Description:   analysisBlock.Description,
