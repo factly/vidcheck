@@ -14,12 +14,13 @@ function ClaimForm() {
   const { video, claims } = useSelector(({ analysis }) => analysis);
 
   if (!video.url) {
-    return <Skeleton />;
+    history.push("/analysis/create");
   }
 
   const onCreate = (values) => {
     dispatch(addClaim(values));
-    history.push("/analysis/create");
+    if (video.id > 0) history.push(`/analysis/${video.id}/edit`);
+    else history.push("/analysis/create");
   };
 
   return (

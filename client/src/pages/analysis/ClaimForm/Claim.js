@@ -168,7 +168,7 @@ function Claim({ onCreate, startTime, data, video }) {
         <Input.TextArea />
       </Form.Item>
       <Form.Item name="fact" label="Fact">
-        <Editor />
+        <Input.TextArea />
       </Form.Item>
       <Form.Item name={"description"} label={"Description"}>
         <Editor />
