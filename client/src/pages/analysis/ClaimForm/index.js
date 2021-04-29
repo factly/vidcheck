@@ -1,9 +1,10 @@
-import { Skeleton } from "antd";
+import { Button, Space } from "antd";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { addClaim } from "../../../actions/analysis";
 import { convertSecondsToTimeString } from "../../../utils/analysis";
+import { Link } from "react-router-dom";
 
 import CreateClaimForm from "./Claim";
 
@@ -24,14 +25,19 @@ function ClaimForm() {
   };
 
   return (
-    <CreateClaimForm
-      onCreate={onCreate}
-      startTime={
-        claims.length > 0
-          ? convertSecondsToTimeString(claims[claims.length - 1].end_time)
-          : "00:00"
-      }
-    />
+    <Space direction="vertical">
+      <Link to={"/analysis/create"}>
+        <Button>Back</Button>
+      </Link>
+      <CreateClaimForm
+        onCreate={onCreate}
+        startTime={
+          claims.length > 0
+            ? convertSecondsToTimeString(claims[claims.length - 1].end_time)
+            : "00:00"
+        }
+      />
+    </Space>
   );
 }
 

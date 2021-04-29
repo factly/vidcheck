@@ -1,4 +1,7 @@
+import { Button, Space } from "antd";
 import React from "react";
+import { Link } from "react-router-dom";
+
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
 import { addClaim } from "../../actions/analysis";
@@ -23,15 +26,20 @@ function ClaimForm() {
   };
 
   return (
-    <EditClaimForm
-      data={claims[id]}
-      onCreate={onUpdate}
-      startTime={
-        claims.length > 0
-          ? convertSecondsToTimeString(claims[claims.length - 1].end_time)
-          : "00:00"
-      }
-    />
+    <Space direction="vertical">
+      <Link to={`/analysis/${id}/edit`}>
+        <Button>Back</Button>
+      </Link>
+      <EditClaimForm
+        data={claims[id]}
+        onCreate={onUpdate}
+        startTime={
+          claims.length > 0
+            ? convertSecondsToTimeString(claims[claims.length - 1].end_time)
+            : "00:00"
+        }
+      />
+    </Space>
   );
 }
 
