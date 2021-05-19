@@ -37,7 +37,7 @@ function HorizontalTimelineBar({
                 <VideoLengthPart
                   height={height}
                   width={`${((end_time - st) / totalDuration) * 100}%`}
-                  backgroundColor={"#f9f9fa"}
+                  backgroundColor={"#d9d9d9"}
                 ></VideoLengthPart>
                 <Tooltip
                   title={
@@ -71,21 +71,13 @@ function HorizontalTimelineBar({
                       ((totalDuration - review.end_time + 1) / totalDuration) *
                       100
                     }%`}
-                    backgroundColor={"#f9f9fa"}
+                    backgroundColor={"#d9d9d9"}
                   ></VideoLengthPart>
                 ) : null}
               </>
             );
           } else {
             start_time = review.end_time + 1;
-            console.log({
-              last:
-                index === factCheckReview.length &&
-                review.end_time < totalDuration,
-              index,
-              factCheckReview: factCheckReview.length,
-              totalDuration,
-            });
             return (
               <>
                 <Tooltip
@@ -111,19 +103,18 @@ function HorizontalTimelineBar({
                       setCurrentFormData(review);
                     }}
                   ></VideoLengthPart>
-                  {index + 1 === factCheckReview.length &&
-                  review.end_time < totalDuration ? (
-                    <VideoLengthPart
-                      height={height}
-                      width={`${
-                        ((totalDuration - review.end_time + 1) /
-                          totalDuration) *
-                        100
-                      }%`}
-                      backgroundColor={"#f9f9fa"}
-                    ></VideoLengthPart>
-                  ) : null}
                 </Tooltip>
+                {index + 1 === factCheckReview.length &&
+                review.end_time < totalDuration ? (
+                  <VideoLengthPart
+                    height={height}
+                    width={`${
+                      ((totalDuration - review.end_time + 1) / totalDuration) *
+                      100
+                    }%`}
+                    backgroundColor={"#d9d9d9"}
+                  ></VideoLengthPart>
+                ) : null}
               </>
             );
           }
