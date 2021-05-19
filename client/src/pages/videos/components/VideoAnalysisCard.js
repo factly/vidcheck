@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Row, Col, Typography } from "antd";
+import { Button, Row, Col, Typography, Popconfirm } from "antd";
 import { Link, useHistory } from "react-router-dom";
 
 import { useDispatch } from "react-redux";
@@ -64,15 +64,16 @@ function VideoAnalysisCard({ data }) {
             >
               Edit
             </Button>
-            <Button
-              onClick={() =>
+            <Popconfirm
+              title="Sure to Delete?"
+              onConfirm={() =>
                 dispatch(deleteVideo(data.video.id)).then(() =>
                   dispatch(getVideos())
                 )
               }
             >
-              Delete
-            </Button>
+              <Button>Delete</Button>
+            </Popconfirm>
           </div>
         </Col>
       </Row>
