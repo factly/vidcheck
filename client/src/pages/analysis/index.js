@@ -40,6 +40,15 @@ function Analysis({ onSubmit }) {
     });
   };
 
+  // to check any claims lies between selected time interval
+  const timeValidation = (startTime, endTime) => {
+    return (
+      claims.filter(
+        (each) => startTime < each.start_time && each.end_time < endTime
+      ).length > 0
+    );
+  };
+
   const isEndTimeValid = (startTime, endTime) => {
     if (endTime > video.total_duration) {
       alert("end time can not exceed total duration");
@@ -49,6 +58,12 @@ function Analysis({ onSubmit }) {
       alert("start time should be greater than or equal to end time");
       return;
     }
+
+    if (timeValidation(startTime, endTime)) {
+      alert("select time includes one or more claims");
+      return;
+    }
+
     dispatch(
       addVideo({
         ...video,
