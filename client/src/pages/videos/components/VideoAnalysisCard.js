@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, Row, Col, Typography } from "antd";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 import { useDispatch } from "react-redux";
 import { deleteVideo, getVideos } from "../../../actions/videos";
@@ -38,7 +38,10 @@ function VideoAnalysisCard({ data }) {
           />
         </Col>
         <Col span={18}>
-          <Typography.Title level={4}>{data.video.title}</Typography.Title>
+          <Link to={`/preview/${data.video.id}`}>
+            <Typography.Title level={4}>{data.video.title}</Typography.Title>
+          </Link>
+
           <Typography>{`${data.analysis.length} CLAIMS IN TOTAL`}</Typography>
           <div style={{ width: "30%" }}>
             <HorizontalTimelineBar
