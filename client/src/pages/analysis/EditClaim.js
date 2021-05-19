@@ -27,7 +27,7 @@ function ClaimForm() {
 
   return (
     <Space direction="vertical">
-      <Link to={`/analysis/${id}/edit`}>
+      <Link to={`/analysis/${video.id}/edit`}>
         <Button>Back</Button>
       </Link>
       <EditClaimForm

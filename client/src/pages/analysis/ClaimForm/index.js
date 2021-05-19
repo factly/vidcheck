@@ -3,7 +3,6 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { addClaim } from "../../../actions/analysis";
-import { convertSecondsToTimeString } from "../../../utils/analysis";
 import { Link } from "react-router-dom";
 
 import CreateClaimForm from "./Claim";
@@ -26,7 +25,9 @@ function ClaimForm() {
 
   return (
     <Space direction="vertical">
-      <Link to={"/analysis/create"}>
+      <Link
+        to={video.id > 0 ? `/analysis/${video.id}/edit` : "/analysis/create"}
+      >
         <Button>Back</Button>
       </Link>
       <CreateClaimForm onCreate={onCreate} video={video} />
