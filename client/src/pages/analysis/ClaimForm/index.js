@@ -12,7 +12,7 @@ function ClaimForm() {
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const { video, claims } = useSelector(({ analysis }) => analysis);
+  const { video } = useSelector(({ analysis }) => analysis);
 
   if (!video.url) {
     history.push("/analysis/create");
@@ -29,14 +29,7 @@ function ClaimForm() {
       <Link to={"/analysis/create"}>
         <Button>Back</Button>
       </Link>
-      <CreateClaimForm
-        onCreate={onCreate}
-        startTime={
-          claims.length > 0
-            ? convertSecondsToTimeString(claims[claims.length - 1].end_time)
-            : "00:00"
-        }
-      />
+      <CreateClaimForm onCreate={onCreate} video={video} />
     </Space>
   );
 }

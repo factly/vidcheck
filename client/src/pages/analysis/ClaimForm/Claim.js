@@ -12,7 +12,7 @@ import {
   convertTimeStringToSeconds,
 } from "../../../utils/analysis";
 
-function Claim({ onCreate, startTime, data, video }) {
+function Claim({ onCreate, data, video }) {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const [filters, setFilters] = React.useState({
@@ -78,23 +78,23 @@ function Claim({ onCreate, startTime, data, video }) {
         claim_date: data.claim_date ? moment(data.claim_date) : null,
         checked_date: data.checked_date ? moment(data.checked_date) : null,
       }
-    : {};
+    : {
+        end_time: convertSecondsToTimeString(video.end_time),
+        start_time: convertSecondsToTimeString(video.start_time),
+      };
 
   return (
     <Form
       {...layout}
       initialValues={initialValues}
       form={form}
-      //onValuesChange={() => setPlay(false)}
       onFinish={(values) => {
         const rating = ratings.find((each) => each.id === values.rating_id);
         onCreate({
           ...values,
           colour: rating.colour.hex,
           slug: rating.slug,
-          start_time: values.start_time
-            ? convertTimeStringToSeconds(values.start_time)
-            : convertTimeStringToSeconds(startTime),
+          start_time: convertTimeStringToSeconds(values.start_time),
           end_time: convertTimeStringToSeconds(values["end_time"]),
         });
       }}
@@ -112,8 +112,15 @@ function Claim({ onCreate, startTime, data, video }) {
           name="start_time"
           label="Start time"
           style={{ display: "inline-block", width: "50%" }}
+          rules={[
+            {
+              required: true,
+              pattern: new RegExp(/^[0-2]?[0-9]?[0-9]:[0-5][0-9]$/),
+              message: "Wrong format! (mm:ss)",
+            },
+          ]}
         >
-          <Input disabled defaultValue={startTime} />
+          <Input disabled />
         </Form.Item>
         <Form.Item
           name="end_time"
@@ -127,7 +134,7 @@ function Claim({ onCreate, startTime, data, video }) {
           ]}
           style={{ display: "inline-block", width: "50%" }}
         >
-          <Input />
+          <Input disabled />
         </Form.Item>
       </Form.Item>
       <Form.Item name="rating_id" label="Rating" rules={[{ required: true }]}>
@@ -165,9 +172,9 @@ function Claim({ onCreate, startTime, data, video }) {
       </Form.Item>
 
       <Form.Item name="claim" label="Claim">
-        <Input.TextArea />
+        <Input.TextArea autoSize={{ minRows: 4, maxRows: 7 }} />
       </Form.Item>
-      <Form.Item name="fact" label="Fact">
+      <Form.Item name="fact" label="Fact" autoSize={{ minRows: 4, maxRows: 7 }}>
         <Input.TextArea />
       </Form.Item>
       <Form.Item name={"description"} label={"Description"}>
@@ -179,50 +186,6 @@ function Claim({ onCreate, startTime, data, video }) {
       <Form.Item name="checked_date" label="Checked Date">
         <DatePicker />
       </Form.Item>
-      <Form.List name="claim_sources" label="Claim sources">
-        {(fields, { add, remove }) => (
-          <>
-            {fields.map((field) => (
-              <Space
-                key={field.key}
-                style={{ marginBottom: 8 }}
-                align="baseline"
-              >
-                <Form.Item
-                  {...field}
-                  name={[field.name, "url"]}
-                  fieldKey={[field.fieldKey, "url"]}
-                  rules={[{ required: true, message: "Url required" }]}
-                  wrapperCol={24}
-                >
-                  <Input placeholder="Enter url" />
-                </Form.Item>
-                <Form.Item
-                  {...field}
-                  name={[field.name, "description"]}
-                  fieldKey={[field.fieldKey, "description"]}
-                  rules={[{ required: true, message: "Description required" }]}
-                  wrapperCol={24}
-                >
-                  <Input placeholder="Enter description" />
-                </Form.Item>
-                <MinusCircleOutlined onClick={() => remove(field.name)} />
-              </Space>
-            ))}
-            <Form.Item>
-              <Button
-                type="dashed"
-                onClick={() => add()}
-                block
-                icon={<PlusOutlined />}
-              >
-                Add Claim sources
-              </Button>
-            </Form.Item>
-          </>
-        )}
-      </Form.List>
-
       <Form.List name="review_sources" label="Review sources">
         {(fields, { add, remove }) => (
           <>

@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 
-import { Button, Input, Form, Card, Popconfirm } from "antd";
+import { Button, Input, Form, Card, Popconfirm, Tooltip } from "antd";
 import ReactPlayer from "react-player";
 import { useHistory } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,7 +10,11 @@ import {
   convertSecondsToTimeString,
   convertTimeStringToSeconds,
 } from "../../utils/analysis";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  FieldTimeOutlined,
+} from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { deleteVideo } from "../../actions/analysis";
 
@@ -23,24 +27,46 @@ function Analysis({ onSubmit }) {
 
   const player = useRef(null);
 
-  const fillCurrentTime = () => {
+  const fillCurrentTime = (field) => {
     const currentPlayedTime = player.current.getCurrentTime();
 
-    form.setFieldsValue({
+    const values = {
       ...form.getFieldsValue(),
-      end_time: convertSecondsToTimeString(currentPlayedTime),
+    };
+    values[field] = convertSecondsToTimeString(currentPlayedTime);
+
+    form.setFieldsValue({
+      ...values,
     });
   };
 
   const isEndTimeValid = (startTime, endTime) => {
     if (endTime > video.total_duration) {
-      alert("invalid end time");
+      alert("end time can not exceed total duration");
       return;
     }
     if (startTime >= endTime) {
-      alert(" start time greater than or equal to end time");
+      alert("start time should be greater than or equal to end time");
       return;
     }
+    dispatch(
+      addVideo({
+        ...video,
+        start_time: form.getFieldValue("start_time"),
+        end_time: form.getFieldValue("end_time"),
+      })
+    );
+    history.push("/analysis/claim");
+  };
+
+  const checkSelectedTime = (selectedTime) => {
+    return (
+      claims.filter(
+        (each) =>
+          convertTimeStringToSeconds(selectedTime) >= each.start_time &&
+          convertTimeStringToSeconds(selectedTime) <= each.end_time
+      ).length === 0
+    );
   };
 
   return (
@@ -151,15 +177,32 @@ function Analysis({ onSubmit }) {
                 name="start_time"
                 label="Start time"
                 style={{ display: "inline-block", width: "50%" }}
+                rules={[
+                  {
+                    pattern: new RegExp(/^[0-2]?[0-9]?[0-9]:[0-5][0-9]$/),
+                    message: "Wrong format! (mm:ss)",
+                  },
+                  () => ({
+                    validator(_, value) {
+                      if (checkSelectedTime(value)) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(
+                        new Error("Selected start time is part of other claim")
+                      );
+                    },
+                  }),
+                ]}
               >
                 <Input
-                  disabled
-                  defaultValue={
-                    claims.length > 0
-                      ? convertSecondsToTimeString(
-                          claims[claims.length - 1].end_time
-                        )
-                      : "00:00"
+                  addonAfter={
+                    <Tooltip placement="top" title="Now">
+                      {
+                        <FieldTimeOutlined
+                          onClick={() => fillCurrentTime("start_time")}
+                        />
+                      }
+                    </Tooltip>
                   }
                 />
               </Form.Item>
@@ -168,59 +211,62 @@ function Analysis({ onSubmit }) {
                 label="End time"
                 rules={[
                   {
-                    required: true,
                     pattern: new RegExp(/^[0-2]?[0-9]?[0-9]:[0-5][0-9]$/),
                     message: "Wrong format! (mm:ss)",
                   },
+                  () => ({
+                    validator(_, value) {
+                      if (checkSelectedTime(value)) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(
+                        new Error("Selected end time is part of other claim")
+                      );
+                    },
+                  }),
                 ]}
                 style={{ display: "inline-block", width: "50%" }}
               >
-                <Input />
+                <Input
+                  addonAfter={
+                    <Tooltip placement="top" title="Now">
+                      {
+                        <FieldTimeOutlined
+                          onClick={() => fillCurrentTime("end_time")}
+                        />
+                      }
+                    </Tooltip>
+                  }
+                />
               </Form.Item>
-              <span
-                style={{
-                  display: "inline-block",
-                  width: "12px",
-                  position: "absolute",
-                  right: "16px",
-                }}
-              >
-                <Button type="link" onClick={fillCurrentTime}>
-                  now
-                </Button>
-              </span>
             </Form.Item>
             <Form.Item>
               <Button
+                htmlType="submit"
                 onClick={() => {
+                  if (
+                    !form.getFieldValue("start_time") ||
+                    !form.getFieldValue("end_time")
+                  ) {
+                    alert("select start and end time");
+                    return;
+                  }
                   isEndTimeValid(
                     convertTimeStringToSeconds(
-                      claims.length > 0
-                        ? convertSecondsToTimeString(
-                            claims[claims.length - 1].end_time
-                          )
-                        : "00:00"
+                      form.getFieldValue("start_time")
                     ),
                     convertTimeStringToSeconds(form.getFieldValue("end_time"))
                   );
-                  if (form.getFieldValue("end_time")) {
-                    dispatch(
-                      addVideo({
-                        ...video,
-                        end_time: form.getFieldValue("end_time"),
-                      })
-                    );
-                    history.push("/analysis/claim");
-                  } else alert("Please select end time");
                 }}
               >
-                Add New Claim
+                Add Claim
               </Button>
             </Form.Item>
           </Form>
           {claims.map((each, index) => (
             <Card
               style={{ margin: 5 }}
+              key={index}
               actions={[
                 <Link to={`/analysis/claim/${index}`}>
                   <EditOutlined key="edit" />
@@ -248,8 +294,8 @@ function Analysis({ onSubmit }) {
                   {each.fact ? (
                     <>
                       <p>Fact:</p>
-                      <div style={{ color: each.colour }}>
-                        {parseEditorJsData(each.fact)}
+                      <div style={{ color: each.colour || "black" }}>
+                        {each.fact}
                       </div>
                     </>
                   ) : null}
