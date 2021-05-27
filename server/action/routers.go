@@ -20,6 +20,7 @@ import (
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/healthx"
 	"github.com/factly/x/loggerx"
+	"github.com/factly/x/middlewarex"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -47,7 +48,7 @@ func RegisterRoutes() http.Handler {
 		"kavach":   util.KavachChecker,
 	})
 
-	r.With(util.CheckUser, util.CheckSpace).Group(func(r chi.Router) {
+	r.With(middlewarex.CheckUser, util.CheckSpace).Group(func(r chi.Router) {
 		r.Mount("/videos", video.Router())
 		r.Mount("/claimants", claimant.Router())
 		if !config.DegaIntegrated() {
