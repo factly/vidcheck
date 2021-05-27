@@ -1,12 +1,15 @@
 package claimant
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
+	"github.com/factly/x/meilisearchx"
 	"github.com/factly/x/paginationx"
 	"github.com/factly/x/renderx"
 )
@@ -36,16 +39,51 @@ func list(w http.ResponseWriter, r *http.Request) {
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
+	searchQuery := r.URL.Query().Get("q")
+	sort := r.URL.Query().Get("sort")
+
+	filteredClaimantIDs := make([]uint, 0)
 
 	result := paging{}
 	result.Nodes = make([]model.Claimant, 0)
 
 	offset, limit := paginationx.Parse(r.URL.Query())
 
-	err = model.DB.Model(&model.Claimant{}).Where(&model.Claimant{
-		SpaceID: uint(sID),
-	}).Order("id desc").Count(&result.Total).Offset(offset).Limit(limit).Find(&result.Nodes).Error
+	if searchQuery != "" {
 
+		filters := fmt.Sprint("space_id=", sID)
+		var hits []interface{}
+
+		hits, err = meilisearchx.SearchWithQuery("vidcheck", searchQuery, filters, "claimant")
+
+		if err != nil {
+			loggerx.Error(err)
+			renderx.JSON(w, http.StatusOK, result)
+			return
+		}
+
+		filteredClaimantIDs = meilisearchx.GetIDArray(hits)
+		if len(filteredClaimantIDs) == 0 {
+			renderx.JSON(w, http.StatusOK, result)
+			return
+		}
+	}
+
+	if sort != "asc" {
+		sort = "desc"
+	}
+
+	log.Println("filteredClaimantIDs", filteredClaimantIDs)
+
+	tx := model.DB.Model(&model.Claimant{}).Where(&model.Claimant{
+		SpaceID: uint(sID),
+	}).Order("created_at " + sort)
+
+	if len(filteredClaimantIDs) > 0 {
+		err = tx.Where(filteredClaimantIDs).Count(&result.Total).Offset(offset).Limit(limit).Find(&result.Nodes).Error
+	} else {
+		err = tx.Count(&result.Total).Offset(offset).Limit(limit).Find(&result.Nodes).Error
+	}
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DBError()))

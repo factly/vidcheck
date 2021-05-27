@@ -10,6 +10,8 @@ import (
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
+	"github.com/factly/x/meilisearchx"
+	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/validationx"
 	"github.com/go-chi/chi"
@@ -30,6 +32,13 @@ import (
 // @Router /claimants/{claimant_id} [put]
 func update(w http.ResponseWriter, r *http.Request) {
 	sID, err := util.GetSpace(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
+		return
+	}
+
+	uID, err := middlewarex.GetUser(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
@@ -76,7 +85,10 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = model.DB.Model(&result).Updates(model.Claimant{
+	tx := model.DB.Begin()
+
+	err = tx.Model(&result).Updates(model.Claimant{
+		Base:        model.Base{UpdatedByID: uint(uID)},
 		Name:        claimant.Name,
 		Slug:        claimant.Slug,
 		TagLine:     claimant.TagLine,
@@ -84,10 +96,32 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}).First(&result).Error
 
 	if err != nil {
+		tx.Rollback()
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
 	}
+
+	// Update into meili index
+	meiliObj := map[string]interface{}{
+		"id":          result.ID,
+		"kind":        "claimant",
+		"name":        result.Name,
+		"slug":        result.Slug,
+		"description": result.Description,
+		"tag_line":    result.TagLine,
+		"space_id":    result.SpaceID,
+	}
+
+	err = meilisearchx.UpdateDocument("vidcheck", meiliObj)
+	if err != nil {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	tx.Commit()
 
 	renderx.JSON(w, http.StatusOK, result)
 

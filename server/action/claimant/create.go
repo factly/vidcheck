@@ -1,6 +1,7 @@
 package claimant
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -9,6 +10,8 @@ import (
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
+	"github.com/factly/x/meilisearchx"
+	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/validationx"
 )
@@ -29,6 +32,13 @@ import (
 func create(w http.ResponseWriter, r *http.Request) {
 
 	sID, err := util.GetSpace(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
+		return
+	}
+
+	uID, err := middlewarex.GetUser(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
@@ -61,12 +71,37 @@ func create(w http.ResponseWriter, r *http.Request) {
 		TagLine:     claimant.TagLine,
 	}
 
-	err = model.DB.Model(&model.Claimant{}).Create(&result).Error
+	tx := model.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
+
+	err = tx.Model(&model.Claimant{}).Create(&result).Error
+
 	if err != nil {
+		tx.Rollback()
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
 	}
+
+	// Insert into meili index
+	meiliObj := map[string]interface{}{
+		"id":          result.ID,
+		"kind":        "claimant",
+		"name":        result.Name,
+		"slug":        result.Slug,
+		"description": result.Description,
+		"tag_line":    result.TagLine,
+		"space_id":    result.SpaceID,
+	}
+
+	err = meilisearchx.AddDocument("vidcheck", meiliObj)
+	if err != nil {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	tx.Commit()
 
 	renderx.JSON(w, http.StatusCreated, result)
 }
