@@ -46,6 +46,14 @@ func SetupVars() {
 		log.Fatal("please provide kavach_url in config file")
 	}
 
+	if !viper.IsSet("meili_url") {
+		log.Fatal("please provide meili_url config param")
+	}
+
+	if !viper.IsSet("meili_key") {
+		log.Fatal("please provide meili_key config param")
+	}
+
 	if DegaIntegrated() {
 		if !viper.IsSet("dega_url") {
 			log.Fatal("please provide dega_url in config file")
