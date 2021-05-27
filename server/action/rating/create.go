@@ -1,6 +1,7 @@
 package rating
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -11,6 +12,8 @@ import (
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
+	"github.com/factly/x/meilisearchx"
+	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/validationx"
 )
@@ -34,6 +37,13 @@ func create(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	uID, err := middlewarex.GetUser(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
 
@@ -66,21 +76,66 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := &model.Rating{
-		Name:         rating.Name,
-		Slug:         rating.Slug,
-		Description:  rating.Description,
-		NumericValue: rating.NumericValue,
-		Colour:       rating.Colour,
+	// Check if rating with same numeric value exist
+	var sameValueRatings int64
+	model.DB.Model(&model.Rating{}).Where(&model.Rating{
 		SpaceID:      uint(sID),
+		NumericValue: rating.NumericValue,
+	}).Count(&sameValueRatings)
+
+	if sameValueRatings > 0 {
+		loggerx.Error(errors.New(`rating with same numeric value exist`))
+		errorx.Render(w, errorx.Parser(errorx.GetMessage(`rating with same numeric value exist`, http.StatusUnprocessableEntity)))
+		return
 	}
 
-	err = model.DB.Model(&model.Rating{}).Create(&result).Error
+	result := &model.Rating{
+		Name:             rating.Name,
+		Slug:             rating.Slug,
+		Description:      rating.Description,
+		NumericValue:     rating.NumericValue,
+		BackgroundColour: rating.BackgroundColour,
+		TextColour:       rating.TextColour,
+		SpaceID:          uint(sID),
+	}
+
+	tx := model.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
+	err = tx.Model(&model.Rating{}).Create(&result).Error
+
 	if err != nil {
+		tx.Rollback()
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
 	}
 
+	tx.Model(&model.Rating{}).Preload("Medium").First(&result)
+
+	err = insertIntoMeili(*result)
+	if err != nil {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	tx.Commit()
+
 	renderx.JSON(w, http.StatusCreated, result)
+}
+
+func insertIntoMeili(rating model.Rating) error {
+	meiliObj := map[string]interface{}{
+		"id":                rating.ID,
+		"kind":              "rating",
+		"name":              rating.Name,
+		"background_colour": rating.BackgroundColour,
+		"text_colour":       rating.TextColour,
+		"slug":              rating.Slug,
+		"description":       rating.Description,
+		"numeric_value":     rating.NumericValue,
+		"space_id":          rating.SpaceID,
+	}
+
+	return meilisearchx.AddDocument("vidcheck", meiliObj)
 }

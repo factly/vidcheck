@@ -1,6 +1,7 @@
 package rating
 
 import (
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
+	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
 )
 
@@ -32,7 +34,14 @@ func createDefaults(w http.ResponseWriter, r *http.Request) {
 	sID, err := util.GetSpace(r.Context())
 	if err != nil {
 		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
+		return
+	}
+
+	uID, err := middlewarex.GetUser(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
 
@@ -55,11 +64,33 @@ func createDefaults(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	tx := model.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
+
 	for i := range ratings {
 		ratings[i].SpaceID = uint(sID)
+
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot parse rating description", http.StatusUnprocessableEntity)))
+			return
+		}
+
+		tx.Model(&model.Rating{}).FirstOrCreate(&ratings[i], &ratings[i])
+		err = insertIntoMeili(ratings[i])
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+			return
+		}
 	}
 
-	model.DB.Model(&model.Rating{}).Create(&ratings)
+	result := paging{}
+	result.Nodes = ratings
+	result.Total = int64(len(ratings))
 
-	renderx.JSON(w, http.StatusCreated, ratings)
+	tx.Commit()
+
+	renderx.JSON(w, http.StatusCreated, result)
 }
