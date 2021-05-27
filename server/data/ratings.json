@@ -2,9 +2,13 @@
     {
         "name": "True",
         "slug": "true",
-        "description": "True",
+        "description": {
+            "blocks": [
+                {"type":"paragraph", "data": {"text": "True"}}
+            ]
+        },
         "numeric_value": 5,
-        "colour": {
+        "background_colour": {
             "hex": "#108040",
             "hsl": {
                 "h": 145.7142857142857, 
@@ -26,14 +30,41 @@
                 "a": 1
             },
             "source": "hex"
+        },
+        "text_colour": {
+            "hsl": {
+              "h": 0,
+              "s": 0,
+              "l": 0.9568627450980393,
+              "a": 1
+            },
+            "hex": "#f4f4f4",
+            "rgb": {
+              "r": 244,
+              "g": 244,
+              "b": 244,
+              "a": 1
+            },
+            "hsv": {
+              "h": 0,
+              "s": 0,
+              "v": 0.9568627450980393,
+              "a": 1
+            },
+            "oldHue": 0,
+            "source": "hex"
         }    
     },
     {
         "name": "Partly True",
         "slug": "partly-true",
-        "description": "Partly True",
+        "description": {
+            "blocks": [
+                {"type":"paragraph", "data": {"text": "Partly True"}}
+            ]
+        },
         "numeric_value": 4,
-        "colour": {
+        "background_colour": {
             "hex": "#a5c239",
             "hsl": {
                 "h": 72.70072992700729, 
@@ -55,14 +86,41 @@
                 "a": 1
             },
             "source": "hex"
-        }
+        },
+        "text_colour": {
+            "hsl": {
+              "h": 0,
+              "s": 0,
+              "l": 0.058823529411764705,
+              "a": 1
+            },
+            "hex": "#0f0f0f",
+            "rgb": {
+              "r": 15,
+              "g": 15,
+              "b": 15,
+              "a": 1
+            },
+            "hsv": {
+              "h": 0,
+              "s": 0,
+              "v": 0.058823529411764705,
+              "a": 1
+            },
+            "oldHue": 0,
+            "source": "hex"
+          }
     },
     {
         "name": "Unverified",
         "slug": "unverified",
-        "description": "Unverified",
+        "description": {
+            "blocks": [
+                {"type":"paragraph", "data": {"text": "Unverified"}}
+            ]
+        },
         "numeric_value": 3,
-        "colour": {
+        "background_colour": {
             "hex": "#eca124",
             "hsl": {
                 "h": 37.49999999999999, 
@@ -83,14 +141,41 @@
                 "b": 36, 
                 "a": 1
             }
-        }
+        },
+        "text_colour": {
+            "hsl": {
+              "h": 0,
+              "s": 0,
+              "l": 0.058823529411764705,
+              "a": 1
+            },
+            "hex": "#0f0f0f",
+            "rgb": {
+              "r": 15,
+              "g": 15,
+              "b": 15,
+              "a": 1
+            },
+            "hsv": {
+              "h": 0,
+              "s": 0,
+              "v": 0.058823529411764705,
+              "a": 1
+            },
+            "oldHue": 0,
+            "source": "hex"
+          }
     },
     {
         "name": "Misleading",
         "slug": "misleading",
-        "description": "Misleading",
+        "description": {
+            "blocks": [
+                {"type":"paragraph", "data": {"text": "Misleading"}}
+            ]
+        },
         "numeric_value": 2,
-        "colour": {
+        "background_colour": {
             "hex": "#749990",
             "hsl": {
                 "h": 165.40540540540542, 
@@ -112,14 +197,41 @@
                 "a": 1
             },
             "source": "hex" 
-        }
+        },
+        "text_colour": {
+            "hsl": {
+              "h": 0,
+              "s": 0,
+              "l": 0.058823529411764705,
+              "a": 1
+            },
+            "hex": "#0f0f0f",
+            "rgb": {
+              "r": 15,
+              "g": 15,
+              "b": 15,
+              "a": 1
+            },
+            "hsv": {
+              "h": 0,
+              "s": 0,
+              "v": 0.058823529411764705,
+              "a": 1
+            },
+            "oldHue": 0,
+            "source": "hex"
+          }
     },
     {
         "name": "False",
         "slug": "false",
-        "description": "False",
+        "description": {
+            "blocks": [
+                {"type":"paragraph", "data": {"text": "False"}}
+            ]
+        },
         "numeric_value": 1,
-        "colour": {
+        "background_colour": {
             "hex": "#e82728",
             "hsl": {
                 "h": 359.68911917098444, 
@@ -141,14 +253,41 @@
                 "a": 0.01
             },
             "source": "rgb"
+        },
+        "text_colour": {
+            "hsl": {
+              "h": 0,
+              "s": 0,
+              "l": 0.9568627450980393,
+              "a": 1
+            },
+            "hex": "#f4f4f4",
+            "rgb": {
+              "r": 244,
+              "g": 244,
+              "b": 244,
+              "a": 1
+            },
+            "hsv": {
+              "h": 0,
+              "s": 0,
+              "v": 0.9568627450980393,
+              "a": 1
+            },
+            "oldHue": 0,
+            "source": "hex"
         }
     },
     {
         "name": "Not a Claim",
         "slug": "not-a-claim",
-        "description": "Not a Claim",
+        "description": {
+            "blocks": [
+                {"type":"paragraph", "data": {"text": "Not A Claim"}}
+            ]
+        },
         "numeric_value": 0,
-        "colour": {
+        "background_colour": {
             "hex":"#f9f9fa",
             "hsl": {
                 "h": 240, 
@@ -170,7 +309,30 @@
                 "a": 1
             },
             "source": "hsv"
-        }
+        },
+        "text_colour": {
+            "hsl": {
+              "h": 0,
+              "s": 0,
+              "l": 0.058823529411764705,
+              "a": 1
+            },
+            "hex": "#0f0f0f",
+            "rgb": {
+              "r": 15,
+              "g": 15,
+              "b": 15,
+              "a": 1
+            },
+            "hsv": {
+              "h": 0,
+              "s": 0,
+              "v": 0.058823529411764705,
+              "a": 1
+            },
+            "oldHue": 0,
+            "source": "hex"
+          }
 
     }
 ]
