@@ -23,7 +23,6 @@ type videoanalysis struct {
 	Claim         string         `json:"claim" swaggertype:"primitive,string"`
 	ClaimDate     *time.Time     `json:"claim_date"`
 	CheckedDate   *time.Time     `json:"checked_date"`
-	IsClaim       bool           `json:"is_claim"`
 	Fact          string         `json:"fact" swaggertype:"primitive,string"`
 	ClaimantID    uint           `json:"claimant_id" validate:"required"`
 	ReviewSources postgres.Jsonb `json:"review_sources" swaggertype:"primitive,string"`
@@ -42,6 +41,8 @@ type videoanalysisData struct {
 	Video    model.Video      `json:"video"`
 	Analysis []model.Analysis `json:"analysis"`
 }
+
+var userContext model.ContextKey = "video_user"
 
 // Router - Group of video router
 func Router() chi.Router {

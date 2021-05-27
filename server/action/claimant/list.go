@@ -2,7 +2,6 @@ package claimant
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/factly/vidcheck/model"
@@ -72,8 +71,6 @@ func list(w http.ResponseWriter, r *http.Request) {
 	if sort != "asc" {
 		sort = "desc"
 	}
-
-	log.Println("filteredClaimantIDs", filteredClaimantIDs)
 
 	tx := model.DB.Model(&model.Claimant{}).Where(&model.Claimant{
 		SpaceID: uint(sID),
