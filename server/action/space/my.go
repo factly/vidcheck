@@ -7,9 +7,9 @@ import (
 	"strconv"
 
 	"github.com/factly/vidcheck/model"
-	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
+	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
 	"github.com/spf13/viper"
 )
@@ -38,7 +38,7 @@ type orgWithSpace struct {
 // @Success 200 {array} []orgWithSpace
 // @Router /spaces [get]
 func my(w http.ResponseWriter, r *http.Request) {
-	uID, err := util.GetUser(r.Context())
+	uID, err := middlewarex.GetUser(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
