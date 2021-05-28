@@ -87,13 +87,27 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	tx := model.DB.Begin()
 
+	mediumID := &claimant.MediumID
+	result.MediumID = &claimant.MediumID
+	if claimant.MediumID == 0 {
+		err = tx.Model(&result).Updates(map[string]interface{}{"medium_id": nil}).Error
+		mediumID = nil
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.DBError()))
+			return
+		}
+	}
+
 	err = tx.Model(&result).Updates(model.Claimant{
 		Base:        model.Base{UpdatedByID: uint(uID)},
 		Name:        claimant.Name,
 		Slug:        claimant.Slug,
 		TagLine:     claimant.TagLine,
 		Description: claimant.Description,
-	}).First(&result).Error
+		MediumID:    mediumID,
+	}).Preload("Medium").First(&result).Error
 
 	if err != nil {
 		tx.Rollback()
@@ -110,6 +124,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		"slug":        result.Slug,
 		"description": result.Description,
 		"tag_line":    result.TagLine,
+		"medium_id":   result.MediumID,
 		"space_id":    result.SpaceID,
 	}
 

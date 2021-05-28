@@ -1,7 +1,10 @@
 package model
 
 import (
+	"errors"
+
 	"github.com/jinzhu/gorm/dialects/postgres"
+	"gorm.io/gorm"
 )
 
 // Space model
@@ -25,4 +28,78 @@ type Space struct {
 	SocialMediaURLs   postgres.Jsonb `gorm:"column:social_media_urls" json:"social_media_urls" swaggertype:"primitive,string"`
 	ContactInfo       postgres.Jsonb `gorm:"column:contact_info" json:"contact_info" swaggertype:"primitive,string"`
 	OrganisationID    int            `gorm:"column:organisation_id" json:"organisation_id"`
+}
+
+var spaceUser ContextKey = "space_user"
+
+// BeforeUpdate checks if all associated mediums are in same space
+func (space *Space) BeforeUpdate(tx *gorm.DB) (e error) {
+	if space.LogoID != nil && *space.LogoID > 0 {
+
+		medium := Medium{}
+		medium.ID = *space.LogoID
+
+		err := tx.Model(&Medium{}).Where(Medium{
+			SpaceID: space.ID,
+		}).First(&medium).Error
+
+		if err != nil {
+			return errors.New("logo do not belong to same space")
+		}
+	}
+
+	if space.LogoMobileID != nil && *space.LogoMobileID > 0 {
+		medium := Medium{}
+		medium.ID = *space.LogoMobileID
+
+		err := tx.Model(&Medium{}).Where(Medium{
+			SpaceID: space.ID,
+		}).First(&medium).Error
+
+		if err != nil {
+			return errors.New("logo mobile do not belong to same space")
+		}
+	}
+
+	if space.FavIconID != nil && *space.FavIconID > 0 {
+		medium := Medium{}
+		medium.ID = *space.FavIconID
+
+		err := tx.Model(&Medium{}).Where(Medium{
+			SpaceID: space.ID,
+		}).First(&medium).Error
+
+		if err != nil {
+			return errors.New("fav icon do not belong to same space")
+		}
+	}
+
+	if space.MobileIconID != nil && *space.MobileIconID > 0 {
+		medium := Medium{}
+		medium.ID = *space.MobileIconID
+
+		err := tx.Model(&Medium{}).Where(Medium{
+			SpaceID: space.ID,
+		}).First(&medium).Error
+
+		if err != nil {
+			return errors.New("mobile icon do not belong to same space")
+		}
+	}
+	return nil
+}
+
+// BeforeCreate hook
+func (space *Space) BeforeCreate(tx *gorm.DB) error {
+	ctx := tx.Statement.Context
+	userID := ctx.Value(spaceUser)
+
+	if userID == nil {
+		return nil
+	}
+	uID := userID.(int)
+
+	space.CreatedByID = uint(uID)
+	space.UpdatedByID = uint(uID)
+	return nil
 }

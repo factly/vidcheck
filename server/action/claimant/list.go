@@ -72,7 +72,7 @@ func list(w http.ResponseWriter, r *http.Request) {
 		sort = "desc"
 	}
 
-	tx := model.DB.Model(&model.Claimant{}).Where(&model.Claimant{
+	tx := model.DB.Model(&model.Claimant{}).Preload("Medium").Where(&model.Claimant{
 		SpaceID: uint(sID),
 	}).Order("created_at " + sort)
 

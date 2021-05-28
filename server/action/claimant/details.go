@@ -47,7 +47,7 @@ func details(w http.ResponseWriter, r *http.Request) {
 
 	err = model.DB.Model(&model.Claimant{}).Where(&model.Claimant{
 		SpaceID: uint(sID),
-	}).First(&result).Error
+	}).Preload("Medium").First(&result).Error
 
 	if err != nil {
 		loggerx.Error(err)

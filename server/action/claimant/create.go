@@ -63,12 +63,18 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	mediumID := &claimant.MediumID
+	if claimant.MediumID == 0 {
+		mediumID = nil
+	}
+
 	result := &model.Claimant{
 		Name:        claimant.Name,
 		Slug:        claimant.Slug,
 		Description: claimant.Description,
 		SpaceID:     uint(sID),
 		TagLine:     claimant.TagLine,
+		MediumID:    mediumID,
 	}
 
 	tx := model.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
@@ -82,6 +88,8 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	tx.Model(&model.Claimant{}).Preload("Medium").First(&result)
+
 	// Insert into meili index
 	meiliObj := map[string]interface{}{
 		"id":          result.ID,
@@ -91,6 +99,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		"description": result.Description,
 		"tag_line":    result.TagLine,
 		"space_id":    result.SpaceID,
+		"medium_id":   mediumID,
 	}
 
 	err = meilisearchx.AddDocument("vidcheck", meiliObj)

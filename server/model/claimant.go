@@ -1,6 +1,8 @@
 package model
 
 import (
+	"errors"
+
 	"github.com/jinzhu/gorm/dialects/postgres"
 	"gorm.io/gorm"
 )
@@ -31,5 +33,23 @@ func (claimant *Claimant) BeforeCreate(tx *gorm.DB) error {
 
 	claimant.CreatedByID = uint(uID)
 	claimant.UpdatedByID = uint(uID)
+	return nil
+}
+
+// BeforeSave - validation for medium
+func (claimant *Claimant) BeforeSave(tx *gorm.DB) (e error) {
+	if claimant.MediumID != nil && *claimant.MediumID > 0 {
+		medium := Medium{}
+		medium.ID = *claimant.MediumID
+
+		err := tx.Model(&Medium{}).Where(Medium{
+			SpaceID: claimant.SpaceID,
+		}).First(&medium).Error
+
+		if err != nil {
+			return errors.New("medium do not belong to same space")
+		}
+	}
+
 	return nil
 }

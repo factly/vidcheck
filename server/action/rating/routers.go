@@ -14,6 +14,7 @@ type rating struct {
 	NumericValue     int            `json:"numeric_value" validate:"required"`
 	BackgroundColour postgres.Jsonb `json:"background_colour" validate:"required" swaggertype:"primitive,string"`
 	TextColour       postgres.Jsonb `json:"text_colour" validate:"required" swaggertype:"primitive,string"`
+	MediumID         uint           `json:"medium_id"`
 }
 
 var userContext model.ContextKey = "rating_user"

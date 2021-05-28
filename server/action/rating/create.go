@@ -88,6 +88,10 @@ func create(w http.ResponseWriter, r *http.Request) {
 		errorx.Render(w, errorx.Parser(errorx.GetMessage(`rating with same numeric value exist`, http.StatusUnprocessableEntity)))
 		return
 	}
+	mediumID := &rating.MediumID
+	if rating.MediumID == 0 {
+		mediumID = nil
+	}
 
 	result := &model.Rating{
 		Name:             rating.Name,
@@ -97,6 +101,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		BackgroundColour: rating.BackgroundColour,
 		TextColour:       rating.TextColour,
 		SpaceID:          uint(sID),
+		MediumID:         mediumID,
 	}
 
 	tx := model.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
@@ -134,6 +139,7 @@ func insertIntoMeili(rating model.Rating) error {
 		"slug":              rating.Slug,
 		"description":       rating.Description,
 		"numeric_value":     rating.NumericValue,
+		"medium_id":         rating.MediumID,
 		"space_id":          rating.SpaceID,
 	}
 

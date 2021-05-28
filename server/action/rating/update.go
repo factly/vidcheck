@@ -112,6 +112,18 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tx := model.DB.Begin()
+	mediumID := &rating.MediumID
+	result.MediumID = &rating.MediumID
+	if rating.MediumID == 0 {
+		err = tx.Model(&result).Updates(map[string]interface{}{"medium_id": nil}).Error
+		mediumID = nil
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.DBError()))
+			return
+		}
+	}
 
 	err = tx.Model(&result).Updates(model.Rating{
 		Base:             model.Base{UpdatedByID: uint(uID)},
@@ -121,6 +133,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		TextColour:       rating.TextColour,
 		Description:      rating.Description,
 		NumericValue:     rating.NumericValue,
+		MediumID:         mediumID,
 	}).Preload("Medium").First(&result).Error
 
 	if err != nil {
@@ -136,10 +149,11 @@ func update(w http.ResponseWriter, r *http.Request) {
 		"kind":              "rating",
 		"name":              result.Name,
 		"slug":              result.Slug,
-		"background_colour": rating.BackgroundColour,
-		"text_colour":       rating.TextColour,
+		"background_colour": result.BackgroundColour,
+		"text_colour":       result.TextColour,
 		"description":       result.Description,
 		"numeric_value":     result.NumericValue,
+		"medium_id":         result.MediumID,
 		"space_id":          result.SpaceID,
 	}
 
