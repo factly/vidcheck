@@ -43,30 +43,24 @@ function RatingList() {
   const columns = [
     { title: "Name", dataIndex: "name", key: "name" },
     { title: "Slug", dataIndex: "slug", key: "slug" },
-    {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-      width: "40%",
-      render: (_, record) => {
-        return (
-          <Typography.Paragraph ellipsis={{ rows: 2 }}>
-            {record.description}
-          </Typography.Paragraph>
-        );
-      },
-    },
     { title: "Rating Value", dataIndex: "numeric_value", key: "numeric_value" },
     {
-      title: "Colour",
-      dataIndex: "colour",
-      key: "colour",
-      width: "10%",
-      render: (_, record) => {
-        return record.colour && record.colour.hex ? (
-          <Tag color={record.colour.hex}>{record.colour.hex}</Tag>
-        ) : null;
-      },
+      title: "Preview",
+      dataIndex: "preview",
+      render: (_, record) => (
+        <div
+          style={{
+            color: record.text_colour?.hex,
+            backgroundColor: record.background_colour?.hex,
+            width: "100px",
+            border: "1px solid black",
+            padding: "0.5rem",
+            textAlign: "center",
+          }}
+        >
+          {record.name}
+        </div>
+      ),
     },
     {
       title: "Action",

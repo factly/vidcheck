@@ -65,8 +65,6 @@ function Editor({
     },
   };
 
-  console.log({ basic });
-
   React.useEffect(() => {
     const editor = new EditorJS({
       holder: editor_block.current,

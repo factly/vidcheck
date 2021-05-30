@@ -14,9 +14,8 @@ import {
 import { Prompt } from "react-router-dom";
 
 function Claim({ onCreate, data, video }) {
-  const [shouldBlockNavigation, setShouldBlockNavigation] = React.useState(
-    false
-  );
+  const [shouldBlockNavigation, setShouldBlockNavigation] =
+    React.useState(false);
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const [filters, setFilters] = React.useState({
@@ -119,7 +118,7 @@ function Claim({ onCreate, data, video }) {
           const rating = ratings.find((each) => each.id === values.rating_id);
           onCreate({
             ...values,
-            colour: rating.colour.hex,
+            colour: rating.background_colour.hex,
             slug: rating.slug,
             start_time: convertTimeStringToSeconds(values.start_time),
             end_time: convertTimeStringToSeconds(values["end_time"]),
