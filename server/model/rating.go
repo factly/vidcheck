@@ -10,7 +10,7 @@ type Rating struct {
 	Base
 	Name             string         `gorm:"column:name" json:"name"`
 	Slug             string         `gorm:"column:slug" json:"slug"`
-	Description      string         `gorm:"column:description" json:"description"`
+	Description      postgres.Jsonb `gorm:"column:description" json:"description" swaggertype:"primitive,string"`
 	NumericValue     int            `gorm:"column:numeric_value" json:"numeric_value"`
 	BackgroundColour postgres.Jsonb `gorm:"column:background_colour" json:"background_colour" swaggertype:"primitive,string"`
 	TextColour       postgres.Jsonb `gorm:"column:text_colour" json:"text_colour" swaggertype:"primitive,string"`
