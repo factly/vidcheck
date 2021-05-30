@@ -1,6 +1,7 @@
 package video
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -13,6 +14,8 @@ import (
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
+	"github.com/factly/x/meilisearchx"
+	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/validationx"
 )
@@ -36,7 +39,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uID, err := util.GetUser(r.Context())
+	uID, err := middlewarex.GetUser(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
@@ -57,7 +60,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		errorx.Render(w, validationError)
 		return
 	}
-	tx := model.DB.Begin()
+	tx := model.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
 	videoObj := model.Video{}
 	videoObj = model.Video{
 		URL:           videoAnalysisData.Video.URL,
@@ -73,6 +76,14 @@ func create(w http.ResponseWriter, r *http.Request) {
 		tx.Rollback()
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
+		return
+	}
+
+	err = insertVideoIntoMeili(videoObj)
+	if err != nil {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
 		return
 	}
 
@@ -118,7 +129,6 @@ func create(w http.ResponseWriter, r *http.Request) {
 			Claim:         analysisBlock.Claim,
 			ClaimDate:     analysisBlock.ClaimDate,
 			CheckedDate:   analysisBlock.CheckedDate,
-			IsClaim:       analysisBlock.IsClaim,
 			Fact:          analysisBlock.Fact,
 			Description:   analysisBlock.Description,
 			ClaimantID:    analysisBlock.ClaimantID,
@@ -126,6 +136,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 			ClaimSources:  analysisBlock.ClaimSources,
 			StartTime:     analysisBlock.StartTime,
 			EndTime:       analysisBlock.EndTime,
+			SpaceID:       uint(sID),
 		}
 		analysisBlocks = append(analysisBlocks, analysisBlockObj)
 	}
@@ -136,6 +147,24 @@ func create(w http.ResponseWriter, r *http.Request) {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
+	}
+
+	for _, analysis := range analysisBlocks {
+		var claimMeiliDate int64 = 0
+		if analysis.ClaimDate != nil {
+			claimMeiliDate = analysis.ClaimDate.Unix()
+		}
+		var checkedMeiliDate int64 = 0
+		if analysis.CheckedDate != nil {
+			checkedMeiliDate = analysis.CheckedDate.Unix()
+		}
+		err = insertAnalysisIntoMeili(analysis, claimMeiliDate, checkedMeiliDate)
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+			return
+		}
 	}
 
 	stmt := tx.Model(&model.Analysis{}).Order("start_time").Where("video_id = ?", videoObj.ID).Preload("Claimant")
@@ -159,4 +188,41 @@ func create(w http.ResponseWriter, r *http.Request) {
 		Analysis: analysisBlocks,
 	}
 	renderx.JSON(w, http.StatusCreated, result)
+}
+
+func insertVideoIntoMeili(video model.Video) error {
+	meiliObj := map[string]interface{}{
+		"id":             video.ID,
+		"kind":           "video",
+		"title":          video.Title,
+		"url":            video.URL,
+		"summary":        video.Summary,
+		"video_type":     video.VideoType,
+		"status":         video.Status,
+		"total_duration": video.TotalDuration,
+		"space_id":       video.SpaceID,
+	}
+
+	return meilisearchx.AddDocument("vidcheck", meiliObj)
+}
+
+func insertAnalysisIntoMeili(analysis model.Analysis, claimMeiliDate int64, checkedMeiliDate int64) error {
+	meiliObj := map[string]interface{}{
+		"id":             analysis.ID,
+		"kind":           "analysis",
+		"video_id":       analysis.VideoID,
+		"rating_id":      analysis.RatingID,
+		"claim":          analysis.Claim,
+		"description":    analysis.Description,
+		"claim_date":     claimMeiliDate,
+		"checked_date":   checkedMeiliDate,
+		"fact":           analysis.Fact,
+		"claimant_id":    analysis.ClaimantID,
+		"review_sources": analysis.ReviewSources,
+		"end_time":       analysis.EndTime,
+		"start_time":     analysis.StartTime,
+		"space_id":       analysis.SpaceID,
+	}
+
+	return meilisearchx.AddDocument("vidcheck", meiliObj)
 }

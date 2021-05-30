@@ -10,6 +10,8 @@ import (
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
+	"github.com/factly/x/meilisearchx"
+	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/validationx"
 	"github.com/go-chi/chi"
@@ -35,6 +37,12 @@ func update(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+	uID, err := middlewarex.GetUser(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
 
@@ -88,21 +96,62 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = model.DB.Model(&result).Updates(model.Rating{
-		Name:         rating.Name,
-		Slug:         rating.Slug,
-		Description:  rating.Description,
-		NumericValue: rating.NumericValue,
-		Colour:       rating.Colour,
-	}).Error
+	if rating.NumericValue != result.NumericValue {
+		// Check if rating with same numeric value exist
+		var sameValueRatings int64
+		model.DB.Model(&model.Rating{}).Where(&model.Rating{
+			SpaceID:      uint(sID),
+			NumericValue: rating.NumericValue,
+		}).Count(&sameValueRatings)
+
+		if sameValueRatings > 0 {
+			loggerx.Error(errors.New(`rating with same numeric value exist`))
+			errorx.Render(w, errorx.Parser(errorx.GetMessage(`rating with same numeric value exist`, http.StatusUnprocessableEntity)))
+			return
+		}
+	}
+
+	tx := model.DB.Begin()
+
+	err = tx.Model(&result).Updates(model.Rating{
+		Base:             model.Base{UpdatedByID: uint(uID)},
+		Name:             rating.Name,
+		Slug:             rating.Slug,
+		BackgroundColour: rating.BackgroundColour,
+		TextColour:       rating.TextColour,
+		Description:      rating.Description,
+		NumericValue:     rating.NumericValue,
+	}).Preload("Medium").First(&result).Error
 
 	if err != nil {
+		tx.Rollback()
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
 	}
 
-	model.DB.First(&result)
+	// Update into meili index
+	meiliObj := map[string]interface{}{
+		"id":                result.ID,
+		"kind":              "rating",
+		"name":              result.Name,
+		"slug":              result.Slug,
+		"background_colour": rating.BackgroundColour,
+		"text_colour":       rating.TextColour,
+		"description":       result.Description,
+		"numeric_value":     result.NumericValue,
+		"space_id":          result.SpaceID,
+	}
+
+	err = meilisearchx.UpdateDocument("vidcheck", meiliObj)
+	if err != nil {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	tx.Commit()
 
 	renderx.JSON(w, http.StatusOK, result)
 }

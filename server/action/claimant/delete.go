@@ -9,6 +9,7 @@ import (
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
+	"github.com/factly/x/meilisearchx"
 	"github.com/factly/x/renderx"
 	"github.com/go-chi/chi"
 )
@@ -68,7 +69,18 @@ func delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	model.DB.Model(&model.Claimant{}).Delete(&result)
+	tx := model.DB.Begin()
+	tx.Model(&model.Claimant{}).Delete(&result)
+
+	err = meilisearchx.DeleteDocument("vidcheck", result.ID, "claimant")
+	if err != nil {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	tx.Commit()
 
 	renderx.JSON(w, http.StatusOK, nil)
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
+	"github.com/factly/x/meilisearchx"
 	"github.com/factly/x/renderx"
 )
 
@@ -45,6 +46,7 @@ func delete(w http.ResponseWriter, r *http.Request) {
 
 	result := &model.Video{}
 	result.ID = uint(id)
+	analysisBlocks := []model.Analysis{}
 
 	// check record exists or not
 	err = model.DB.Where(&model.Video{
@@ -64,6 +66,33 @@ func delete(w http.ResponseWriter, r *http.Request) {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
+	}
+
+	err = meilisearchx.DeleteDocument("vidcheck", result.ID, "video")
+	if err != nil {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	err = tx.Model(&model.Analysis{}).Where("video_id = ?", result.ID).Find(&analysisBlocks).Error
+
+	if err != nil {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.DBError()))
+		return
+	}
+
+	for _, analysis := range analysisBlocks {
+		err = meilisearchx.DeleteDocument("vidcheck", analysis.ID, "analysis")
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+			return
+		}
 	}
 
 	err = tx.Model(&model.Analysis{}).Where("video_id = ?", result.ID).Delete(&model.Analysis{}).Error

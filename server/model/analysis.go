@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm/dialects/postgres"
+	"gorm.io/gorm"
 )
 
 // Analysis model
@@ -18,7 +19,6 @@ type Analysis struct {
 	Description     postgres.Jsonb `gorm:"column:description" json:"description" swaggertype:"primitive,string"`
 	ClaimDate       *time.Time     `gorm:"column:claim_date" json:"claim_date" sql:"DEFAULT:NULL"`
 	CheckedDate     *time.Time     `gorm:"column:checked_date" json:"checked_date" sql:"DEFAULT:NULL"`
-	IsClaim         bool           `gorm:"column:is_claim" json:"is_claim"`
 	Fact            string         `gorm:"column:fact" json:"fact"  swaggertype:"primitive,string"`
 	ClaimantID      uint           `gorm:"column:claimant_id" json:"claimant_id"`
 	Claimant        *Claimant      `json:"claimant"`
@@ -26,4 +26,22 @@ type Analysis struct {
 	ClaimSources    postgres.Jsonb `gorm:"column:claim_sources" json:"claim_sources" swaggertype:"primitive,string"`
 	EndTime         int            `gorm:"column:end_time" json:"end_time"`
 	StartTime       int            `gorm:"column:start_time" json:"start_time"`
+	SpaceID         uint           `gorm:"column:space_id" json:"space_id"`
+}
+
+var analysisUser ContextKey = "video_user"
+
+// BeforeCreate hook
+func (analysis *Analysis) BeforeCreate(tx *gorm.DB) error {
+	ctx := tx.Statement.Context
+	userID := ctx.Value(analysisUser)
+
+	if userID == nil {
+		return nil
+	}
+	uID := userID.(int)
+
+	analysis.CreatedByID = uint(uID)
+	analysis.UpdatedByID = uint(uID)
+	return nil
 }

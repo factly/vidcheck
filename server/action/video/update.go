@@ -3,7 +3,6 @@ package video
 import (
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -13,6 +12,8 @@ import (
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
+	"github.com/factly/x/meilisearchx"
+	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/validationx"
 	"github.com/go-chi/chi"
@@ -40,7 +41,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uID, err := util.GetUser(r.Context())
+	uID, err := middlewarex.GetUser(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
@@ -98,11 +99,32 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	tx := model.DB.Begin()
 	tx.Model(&videoObj).Updates(model.Video{
+		Base:      model.Base{UpdatedByID: uint(uID)},
 		Title:     videoAnalysisData.Video.Title,
 		Summary:   videoAnalysisData.Video.Summary,
 		VideoType: videoAnalysisData.Video.VideoType,
 		Status:    videoAnalysisData.Video.Status,
 	}).First(&videoObj)
+
+	meiliVideoObj := map[string]interface{}{
+		"id":             videoObj.ID,
+		"kind":           "video",
+		"title":          videoObj.Title,
+		"url":            videoObj.URL,
+		"summary":        videoObj.Summary,
+		"video_type":     videoObj.VideoType,
+		"status":         videoObj.Status,
+		"total_duration": videoObj.TotalDuration,
+		"space_id":       videoObj.SpaceID,
+	}
+
+	err = meilisearchx.UpdateDocument("vidcheck", meiliVideoObj)
+	if err != nil {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
 
 	var updatedOrCreatedVideoBlock []uint
 	for _, analysisBlock := range videoAnalysisData.Analysis {
@@ -118,7 +140,6 @@ func update(w http.ResponseWriter, r *http.Request) {
 				rat := model.Rating{}
 				rat.ID = analysisBlock.RatingID
 				err = tx.First(&rat).Error
-				log.Print("rating error======>", err)
 			}
 
 			if err != nil {
@@ -130,8 +151,8 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 			analysisBlockObj := &model.Analysis{}
 			analysisBlockObj.ID = uint(analysisBlock.ID)
-			//tx.Model(&analysisBlock).Select("IsClaim").Updates(model.Analysis{IsClaim: analysisBlock.IsClaim})
 			tx.Model(&analysisBlockObj).Updates(model.Analysis{
+				Base:          model.Base{UpdatedByID: uint(uID)},
 				RatingID:      analysisBlock.RatingID,
 				Claim:         analysisBlock.Claim,
 				ClaimDate:     analysisBlock.ClaimDate,
@@ -144,6 +165,14 @@ func update(w http.ResponseWriter, r *http.Request) {
 				StartTime:     analysisBlock.StartTime,
 				EndTime:       analysisBlock.EndTime,
 			})
+
+			err = updateAnalysisObjIntoMeili(*analysisBlockObj)
+			if err != nil {
+				tx.Rollback()
+				loggerx.Error(err)
+				errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+				return
+			}
 			updatedOrCreatedVideoBlock = append(updatedOrCreatedVideoBlock, analysisBlockObj.ID)
 		} else {
 			// check if new rating exist
@@ -185,6 +214,14 @@ func update(w http.ResponseWriter, r *http.Request) {
 				errorx.Render(w, errorx.Parser(errorx.DBError()))
 				return
 			}
+
+			err = updateAnalysisObjIntoMeili(analysisBlockObj)
+			if err != nil {
+				tx.Rollback()
+				loggerx.Error(err)
+				errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+				return
+			}
 			updatedOrCreatedVideoBlock = append(updatedOrCreatedVideoBlock, analysisBlockObj.ID)
 		}
 	}
@@ -192,6 +229,16 @@ func update(w http.ResponseWriter, r *http.Request) {
 	if len(updatedOrCreatedVideoBlock) > 0 {
 		analysisBlocks := []model.Analysis{}
 		tx.Model(&model.Analysis{}).Not(updatedOrCreatedVideoBlock).Where("video_id = ?", uint(id)).Delete(&analysisBlocks)
+
+		for _, analysis := range analysisBlocks {
+			err = meilisearchx.DeleteDocument("vidcheck", analysis.ID, "analysis")
+			if err != nil {
+				tx.Rollback()
+				loggerx.Error(err)
+				errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+				return
+			}
+		}
 	}
 
 	tx.Commit()
@@ -215,4 +262,33 @@ func update(w http.ResponseWriter, r *http.Request) {
 		Analysis: analysisBlocks,
 	}
 	renderx.JSON(w, http.StatusOK, result)
+}
+
+func updateAnalysisObjIntoMeili(analysis model.Analysis) error {
+	var claimMeiliDate int64 = 0
+	if analysis.ClaimDate != nil {
+		claimMeiliDate = analysis.ClaimDate.Unix()
+	}
+	var checkedMeiliDate int64 = 0
+	if analysis.CheckedDate != nil {
+		checkedMeiliDate = analysis.CheckedDate.Unix()
+	}
+	meiliObj := map[string]interface{}{
+		"id":             analysis.ID,
+		"kind":           "analysis",
+		"video_id":       analysis.VideoID,
+		"rating_id":      analysis.RatingID,
+		"claim":          analysis.Claim,
+		"description":    analysis.Description,
+		"claim_date":     claimMeiliDate,
+		"checked_date":   checkedMeiliDate,
+		"fact":           analysis.Fact,
+		"claimant_id":    analysis.ClaimantID,
+		"review_sources": analysis.ReviewSources,
+		"end_time":       analysis.EndTime,
+		"start_time":     analysis.StartTime,
+		"space_id":       analysis.SpaceID,
+	}
+
+	return meilisearchx.UpdateDocument("vidcheck", meiliObj)
 }

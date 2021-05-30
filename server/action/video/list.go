@@ -1,6 +1,7 @@
 package video
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/factly/vidcheck/action/rating"
@@ -10,6 +11,8 @@ import (
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
+	"github.com/factly/x/meilisearchx"
+	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/paginationx"
 	"github.com/factly/x/renderx"
 )
@@ -40,7 +43,7 @@ func list(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uID, err := util.GetUser(r.Context())
+	uID, err := middlewarex.GetUser(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
@@ -53,9 +56,44 @@ func list(w http.ResponseWriter, r *http.Request) {
 	videos := make([]model.Video, 0)
 	offset, limit := paginationx.Parse(r.URL.Query())
 
-	model.DB.Model(&model.Video{}).Where(&model.Video{
+	searchQuery := r.URL.Query().Get("q")
+	sort := r.URL.Query().Get("sort")
+
+	filteredVideoIDs := make([]uint, 0)
+
+	if searchQuery != "" {
+
+		filters := fmt.Sprint("space_id=", sID)
+		var hits []interface{}
+
+		hits, err = meilisearchx.SearchWithQuery("vidcheck", searchQuery, filters, "video")
+
+		if err != nil {
+			loggerx.Error(err)
+			renderx.JSON(w, http.StatusOK, result)
+			return
+		}
+
+		filteredVideoIDs = meilisearchx.GetIDArray(hits)
+		if len(filteredVideoIDs) == 0 {
+			renderx.JSON(w, http.StatusOK, result)
+			return
+		}
+	}
+
+	if sort != "asc" {
+		sort = "desc"
+	}
+
+	tx := model.DB.Model(&model.Video{}).Where(&model.Video{
 		SpaceID: uint(sID),
-	}).Count(&result.Total).Offset(offset).Limit(limit).Find(&videos)
+	}).Order("created_at " + sort)
+
+	if len(filteredVideoIDs) > 0 {
+		err = tx.Where(filteredVideoIDs).Count(&result.Total).Offset(offset).Limit(limit).Find(&result.Nodes).Error
+	} else {
+		err = tx.Count(&result.Total).Offset(offset).Limit(limit).Find(&result.Nodes).Error
+	}
 
 	var ratingMap map[uint]model.Rating
 

@@ -1,6 +1,7 @@
 package space
 
 import (
+	"github.com/factly/vidcheck/model"
 	"github.com/go-chi/chi"
 	"github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -16,8 +17,11 @@ type space struct {
 	VerificationCodes postgres.Jsonb `json:"verification_codes" swaggertype:"primitive,string"`
 	SocialMediaURLs   postgres.Jsonb `json:"social_media_urls" swaggertype:"primitive,string"`
 	ContactInfo       postgres.Jsonb `json:"contact_info" swaggertype:"primitive,string"`
+	Analytics         postgres.Jsonb `json:"analytics" swaggertype:"primitive,string"`
 	OrganisationID    int            `json:"organisation_id" validate:"required"`
 }
+
+var userContext model.ContextKey = "space_user"
 
 // Router - Group of currency router
 func Router() chi.Router {

@@ -5,9 +5,10 @@ import (
 	"strconv"
 
 	"github.com/factly/vidcheck/model"
-	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
+	"github.com/factly/x/meilisearchx"
+	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
 	"github.com/go-chi/chi"
 )
@@ -24,7 +25,7 @@ import (
 // @Success 200
 // @Router /spaces/{space_id} [delete]
 func delete(w http.ResponseWriter, r *http.Request) {
-	uID, err := util.GetUser(r.Context())
+	uID, err := middlewarex.GetUser(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
@@ -63,7 +64,18 @@ func delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	model.DB.Model(&model.Space{}).Delete(&result)
+	tx := model.DB.Begin()
+	tx.Model(&model.Space{}).Delete(&result)
+
+	err = meilisearchx.DeleteDocument("vidcheck", result.ID, "space")
+	if err != nil {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	tx.Commit()
 
 	renderx.JSON(w, http.StatusOK, nil)
 }

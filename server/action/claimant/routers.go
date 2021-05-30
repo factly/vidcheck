@@ -1,6 +1,7 @@
 package claimant
 
 import (
+	"github.com/factly/vidcheck/model"
 	"github.com/go-chi/chi"
 	"github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -12,6 +13,8 @@ type claimant struct {
 	Description postgres.Jsonb `json:"description" swaggertype:"primitive,string"`
 	TagLine     string         `json:"tag_line"`
 }
+
+var userContext model.ContextKey = "claimant_user"
 
 // Router - Group of video router
 func Router() chi.Router {
