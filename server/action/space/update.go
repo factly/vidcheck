@@ -82,6 +82,58 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	tx := model.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
 
+	logoID := &space.LogoID
+	result.LogoID = &space.LogoID
+	if space.LogoID == 0 {
+		err = tx.Model(&result).Updates(map[string]interface{}{"logo_id": nil}).Error
+		logoID = nil
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.DBError()))
+			return
+		}
+	}
+
+	logoMobileID := &space.LogoMobileID
+	result.LogoMobileID = &space.LogoMobileID
+	if space.LogoMobileID == 0 {
+		err = tx.Model(&result).Updates(map[string]interface{}{"logo_mobile_id": nil}).Error
+		logoMobileID = nil
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.DBError()))
+			return
+		}
+	}
+
+	favIconID := &space.FavIconID
+	result.FavIconID = &space.FavIconID
+	if space.FavIconID == 0 {
+		err = tx.Model(&result).Updates(map[string]interface{}{"fav_icon_id": nil}).Error
+		favIconID = nil
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.DBError()))
+			return
+		}
+	}
+
+	mobileIconID := &space.MobileIconID
+	result.MobileIconID = &space.MobileIconID
+	if space.MobileIconID == 0 {
+		err = tx.Model(&result).Updates(map[string]interface{}{"mobile_icon_id": nil}).Error
+		mobileIconID = nil
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.DBError()))
+			return
+		}
+	}
+
 	// check record exists or not
 	err = tx.First(&result).Error
 
@@ -92,16 +144,22 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = tx.Model(&result).Updates(model.Space{
+		Base:              model.Base{UpdatedByID: uint(uID)},
 		Name:              space.Name,
 		SiteTitle:         space.SiteTitle,
 		Slug:              space.Slug,
 		Description:       space.Description,
 		TagLine:           space.TagLine,
 		SiteAddress:       space.SiteAddress,
+		LogoID:            logoID,
+		FavIconID:         favIconID,
+		MobileIconID:      mobileIconID,
+		LogoMobileID:      logoMobileID,
+		Analytics:         space.Analytics,
 		VerificationCodes: space.VerificationCodes,
 		SocialMediaURLs:   space.SocialMediaURLs,
 		ContactInfo:       space.ContactInfo,
-	}).First(&result).Error
+	}).Preload("Logo").Preload("LogoMobile").Preload("FavIcon").Preload("MobileIcon").First(&result).Error
 
 	if err != nil {
 		loggerx.Error(err)
@@ -121,6 +179,10 @@ func update(w http.ResponseWriter, r *http.Request) {
 		"tag_line":        result.TagLine,
 		"organisation_id": result.OrganisationID,
 		"analytics":       result.Analytics,
+		"logo_id":         logoID,
+		"fav_icon_id":     favIconID,
+		"mobile_icon_id":  mobileIconID,
+		"logo_mobile_id":  logoMobileID,
 	}
 
 	err = meilisearchx.UpdateDocument("vidcheck", meiliObj)
