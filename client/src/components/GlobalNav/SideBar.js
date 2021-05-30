@@ -25,6 +25,7 @@ function Sidebar() {
     { title: "Ratings", path: "/ratings", Icon: StarOutlined },
     { title: "Claimants", path: "/claimants", Icon: TeamOutlined },
     { title: "Space", path: "/spaces", Icon: AuditOutlined },
+    { title: "Media", path: "/media", Icon: AuditOutlined },
   ];
 
   return (
