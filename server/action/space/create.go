@@ -1,6 +1,7 @@
 package space
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -8,6 +9,7 @@ import (
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
+	"github.com/factly/x/meilisearchx"
 	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/validationx"
@@ -76,13 +78,39 @@ func create(w http.ResponseWriter, r *http.Request) {
 		ContactInfo:       space.ContactInfo,
 	}
 
-	err = model.DB.Create(&result).Error
+	tx := model.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
+	err = tx.Create(&result).Error
 
 	if err != nil {
+		tx.Rollback()
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
 	}
+
+	// Insert into meili index
+	meiliObj := map[string]interface{}{
+		"id":              result.ID,
+		"kind":            "space",
+		"name":            result.Name,
+		"slug":            result.Slug,
+		"description":     result.Description,
+		"site_title":      result.SiteTitle,
+		"site_address":    result.SiteAddress,
+		"tag_line":        result.TagLine,
+		"organisation_id": result.OrganisationID,
+		"analytics":       result.Analytics,
+	}
+
+	err = meilisearchx.AddDocument("vidcheck", meiliObj)
+	if err != nil {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	tx.Commit()
 	renderx.JSON(w, http.StatusCreated, result)
 }
 
