@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/factly/vidcheck/model"
+	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/meilisearchx"
@@ -33,7 +34,7 @@ import (
 // @Router /core/media/{medium_id} [put]
 func update(w http.ResponseWriter, r *http.Request) {
 
-	sID, err := middlewarex.GetSpace(r.Context())
+	sID, err := util.GetSpace(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))

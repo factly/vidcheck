@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/factly/vidcheck/action/claimant"
+	"github.com/factly/vidcheck/action/medium"
 
 	"github.com/factly/vidcheck/model"
 
@@ -51,6 +52,7 @@ func RegisterRoutes() http.Handler {
 	r.With(middlewarex.CheckUser, util.CheckSpace).Group(func(r chi.Router) {
 		r.Mount("/videos", video.Router())
 		r.Mount("/claimants", claimant.Router())
+		r.Mount("/media", medium.Router())
 		if !config.DegaIntegrated() {
 			r.Mount("/spaces", space.Router())
 			r.Mount("/ratings", rating.Router())
