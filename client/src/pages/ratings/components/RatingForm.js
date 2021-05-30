@@ -98,7 +98,7 @@ const RatingForm = ({ onCreate, data = {} }) => {
       </Form.Item>
 
       <Form.Item name="description" label="Description">
-        <Editor style={{ width: "600px" }} />
+        <Editor style={{ width: "600px" }} basic={true} />
       </Form.Item>
 
       <Form.Item {...tailLayout}>
