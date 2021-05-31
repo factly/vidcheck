@@ -2,6 +2,7 @@ import React from "react";
 import { Button, Form, Input, Space } from "antd";
 import { maker, checker } from "../../../utils/sluger";
 import Editor from "../../../components/Editor";
+import MediaSelector from "../../../components/MediaSelector";
 
 const { TextArea } = Input;
 
@@ -78,8 +79,11 @@ const ClaimantForm = ({ onCreate, data = {} }) => {
       <Form.Item name="tag_line" label="Tag Line">
         <TextArea />
       </Form.Item>
+      <Form.Item label="Featured Image" name="medium_id">
+        <MediaSelector />
+      </Form.Item>
       <Form.Item name="description" label="Description">
-        <Editor style={{ width: "600px" }} />
+        <Editor style={{ width: "600px" }} basic={true} />
       </Form.Item>
       <Form.Item {...tailLayout}>
         <Space>

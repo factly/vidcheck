@@ -6,6 +6,7 @@ import spaces from "./spacesReducer";
 import videos from "./videosReducer";
 import claimants from "./claimantsReducer";
 import analysis from "./analysisReducer";
+import media from "./mediumReducer";
 
 const rootReducer = combineReducers({
   analysis,
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
   settings,
   spaces,
   videos,
+  media,
 });
 
 export default rootReducer;

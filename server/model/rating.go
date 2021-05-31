@@ -1,6 +1,8 @@
 package model
 
 import (
+	"errors"
+
 	"github.com/jinzhu/gorm/dialects/postgres"
 	"gorm.io/gorm"
 )
@@ -10,6 +12,8 @@ type Rating struct {
 	Base
 	Name             string         `gorm:"column:name" json:"name"`
 	Slug             string         `gorm:"column:slug" json:"slug"`
+	MediumID         *uint          `gorm:"column:medium_id;default:NULL" json:"medium_id"`
+	Medium           *Medium        `json:"medium"`
 	Description      postgres.Jsonb `gorm:"column:description" json:"description" swaggertype:"primitive,string"`
 	NumericValue     int            `gorm:"column:numeric_value" json:"numeric_value"`
 	BackgroundColour postgres.Jsonb `gorm:"column:background_colour" json:"background_colour" swaggertype:"primitive,string"`
@@ -31,5 +35,23 @@ func (rating *Rating) BeforeCreate(tx *gorm.DB) error {
 
 	rating.CreatedByID = uint(uID)
 	rating.UpdatedByID = uint(uID)
+	return nil
+}
+
+// BeforeSave - validation for medium
+func (rating *Rating) BeforeSave(tx *gorm.DB) (e error) {
+
+	if rating.MediumID != nil && *rating.MediumID > 0 {
+		medium := Medium{}
+		medium.ID = *rating.MediumID
+
+		err := tx.Model(&Medium{}).Where(Medium{
+			SpaceID: rating.SpaceID,
+		}).First(&medium).Error
+
+		if err != nil {
+			return errors.New("medium does not belong to same space")
+		}
+	}
 	return nil
 }

@@ -1,4 +1,4 @@
-package claimant
+package medium
 
 import (
 	"encoding/json"
@@ -13,24 +13,27 @@ import (
 	"github.com/factly/x/meilisearchx"
 	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
+	"github.com/factly/x/slugx"
 	"github.com/factly/x/validationx"
 	"github.com/go-chi/chi"
+	"gorm.io/gorm"
 )
 
-// update - Update claimant by id
-// @Summary Update a claimant by id
-// @Description Update claimant by ID
-// @Tags Claimant
-// @ID update-claimant-by-id
+// update - Update medium by id
+// @Summary Update a medium by id
+// @Description Update medium by ID
+// @Tags Medium
+// @ID update-medium-by-id
 // @Produce json
 // @Consume json
 // @Param X-User header string true "User ID"
+// @Param medium_id path string true "Medium ID"
 // @Param X-Space header string true "Space ID"
-// @Param claimant_id path string true "Claimant ID"
-// @Param Claimant body claimant false "Claimant"
-// @Success 200 {object} model.Claimant
-// @Router /claimants/{claimant_id} [put]
+// @Param Medium body medium false "Medium"
+// @Success 200 {object} model.Medium
+// @Router /core/media/{medium_id} [put]
 func update(w http.ResponseWriter, r *http.Request) {
+
 	sID, err := util.GetSpace(r.Context())
 	if err != nil {
 		loggerx.Error(err)
@@ -45,8 +48,8 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	claimantID := chi.URLParam(r, "claimant_id")
-	id, err := strconv.Atoi(claimantID)
+	mediumID := chi.URLParam(r, "medium_id")
+	id, err := strconv.Atoi(mediumID)
 
 	if err != nil {
 		loggerx.Error(err)
@@ -54,8 +57,8 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	claimant := &claimant{}
-	err = json.NewDecoder(r.Body).Decode(&claimant)
+	medium := &medium{}
+	err = json.NewDecoder(r.Body).Decode(&medium)
 
 	if err != nil {
 		loggerx.Error(err)
@@ -63,7 +66,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	validationError := validationx.Check(claimant)
+	validationError := validationx.Check(medium)
 
 	if validationError != nil {
 		loggerx.Error(errors.New("validation error"))
@@ -71,11 +74,11 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := model.Claimant{}
+	result := &model.Medium{}
 	result.ID = uint(id)
 
 	// check record exists or not
-	err = model.DB.Where(&model.Claimant{
+	err = model.DB.Where(&model.Medium{
 		SpaceID: uint(sID),
 	}).First(&result).Error
 
@@ -85,29 +88,34 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tx := model.DB.Begin()
+	var mediumSlug string
+	// Get table name
+	stmt := &gorm.Statement{DB: model.DB}
+	_ = stmt.Parse(&model.Medium{})
+	tableName := stmt.Schema.Table
 
-	mediumID := &claimant.MediumID
-	result.MediumID = &claimant.MediumID
-	if claimant.MediumID == 0 {
-		err = tx.Model(&result).Updates(map[string]interface{}{"medium_id": nil}).Error
-		mediumID = nil
-		if err != nil {
-			tx.Rollback()
-			loggerx.Error(err)
-			errorx.Render(w, errorx.Parser(errorx.DBError()))
-			return
-		}
+	if result.Slug == medium.Slug {
+		mediumSlug = result.Slug
+	} else if medium.Slug != "" && slugx.Check(medium.Slug) {
+		mediumSlug = slugx.Approve(&model.DB, medium.Slug, sID, tableName)
+	} else {
+		mediumSlug = slugx.Approve(&model.DB, slugx.Make(medium.Name), sID, tableName)
 	}
 
-	err = tx.Model(&result).Updates(model.Claimant{
+	tx := model.DB.Begin()
+	err = tx.Model(&result).Updates(model.Medium{
 		Base:        model.Base{UpdatedByID: uint(uID)},
-		Name:        claimant.Name,
-		Slug:        claimant.Slug,
-		TagLine:     claimant.TagLine,
-		Description: claimant.Description,
-		MediumID:    mediumID,
-	}).Preload("Medium").First(&result).Error
+		Name:        medium.Name,
+		Slug:        mediumSlug,
+		Title:       medium.Title,
+		Type:        medium.Type,
+		Description: medium.Description,
+		AltText:     medium.AltText,
+		Caption:     medium.Caption,
+		FileSize:    medium.FileSize,
+		URL:         medium.URL,
+		Dimensions:  medium.Dimensions,
+	}).First(&result).Error
 
 	if err != nil {
 		tx.Rollback()
@@ -119,12 +127,12 @@ func update(w http.ResponseWriter, r *http.Request) {
 	// Update into meili index
 	meiliObj := map[string]interface{}{
 		"id":          result.ID,
-		"kind":        "claimant",
+		"kind":        "medium",
 		"name":        result.Name,
 		"slug":        result.Slug,
+		"title":       result.Title,
+		"type":        result.Type,
 		"description": result.Description,
-		"tag_line":    result.TagLine,
-		"medium_id":   result.MediumID,
 		"space_id":    result.SpaceID,
 	}
 
@@ -139,5 +147,4 @@ func update(w http.ResponseWriter, r *http.Request) {
 	tx.Commit()
 
 	renderx.JSON(w, http.StatusOK, result)
-
 }

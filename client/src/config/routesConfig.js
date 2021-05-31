@@ -15,6 +15,11 @@ import Spaces from "../pages/spaces";
 import CreateSpace from "../pages/spaces/CreateSpace";
 import EditSpace from "../pages/spaces/EditSpace";
 
+//Media
+import Media from "../pages/media";
+import UploadMedium from "../pages/media/UploadMedium";
+import EditMedium from "../pages/media/EditMedium";
+
 //Videos
 import CreateVideo from "../pages/videos/CreateVideo";
 import EditVideo from "../pages/videos/EditVideo";
@@ -111,6 +116,21 @@ const routes = [
     path: "/preview/:id",
     Component: Preview,
     title: "Preview",
+  },
+  {
+    path: "/media",
+    Component: Media,
+    title: "Media",
+  },
+  {
+    path: "/media/upload",
+    Component: UploadMedium,
+    title: "Upload",
+  },
+  {
+    path: "/media/:id/edit",
+    Component: EditMedium,
+    title: "Edit",
   },
 ];
 

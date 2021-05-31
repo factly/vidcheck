@@ -61,7 +61,7 @@ func my(w http.ResponseWriter, r *http.Request) {
 	// Fetched all the spaces related to all the organisations
 	var allSpaces = make([]model.Space, 0)
 
-	model.DB.Model(model.Space{}).Where("organisation_id IN (?)", allOrgIDs).Find(&allSpaces)
+	model.DB.Model(model.Space{}).Preload("Logo").Preload("LogoMobile").Preload("FavIcon").Preload("MobileIcon").Where("organisation_id IN (?)", allOrgIDs).Find(&allSpaces)
 
 	orgSpaceMap := make(map[uint][]model.Space)
 

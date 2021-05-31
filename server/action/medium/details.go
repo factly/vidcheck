@@ -1,4 +1,4 @@
-package claimant
+package medium
 
 import (
 	"net/http"
@@ -12,17 +12,17 @@ import (
 	"github.com/go-chi/chi"
 )
 
-// details - Get claimant by id
-// @Summary Show a claimant by id
-// @Description Get claimant by ID
-// @Tags Claimant
-// @ID get-claimant-by-id
+// details - Get medium by id
+// @Summary Show a medium by id
+// @Description Get medium by ID
+// @Tags Medium
+// @ID get-medium-by-id
 // @Produce  json
 // @Param X-User header string true "User ID"
+// @Param medium_id path string true "Medium ID"
 // @Param X-Space header string true "Space ID"
-// @Param claimant_id path string true "Claimant ID"
-// @Success 200 {object} model.Claimant
-// @Router /claimants/{claimant_id} [get]
+// @Success 200 {object} model.Medium
+// @Router /core/media/{medium_id} [get]
 func details(w http.ResponseWriter, r *http.Request) {
 
 	sID, err := util.GetSpace(r.Context())
@@ -32,8 +32,8 @@ func details(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	claimantID := chi.URLParam(r, "claimant_id")
-	id, err := strconv.Atoi(claimantID)
+	mediumID := chi.URLParam(r, "medium_id")
+	id, err := strconv.Atoi(mediumID)
 
 	if err != nil {
 		loggerx.Error(err)
@@ -41,13 +41,13 @@ func details(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := &model.Claimant{}
+	result := &model.Medium{}
 
 	result.ID = uint(id)
 
-	err = model.DB.Model(&model.Claimant{}).Where(&model.Claimant{
+	err = model.DB.Model(&model.Medium{}).Where(&model.Medium{
 		SpaceID: uint(sID),
-	}).Preload("Medium").First(&result).Error
+	}).First(&result).Error
 
 	if err != nil {
 		loggerx.Error(err)

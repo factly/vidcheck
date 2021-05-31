@@ -12,6 +12,7 @@ type claimant struct {
 	Slug        string         `json:"slug"`
 	Description postgres.Jsonb `json:"description" swaggertype:"primitive,string"`
 	TagLine     string         `json:"tag_line"`
+	MediumID    uint           `json:"medium_id"`
 }
 
 var userContext model.ContextKey = "claimant_user"
