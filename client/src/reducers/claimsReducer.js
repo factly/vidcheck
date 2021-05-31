@@ -1,19 +1,19 @@
 import {
-  SET_ANALYSIS,
+  SET_CLAIMS,
   ADD_VIDEO_DATA,
   ADD_CLAIM,
-  ADD_ANALYSIS,
+  ADD_CLAIMS,
   DELETE_CLAIM,
-} from "../constants/analysis";
+} from "../constants/claims";
 
 const initialState = {
   video: {},
   claims: [],
 };
 
-export default function analysisReducer(state = initialState, action = {}) {
+export default function claimsReducer(state = initialState, action = {}) {
   switch (action.type) {
-    case SET_ANALYSIS:
+    case SET_CLAIMS:
       return {
         video: {},
         claims: [],
@@ -23,7 +23,7 @@ export default function analysisReducer(state = initialState, action = {}) {
         ...state,
         video: action.payload,
       };
-    case ADD_ANALYSIS:
+    case ADD_CLAIMS:
       return action.payload;
     case DELETE_CLAIM:
       const start_time = state.claims[action.payload].start_time;

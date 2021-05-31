@@ -13,7 +13,7 @@ function VideoAnalysisCard({ data }) {
   let ratingsCount = {};
 
   const getRatingsCount = () =>
-    data.analysis?.map((each) => {
+    data.claims?.map((each) => {
       if (ratingsCount[each.rating.name]) {
         ratingsCount[each.rating.name] += 1;
       } else {
@@ -42,11 +42,11 @@ function VideoAnalysisCard({ data }) {
             <Typography.Title level={4}>{data.video.title}</Typography.Title>
           </Link>
 
-          <Typography>{`${data.analysis.length} CLAIMS IN TOTAL`}</Typography>
+          <Typography>{`${data.claims.length} CLAIMS IN TOTAL`}</Typography>
           <div style={{ width: "30%" }}>
             <HorizontalTimelineBar
               totalDuration={data.video.total_duration}
-              factCheckReview={data.analysis}
+              factCheckReview={data.claims}
               height={"12px"}
             />
           </div>

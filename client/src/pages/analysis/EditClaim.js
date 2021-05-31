@@ -14,7 +14,7 @@ function ClaimForm() {
   const dispatch = useDispatch();
   const { id } = useParams();
 
-  const { video, claims } = useSelector(({ analysis }) => analysis);
+  const { video, claims } = useSelector(({ videoClaims }) => videoClaims);
 
   if (!video.url || !claims[id]) {
     history.push("/analysis/create");

@@ -22,7 +22,7 @@ function Analysis({ onSubmit }) {
   const history = useHistory();
   const [form] = Form.useForm();
 
-  const { video, claims } = useSelector(({ analysis }) => analysis);
+  const { video, claims } = useSelector(({ videoClaims }) => videoClaims);
   const dispatch = useDispatch();
 
   const player = useRef(null);
@@ -323,7 +323,7 @@ function Analysis({ onSubmit }) {
           <Button
             type="primary"
             disabled={claims.length === 0}
-            onClick={() => onSubmit({ video, analysis: claims })}
+            onClick={() => onSubmit({ video, claims })}
           >
             Submit
           </Button>

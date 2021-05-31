@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
-import { addAnalysis } from "../../actions/analysis";
+import { addClaims } from "../../actions/analysis";
 import { getVideo, updateVideo } from "../../actions/videos";
 import { Skeleton } from "antd";
 import EditAnalysisForm from "./index";
@@ -13,12 +13,12 @@ function EditAnalysis() {
 
   const { loading } = useSelector((state) => state.videos.loading);
 
-  const { video } = useSelector(({ analysis }) => analysis);
+  const { video } = useSelector(({ videoClaims }) => videoClaims);
 
   React.useEffect(() => {
     if (!video.id) {
       dispatch(getVideo(id)).then((data) =>
-        dispatch(addAnalysis({ video: data.video, claims: data.analysis }))
+        dispatch(addClaims({ video: data.video, claims: data.claims }))
       );
     }
   }, [dispatch, id]);

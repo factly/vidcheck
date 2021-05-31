@@ -2,9 +2,9 @@ import {
   ADD_CLAIM,
   DELETE_CLAIM,
   ADD_VIDEO_DATA,
-  ADD_ANALYSIS,
-  SET_ANALYSIS,
-} from "../constants/analysis";
+  ADD_CLAIMS,
+  SET_CLAIMS,
+} from "../constants/claims";
 
 export const addClaim = (data) => ({
   type: ADD_CLAIM,
@@ -12,17 +12,17 @@ export const addClaim = (data) => ({
 });
 
 export const resetClaim = () => ({
-  type: SET_ANALYSIS,
+  type: SET_CLAIMS,
 });
 
-export const addAnalysis = (data) => {
+export const addClaims = (data) => {
   const claims = data.claims.map((each) => ({
     ...each,
     colour: each.rating.background_colour.hex,
     slug: each.rating.slug,
   }));
   return {
-    type: ADD_ANALYSIS,
+    type: ADD_CLAIMS,
     payload: { video: data.video, claims },
   };
 };

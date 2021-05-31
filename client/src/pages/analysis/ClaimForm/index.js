@@ -2,7 +2,7 @@ import { Button, Space } from "antd";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
-import { addClaim } from "../../../actions/analysis";
+import { addClaim } from "../../../actions/claims";
 import { Link } from "react-router-dom";
 
 import CreateClaimForm from "./Claim";
@@ -11,7 +11,7 @@ function ClaimForm() {
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const { video } = useSelector(({ analysis }) => analysis);
+  const { video } = useSelector(({ videoClaims }) => videoClaims);
 
   if (!video.url) {
     history.push("/analysis/create");

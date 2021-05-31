@@ -61,14 +61,14 @@ function Preview({ vid }) {
     setPlayed(data.end_time_fraction);
     player.current.seekTo(data.start_time, "seconds");
     setCurrentFormData(data);
-    const claimIndex = videoData.analysis.findIndex(
+    const claimIndex = videoData.claims.findIndex(
       (item) => item.id === data.id
     );
     setCurrentClaimIndex(claimIndex);
   };
   const factCheckReview =
-    videoData && videoData.analysis && videoData.analysis.length > 0
-      ? videoData.analysis
+    videoData && videoData.claims && videoData.claims.length > 0
+      ? videoData.claims
       : [];
 
   const handleProgress = () => {
@@ -103,7 +103,7 @@ function Preview({ vid }) {
     setPlayed(currentPlayed);
   };
 
-  const ratingCount = videoData.analysis.reduce((acc, claim) => {
+  const ratingCount = videoData.claims.reduce((acc, claim) => {
     if (!acc[claim.rating.name]) {
       acc[claim.rating.name] = {
         count: 0,
@@ -114,7 +114,7 @@ function Preview({ vid }) {
     return acc;
   }, {});
 
-  const currentClaim = videoData.analysis[currentClaimIndex];
+  const currentClaim = videoData.claims[currentClaimIndex];
   return (
     <div style={{}}>
       <div
@@ -175,7 +175,7 @@ function Preview({ vid }) {
               fontWeight: "bold",
             }}
           >
-            {videoData.analysis.length} claims in total
+            {videoData.claims.length} claims in total
           </div>
           <HorizontalTimelineBar
             totalDuration={videoData.video.total_duration}
@@ -274,7 +274,7 @@ function Preview({ vid }) {
                 }}
               >
                 <div style={{ fontSize: "12px", textTransform: "uppercase" }}>
-                  {currentClaimIndex + 1} of {videoData.analysis.length} claims
+                  {currentClaimIndex + 1} of {videoData.claims.length} claims
                 </div>
                 <div
                   style={{
@@ -298,14 +298,14 @@ function Preview({ vid }) {
                     color: ratingColor[currentClaim.rating.id],
                   }}
                 >
-                  {videoData.analysis[currentClaimIndex].fact}
+                  {videoData.claims[currentClaimIndex].fact}
                 </div>
               </div>
             </div>
             <div
               style={{ padding: 20 }}
               onClick={() =>
-                currentClaimIndex === videoData.analysis.length - 1
+                currentClaimIndex === videoData.claims.length - 1
                   ? null
                   : updateFormState(factCheckReview[currentClaimIndex + 1])
               }
@@ -314,7 +314,7 @@ function Preview({ vid }) {
                 style={{
                   fontSize: 30,
                   color:
-                    currentClaimIndex === videoData.analysis.length - 1
+                    currentClaimIndex === videoData.claims.length - 1
                       ? "#ddd"
                       : "#222",
                 }}
@@ -331,10 +331,10 @@ function Preview({ vid }) {
           marginTop: "60px",
         }}
         dangerouslySetInnerHTML={{
-          __html: videoData.analysis[currentClaimIndex].html_description,
+          __html: videoData.claims[currentClaimIndex].html_description,
         }}
       />
-      {videoData.analysis[currentClaimIndex].review_sources ? (
+      {videoData.claims[currentClaimIndex].review_sources ? (
         <div
           style={{
             width: "70%",
@@ -347,15 +347,13 @@ function Preview({ vid }) {
         >
           <h4>Review sources</h4>
           <ul>
-            {videoData.analysis[currentClaimIndex].review_sources.map(
-              (each) => (
-                <li>
-                  <a style={{ color: "inherit" }} href={each.url}>
-                    {each.description}
-                  </a>
-                </li>
-              )
-            )}
+            {videoData.claims[currentClaimIndex].review_sources.map((each) => (
+              <li>
+                <a style={{ color: "inherit" }} href={each.url}>
+                  {each.description}
+                </a>
+              </li>
+            ))}
           </ul>
         </div>
       ) : null}
