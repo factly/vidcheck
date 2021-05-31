@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/factly/dega-server/test"
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
@@ -72,7 +71,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 
 	var description string
 	// Store HTML description
-	if len(claimant.Description.RawMessage) > 0 && !reflect.DeepEqual(claimant.Description, test.NilJsonb()) {
+	if len(claimant.Description.RawMessage) > 0 && !reflect.DeepEqual(claimant.Description, util.NilJsonb()) {
 		description, err = util.HTMLDescription(claimant.Description)
 		if err != nil {
 			loggerx.Error(err)
