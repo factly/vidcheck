@@ -4,7 +4,7 @@ import { Button, Input, Form, Card, Popconfirm, Tooltip } from "antd";
 import ReactPlayer from "react-player";
 import { useHistory } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
-import { addVideo } from "../../actions/analysis";
+import { addVideo } from "../../actions/videos";
 import {
   convertSecondsToTimeString,
   convertTimeStringToSeconds,
@@ -15,7 +15,7 @@ import {
   FieldTimeOutlined,
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
-import { deleteVideo } from "../../actions/analysis";
+import { deleteVideo } from "../../actions/claims";
 
 function Analysis({ onSubmit }) {
   const history = useHistory();
@@ -282,7 +282,7 @@ function Analysis({ onSubmit }) {
               style={{ margin: 5 }}
               key={index}
               actions={[
-                <Link to={`/analysis/claim/${index}`}>
+                <Link to={`/videos/claim/${index}`}>
                   <EditOutlined key="edit" />
                 </Link>,
                 <Popconfirm

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
-import { addClaim } from "../../actions/analysis";
+import { addClaim } from "../../actions/claims";
 import { convertSecondsToTimeString } from "../../utils/analysis";
 
 import EditClaimForm from "./ClaimForm/Claim";

@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
-import { addClaims } from "../../actions/analysis";
+import { addClaims } from "../../actions/claims";
 import { getVideo, updateVideo } from "../../actions/videos";
 import { Skeleton } from "antd";
 import EditAnalysisForm from "./index";
