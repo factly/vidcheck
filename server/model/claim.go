@@ -7,8 +7,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// Analysis model
-type Analysis struct {
+// Claim model
+type Claim struct {
 	Base
 	VideoID         uint           `gorm:"column:video_id" json:"video_id"`
 	Video           *Video         `json:"video"`
@@ -29,19 +29,19 @@ type Analysis struct {
 	SpaceID         uint           `gorm:"column:space_id" json:"space_id"`
 }
 
-var analysisUser ContextKey = "video_user"
+var claimUser ContextKey = "video_user"
 
 // BeforeCreate hook
-func (analysis *Analysis) BeforeCreate(tx *gorm.DB) error {
+func (claim *Claim) BeforeCreate(tx *gorm.DB) error {
 	ctx := tx.Statement.Context
-	userID := ctx.Value(analysisUser)
+	userID := ctx.Value(claimUser)
 
 	if userID == nil {
 		return nil
 	}
 	uID := userID.(int)
 
-	analysis.CreatedByID = uint(uID)
-	analysis.UpdatedByID = uint(uID)
+	claim.CreatedByID = uint(uID)
+	claim.UpdatedByID = uint(uID)
 	return nil
 }

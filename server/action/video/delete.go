@@ -46,7 +46,7 @@ func delete(w http.ResponseWriter, r *http.Request) {
 
 	result := &model.Video{}
 	result.ID = uint(id)
-	analysisBlocks := []model.Analysis{}
+	claimBlocks := []model.Claim{}
 
 	// check record exists or not
 	err = model.DB.Where(&model.Video{
@@ -76,7 +76,7 @@ func delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = tx.Model(&model.Analysis{}).Where("video_id = ?", result.ID).Find(&analysisBlocks).Error
+	err = tx.Model(&model.Claim{}).Where("video_id = ?", result.ID).Find(&claimBlocks).Error
 
 	if err != nil {
 		tx.Rollback()
@@ -85,8 +85,8 @@ func delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, analysis := range analysisBlocks {
-		err = meilisearchx.DeleteDocument("vidcheck", analysis.ID, "analysis")
+	for _, claim := range claimBlocks {
+		err = meilisearchx.DeleteDocument("vidcheck", claim.ID, "claim")
 		if err != nil {
 			tx.Rollback()
 			loggerx.Error(err)
@@ -95,7 +95,7 @@ func delete(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	err = tx.Model(&model.Analysis{}).Where("video_id = ?", result.ID).Delete(&model.Analysis{}).Error
+	err = tx.Model(&model.Claim{}).Where("video_id = ?", result.ID).Delete(&model.Claim{}).Error
 
 	if err != nil {
 		tx.Rollback()

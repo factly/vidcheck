@@ -19,8 +19,8 @@ import (
 
 // list response
 type paging struct {
-	Total int64               `json:"total"`
-	Nodes []videoanalysisData `json:"nodes"`
+	Total int64          `json:"total"`
+	Nodes []videoResData `json:"nodes"`
 }
 
 // list - Get all videos
@@ -51,7 +51,7 @@ func list(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result := paging{}
-	result.Nodes = make([]videoanalysisData, 0)
+	result.Nodes = make([]videoResData, 0)
 
 	videos := make([]model.Video, 0)
 	offset, limit := paginationx.Parse(r.URL.Query())
@@ -107,21 +107,21 @@ func list(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, video := range videos {
-		var analysisData videoanalysisData
-		analysisData.Video = video
-		stmt := model.DB.Model(&model.Analysis{}).Order("start_time").Where("video_id = ?", video.ID).Preload("Claimant")
+		var claimData videoResData
+		claimData.Video = video
+		stmt := model.DB.Model(&model.Claim{}).Order("start_time").Where("video_id = ?", video.ID).Preload("Claimant")
 
 		if !config.DegaIntegrated() {
 			stmt.Preload("Rating")
 		}
 
-		stmt.Find(&analysisData.Analysis)
+		stmt.Find(&claimData.Claims)
 
 		if config.DegaIntegrated() {
-			analysisData.Analysis = AddDegaRatings(uID, sID, analysisData.Analysis, ratingMap)
+			claimData.Claims = AddDegaRatings(uID, sID, claimData.Claims, ratingMap)
 		}
 
-		result.Nodes = append(result.Nodes, analysisData)
+		result.Nodes = append(result.Nodes, claimData)
 	}
 
 	renderx.JSON(w, http.StatusOK, result)

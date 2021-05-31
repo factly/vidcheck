@@ -52,7 +52,7 @@ func Migrate() {
 	// Migrating schema.
 	_ = DB.AutoMigrate(
 		&Video{},
-		&Analysis{},
+		&Claim{},
 		&Rating{},
 		&Space{},
 		&Claimant{},

@@ -59,7 +59,7 @@ func delete(w http.ResponseWriter, r *http.Request) {
 
 	// check if claimant is associated with analysis
 	var totAssociated int64
-	model.DB.Model(&model.Analysis{}).Where(&model.Analysis{
+	model.DB.Model(&model.Claim{}).Where(&model.Claim{
 		ClaimantID: uint(id),
 	}).Count(&totAssociated)
 

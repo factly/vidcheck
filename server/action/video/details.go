@@ -27,7 +27,7 @@ import (
 // @Param X-User header string true "User ID"
 // @Param X-Space header string true "Space ID"
 // @Param video_id path string true "Video ID"
-// @Success 200 {object} videoanalysisData
+// @Success 200 {object} videoResData
 // @Failure 400 {array} string
 // @Router /videos/{video_id} [get]
 func details(w http.ResponseWriter, r *http.Request) {
@@ -55,7 +55,7 @@ func details(w http.ResponseWriter, r *http.Request) {
 
 	videoObj := &model.Video{}
 	videoObj.ID = uint(id)
-	analysisBlocks := []model.Analysis{}
+	claimBlocks := []model.Claim{}
 
 	err = model.DB.Model(&model.Video{}).Where(&model.Video{
 		SpaceID: uint(sID),
@@ -66,13 +66,13 @@ func details(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	stmt := model.DB.Model(&model.Analysis{}).Order("start_time").Where("video_id = ?", uint(id)).Preload("Claimant")
+	stmt := model.DB.Model(&model.Claim{}).Order("start_time").Where("video_id = ?", uint(id)).Preload("Claimant")
 
 	if !config.DegaIntegrated() {
 		stmt.Preload("Rating")
 	}
 
-	stmt.Find(&analysisBlocks)
+	stmt.Find(&claimBlocks)
 
 	if config.DegaIntegrated() {
 		ratingMap, err := rating.GetDegaRatings(uID, sID)
@@ -82,10 +82,10 @@ func details(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		analysisBlocks = AddDegaRatings(uID, sID, analysisBlocks, ratingMap)
+		claimBlocks = AddDegaRatings(uID, sID, claimBlocks, ratingMap)
 	}
 
-	for index, each := range analysisBlocks {
+	for index, each := range claimBlocks {
 
 		arrByte, err := each.Description.MarshalJSON()
 
@@ -94,24 +94,24 @@ func details(w http.ResponseWriter, r *http.Request) {
 
 		if err == nil {
 			html, _ := editorx.EditorjsToHTML(desc)
-			analysisBlocks[index].HTMLDescription = html
+			claimBlocks[index].HTMLDescription = html
 		}
 
 	}
 
-	result := videoanalysisData{
-		Video:    *videoObj,
-		Analysis: analysisBlocks,
+	result := videoResData{
+		Video:  *videoObj,
+		Claims: claimBlocks,
 	}
 	renderx.JSON(w, http.StatusOK, result)
 }
 
-// AddDegaRatings added ratings from dega server in analysis list
-func AddDegaRatings(uID, sID int, analysisList []model.Analysis, ratingMap map[uint]model.Rating) []model.Analysis {
-	for i := range analysisList {
-		if rat, found := ratingMap[analysisList[i].RatingID]; found {
-			analysisList[i].Rating = &rat
+// AddDegaRatings added ratings from dega server in claim list
+func AddDegaRatings(uID, sID int, claimList []model.Claim, ratingMap map[uint]model.Rating) []model.Claim {
+	for i := range claimList {
+		if rat, found := ratingMap[claimList[i].RatingID]; found {
+			claimList[i].Rating = &rat
 		}
 	}
-	return analysisList
+	return claimList
 }

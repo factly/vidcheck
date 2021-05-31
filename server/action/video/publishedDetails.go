@@ -23,7 +23,7 @@ import (
 // @Param X-User header string true "User ID"
 // @Param X-Space header string true "Space ID"
 // @Param video_id path string true "Video ID"
-// @Success 200 {object} videoanalysisData
+// @Success 200 {object} videoResData
 // @Failure 400 {array} string
 // @Router /videos/{video_id}/published [get]
 func publishedDetails(w http.ResponseWriter, r *http.Request) {
@@ -44,7 +44,7 @@ func publishedDetails(w http.ResponseWriter, r *http.Request) {
 
 	videoObj := &model.Video{}
 	videoObj.ID = uint(id)
-	analysisBlocks := make([]model.Analysis, 0)
+	claimBlocks := make([]model.Claim, 0)
 	err = model.DB.Model(&model.Video{}).Where(&model.Video{
 		SpaceID: uint(sID),
 		Status:  "published",
@@ -55,9 +55,9 @@ func publishedDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	model.DB.Model(&model.Analysis{}).Preload("Rating").Order("start_time").Where("video_id = ?", uint(id)).Find(&analysisBlocks)
+	model.DB.Model(&model.Claim{}).Preload("Rating").Order("start_time").Where("video_id = ?", uint(id)).Find(&claimBlocks)
 
-	for index, each := range analysisBlocks {
+	for index, each := range claimBlocks {
 
 		arrByte, err := each.Description.MarshalJSON()
 
@@ -66,14 +66,14 @@ func publishedDetails(w http.ResponseWriter, r *http.Request) {
 
 		if err == nil {
 			html, _ := editorx.EditorjsToHTML(desc)
-			analysisBlocks[index].HTMLDescription = html
+			claimBlocks[index].HTMLDescription = html
 		}
 
 	}
 
-	result := videoanalysisData{
-		Video:    *videoObj,
-		Analysis: analysisBlocks,
+	result := videoResData{
+		Video:  *videoObj,
+		Claims: claimBlocks,
 	}
 	renderx.JSON(w, http.StatusOK, result)
 }

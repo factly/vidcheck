@@ -32,289 +32,6 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/analysis": {
-            "post": {
-                "description": "Create videoAnalysis",
-                "tags": [
-                    "VideoAnalysis"
-                ],
-                "summary": "Create videoAnalysis",
-                "operationId": "add-video-analysis",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "X-User",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "description": "Video Analysis Api Data",
-                        "name": "Data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/videoanalysis.videoAnalysisApiData"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/model.Analysis"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/analysis/video/{video_id}/analysis/{video_analysis_id}": {
-            "get": {
-                "description": "Get videosAnalysis by ID",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "VideoAnalysis"
-                ],
-                "summary": "Show a videosAnalysis by id",
-                "operationId": "get-video-analysis-by-id",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "X-User",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Video ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Video Analysis ID",
-                        "name": "video_analysis_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Analysis"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "Update videosAnalysis by ID",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "VideoAnalysis"
-                ],
-                "summary": "Update a videosAnalysis by id",
-                "operationId": "update-video-analysis-by-id",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "X-User",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Video ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Video Analysis ID",
-                        "name": "video_analysis_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Video Analysis Data",
-                        "name": "Data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/videoanalysis.videoAnalysis"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Analysis"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete videoAnalysis by id",
-                "tags": [
-                    "VideoAnalysis"
-                ],
-                "summary": "Delete a videoAnalysis by id",
-                "operationId": "delete-video-analysis-by-id",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "X-User",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Video ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Video Analysis ID",
-                        "name": "video_analysis_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/analyse": {
-            "get": {
-                "description": "Show all video analysis",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "VideoAnalysis"
-                ],
-                "summary": "Show all video analysis",
-                "operationId": "get-all-video-analysis",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "X-User",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Organisation ID",
-                        "name": "X-Organisation",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "limt per page",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "page number",
-                        "name": "page",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/videoanalysis.paging"
-                        }
-                    }
-                }
-            }
-        },
         "/claimants": {
             "get": {
                 "description": "Get all claimants",
@@ -541,9 +258,258 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": ""
+                    "200": {}
+                }
+            }
+        },
+        "/core/media": {
+            "get": {
+                "description": "Get all media",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Medium"
+                ],
+                "summary": "Show all media",
+                "operationId": "get-all-media",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Query",
+                        "name": "q",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "limit per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "page number",
+                        "name": "page",
+                        "in": "query"
                     }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Medium"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create medium",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Medium"
+                ],
+                "summary": "Create medium",
+                "operationId": "add-medium",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Medium Object",
+                        "name": "Medium",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/medium.medium"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Medium"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/core/media/{medium_id}": {
+            "get": {
+                "description": "Get medium by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Medium"
+                ],
+                "summary": "Show a medium by id",
+                "operationId": "get-medium-by-id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Medium ID",
+                        "name": "medium_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Medium"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update medium by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Medium"
+                ],
+                "summary": "Update a medium by id",
+                "operationId": "update-medium-by-id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Medium ID",
+                        "name": "medium_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Medium",
+                        "name": "Medium",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/medium.medium"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Medium"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete medium by ID",
+                "tags": [
+                    "Medium"
+                ],
+                "summary": "Delete a medium",
+                "operationId": "delete-medium-by-id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Medium ID",
+                        "name": "medium_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {}
                 }
             }
         },
@@ -698,6 +664,55 @@ var doc = `{
                 }
             }
         },
+        "/ratings/embed": {
+            "get": {
+                "description": "Get all ratings",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Ratings"
+                ],
+                "summary": "Show all ratings",
+                "operationId": "get-all-ratings",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "limt per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "page number",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/embed.paging"
+                        }
+                    }
+                }
+            }
+        },
         "/ratings/{rating_id}": {
             "get": {
                 "description": "Get rating by ID",
@@ -822,9 +837,7 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": ""
-                    }
+                    "200": {}
                 }
             }
         },
@@ -980,9 +993,7 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": ""
-                    }
+                    "200": {}
                 }
             }
         },
@@ -1057,12 +1068,12 @@ var doc = `{
                         "required": true
                     },
                     {
-                        "description": "Video Analysis Api Data",
+                        "description": "Video Api Data",
                         "name": "Data",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/video.videoanalysisReqData"
+                            "$ref": "#/definitions/video.videoReqData"
                         }
                     }
                 ],
@@ -1070,7 +1081,109 @@ var doc = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/video.videoanalysisData"
+                            "$ref": "#/definitions/video.videoResData"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/videos/embed": {
+            "get": {
+                "description": "Get all videos",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "Show all videos",
+                "operationId": "get-all-videos",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "limt per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "page number",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/embed.paging"
+                        }
+                    }
+                }
+            }
+        },
+        "/videos/embed/{video_id}": {
+            "get": {
+                "description": "Get published video by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "Show a published video by id",
+                "operationId": "get-published-video-by-id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "X-User",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Space ID",
+                        "name": "X-Space",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Video ID",
+                        "name": "video_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/embed.videoResData"
                         }
                     },
                     "400": {
@@ -1123,7 +1236,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/video.videoanalysisData"
+                            "$ref": "#/definitions/video.videoResData"
                         }
                     },
                     "400": {
@@ -1175,7 +1288,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/video.videoanalysisReqData"
+                            "$ref": "#/definitions/video.videoReqData"
                         }
                     }
                 ],
@@ -1228,9 +1341,7 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": ""
-                    },
+                    "200": {},
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -1281,7 +1392,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/video.videoanalysisData"
+                            "$ref": "#/definitions/video.videoResData"
                         }
                     },
                     "400": {
@@ -1306,6 +1417,9 @@ var doc = `{
             "properties": {
                 "description": {
                     "type": "string"
+                },
+                "medium_id": {
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
@@ -1332,7 +1446,77 @@ var doc = `{
                 }
             }
         },
-        "model.Analysis": {
+        "embed.paging": {
+            "type": "object",
+            "properties": {
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/embed.videoResData"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "embed.videoResData": {
+            "type": "object",
+            "properties": {
+                "claims": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Claim"
+                    }
+                },
+                "video": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Video"
+                }
+            }
+        },
+        "medium.medium": {
+            "type": "object",
+            "required": [
+                "dimensions",
+                "file_size",
+                "name",
+                "type"
+            ],
+            "properties": {
+                "alt_text": {
+                    "type": "string"
+                },
+                "caption": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "dimensions": {
+                    "type": "string"
+                },
+                "file_size": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Claim": {
             "type": "object",
             "properties": {
                 "checked_date": {
@@ -1348,6 +1532,7 @@ var doc = `{
                     "type": "string"
                 },
                 "claimant": {
+                    "type": "object",
                     "$ref": "#/definitions/model.Claimant"
                 },
                 "claimant_id": {
@@ -1355,6 +1540,9 @@ var doc = `{
                 },
                 "created_at": {
                     "type": "string"
+                },
+                "created_by_id": {
+                    "type": "integer"
                 },
                 "deleted_at": {
                     "type": "string"
@@ -1365,22 +1553,17 @@ var doc = `{
                 "end_time": {
                     "type": "integer"
                 },
-                "end_time_fraction": {
-                    "type": "number"
-                },
                 "fact": {
                     "type": "string"
                 },
-                "html": {
+                "html_description": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "is_claim": {
-                    "type": "boolean"
-                },
                 "rating": {
+                    "type": "object",
                     "$ref": "#/definitions/model.Rating"
                 },
                 "rating_id": {
@@ -1389,13 +1572,20 @@ var doc = `{
                 "review_sources": {
                     "type": "string"
                 },
+                "space_id": {
+                    "type": "integer"
+                },
                 "start_time": {
                     "type": "integer"
                 },
                 "updated_at": {
                     "type": "string"
                 },
+                "updated_by_id": {
+                    "type": "integer"
+                },
                 "video": {
+                    "type": "object",
                     "$ref": "#/definitions/model.Video"
                 },
                 "video_id": {
@@ -1409,13 +1599,26 @@ var doc = `{
                 "created_at": {
                     "type": "string"
                 },
+                "created_by_id": {
+                    "type": "integer"
+                },
                 "deleted_at": {
                     "type": "string"
                 },
                 "description": {
                     "type": "string"
                 },
+                "html_description": {
+                    "type": "string"
+                },
                 "id": {
+                    "type": "integer"
+                },
+                "medium": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Medium"
+                },
+                "medium_id": {
                     "type": "integer"
                 },
                 "name": {
@@ -1432,17 +1635,26 @@ var doc = `{
                 },
                 "updated_at": {
                     "type": "string"
+                },
+                "updated_by_id": {
+                    "type": "integer"
                 }
             }
         },
-        "model.Rating": {
+        "model.Medium": {
             "type": "object",
             "properties": {
-                "colour": {
+                "alt_text": {
+                    "type": "string"
+                },
+                "caption": {
                     "type": "string"
                 },
                 "created_at": {
                     "type": "string"
+                },
+                "created_by_id": {
+                    "type": "integer"
                 },
                 "deleted_at": {
                     "type": "string"
@@ -1450,7 +1662,70 @@ var doc = `{
                 "description": {
                     "type": "string"
                 },
+                "dimensions": {
+                    "type": "string"
+                },
+                "file_size": {
+                    "type": "integer"
+                },
                 "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "space_id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by_id": {
+                    "type": "integer"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Rating": {
+            "type": "object",
+            "properties": {
+                "background_colour": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by_id": {
+                    "type": "integer"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "html_description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "medium": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Medium"
+                },
+                "medium_id": {
                     "type": "integer"
                 },
                 "name": {
@@ -1465,19 +1740,31 @@ var doc = `{
                 "space_id": {
                     "type": "integer"
                 },
+                "text_colour": {
+                    "type": "string"
+                },
                 "updated_at": {
                     "type": "string"
+                },
+                "updated_by_id": {
+                    "type": "integer"
                 }
             }
         },
         "model.Space": {
             "type": "object",
             "properties": {
+                "analytics": {
+                    "type": "string"
+                },
                 "contact_info": {
                     "type": "string"
                 },
                 "created_at": {
                     "type": "string"
+                },
+                "created_by_id": {
+                    "type": "integer"
                 },
                 "deleted_at": {
                     "type": "string"
@@ -1485,7 +1772,35 @@ var doc = `{
                 "description": {
                     "type": "string"
                 },
+                "fav_icon": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Medium"
+                },
+                "fav_icon_id": {
+                    "type": "integer"
+                },
                 "id": {
+                    "type": "integer"
+                },
+                "logo": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Medium"
+                },
+                "logo_id": {
+                    "type": "integer"
+                },
+                "logo_mobile": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Medium"
+                },
+                "logo_mobile_id": {
+                    "type": "integer"
+                },
+                "mobile_icon": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Medium"
+                },
+                "mobile_icon_id": {
                     "type": "integer"
                 },
                 "name": {
@@ -1512,6 +1827,9 @@ var doc = `{
                 "updated_at": {
                     "type": "string"
                 },
+                "updated_by_id": {
+                    "type": "integer"
+                },
                 "verification_codes": {
                     "type": "string"
                 }
@@ -1522,6 +1840,9 @@ var doc = `{
             "properties": {
                 "created_at": {
                     "type": "string"
+                },
+                "created_by_id": {
+                    "type": "integer"
                 },
                 "deleted_at": {
                     "type": "string"
@@ -1541,8 +1862,14 @@ var doc = `{
                 "title": {
                     "type": "string"
                 },
+                "total_duration": {
+                    "type": "integer"
+                },
                 "updated_at": {
                     "type": "string"
+                },
+                "updated_by_id": {
+                    "type": "integer"
                 },
                 "url": {
                     "type": "string"
@@ -1569,15 +1896,20 @@ var doc = `{
         "rating.rating": {
             "type": "object",
             "required": [
+                "background_colour",
                 "name",
-                "numeric_value"
+                "numeric_value",
+                "text_colour"
             ],
             "properties": {
-                "colour": {
+                "background_colour": {
                     "type": "string"
                 },
                 "description": {
                     "type": "string"
+                },
+                "medium_id": {
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
@@ -1586,6 +1918,9 @@ var doc = `{
                     "type": "integer"
                 },
                 "slug": {
+                    "type": "string"
+                },
+                "text_colour": {
                     "type": "string"
                 }
             }
@@ -1596,6 +1931,9 @@ var doc = `{
                 "created_at": {
                     "type": "string"
                 },
+                "created_by_id": {
+                    "type": "integer"
+                },
                 "deleted_at": {
                     "type": "string"
                 },
@@ -1603,6 +1941,7 @@ var doc = `{
                     "type": "integer"
                 },
                 "permission": {
+                    "type": "object",
                     "$ref": "#/definitions/space.organisationUser"
                 },
                 "slug": {
@@ -1619,6 +1958,9 @@ var doc = `{
                 },
                 "updated_at": {
                     "type": "string"
+                },
+                "updated_by_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -1627,6 +1969,9 @@ var doc = `{
             "properties": {
                 "created_at": {
                     "type": "string"
+                },
+                "created_by_id": {
+                    "type": "integer"
                 },
                 "deleted_at": {
                     "type": "string"
@@ -1639,6 +1984,9 @@ var doc = `{
                 },
                 "updated_at": {
                     "type": "string"
+                },
+                "updated_by_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -1649,11 +1997,26 @@ var doc = `{
                 "organisation_id"
             ],
             "properties": {
+                "analytics": {
+                    "type": "string"
+                },
                 "contact_info": {
                     "type": "string"
                 },
                 "description": {
                     "type": "string"
+                },
+                "fav_icon_id": {
+                    "type": "integer"
+                },
+                "logo_id": {
+                    "type": "integer"
+                },
+                "logo_mobile_id": {
+                    "type": "integer"
+                },
+                "mobile_icon_id": {
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
@@ -1687,7 +2050,7 @@ var doc = `{
                 "nodes": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/video.videoanalysisData"
+                        "$ref": "#/definitions/video.videoResData"
                     }
                 },
                 "total": {
@@ -1699,6 +2062,7 @@ var doc = `{
             "type": "object",
             "required": [
                 "title",
+                "total_duration",
                 "url",
                 "video_type"
             ],
@@ -1723,12 +2087,45 @@ var doc = `{
                 }
             }
         },
+        "video.videoReqData": {
+            "type": "object",
+            "required": [
+                "claims",
+                "video"
+            ],
+            "properties": {
+                "claims": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/video.videoanalysis"
+                    }
+                },
+                "video": {
+                    "type": "object",
+                    "$ref": "#/definitions/video.video"
+                }
+            }
+        },
+        "video.videoResData": {
+            "type": "object",
+            "properties": {
+                "claims": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Claim"
+                    }
+                },
+                "video": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Video"
+                }
+            }
+        },
         "video.videoanalysis": {
             "type": "object",
             "required": [
                 "claimant_id",
                 "end_time",
-                "end_time_fraction",
                 "rating_id"
             ],
             "properties": {
@@ -1753,17 +2150,11 @@ var doc = `{
                 "end_time": {
                     "type": "integer"
                 },
-                "end_time_fraction": {
-                    "type": "number"
-                },
                 "fact": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
-                },
-                "is_claim": {
-                    "type": "boolean"
                 },
                 "rating_id": {
                     "type": "integer"
@@ -1773,138 +2164,6 @@ var doc = `{
                 },
                 "start_time": {
                     "type": "integer"
-                }
-            }
-        },
-        "video.videoanalysisData": {
-            "type": "object",
-            "properties": {
-                "analysis": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.Analysis"
-                    }
-                },
-                "video": {
-                    "$ref": "#/definitions/model.Video"
-                }
-            }
-        },
-        "video.videoanalysisReqData": {
-            "type": "object",
-            "required": [
-                "analysis",
-                "video"
-            ],
-            "properties": {
-                "analysis": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/video.videoanalysis"
-                    }
-                },
-                "video": {
-                    "$ref": "#/definitions/video.video"
-                }
-            }
-        },
-        "videoanalysis.paging": {
-            "type": "object",
-            "properties": {
-                "nodes": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.Analysis"
-                    }
-                },
-                "total": {
-                    "type": "integer"
-                }
-            }
-        },
-        "videoanalysis.video": {
-            "type": "object",
-            "required": [
-                "title",
-                "url",
-                "video_type"
-            ],
-            "properties": {
-                "summary": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "url": {
-                    "type": "string"
-                },
-                "video_type": {
-                    "type": "string"
-                }
-            }
-        },
-        "videoanalysis.videoAnalysis": {
-            "type": "object",
-            "required": [
-                "end_time",
-                "end_time_fraction",
-                "rating_id"
-            ],
-            "properties": {
-                "checked_date": {
-                    "type": "string"
-                },
-                "claim": {
-                    "type": "string"
-                },
-                "claim_date": {
-                    "type": "string"
-                },
-                "claim_sources": {
-                    "type": "string"
-                },
-                "end_time": {
-                    "type": "integer"
-                },
-                "end_time_fraction": {
-                    "type": "number"
-                },
-                "fact": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "is_claim": {
-                    "type": "boolean"
-                },
-                "rating_id": {
-                    "type": "integer"
-                },
-                "review_sources": {
-                    "type": "string"
-                },
-                "start_time": {
-                    "type": "integer"
-                }
-            }
-        },
-        "videoanalysis.videoAnalysisApiData": {
-            "type": "object",
-            "required": [
-                "analysis",
-                "video"
-            ],
-            "properties": {
-                "analysis": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/videoanalysis.videoAnalysis"
-                    }
-                },
-                "video": {
-                    "$ref": "#/definitions/videoanalysis.video"
                 }
             }
         }

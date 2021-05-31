@@ -6,9 +6,9 @@ import (
 	"github.com/go-chi/chi"
 )
 
-type videoanalysisData struct {
-	Video    model.Video      `json:"video"`
-	Analysis []model.Analysis `json:"analysis"`
+type videoResData struct {
+	Video  model.Video   `json:"video"`
+	Claims []model.Claim `json:"claims"`
 }
 
 // Router - Group of video router
