@@ -20,7 +20,7 @@ export function transformVideoAnalysisdetails(resp) {
           ? analysisData.rating.id
           : analysisData.rating,
 
-      colour: analysisData.rating && analysisData.rating.colour.hex,
+      colour: analysisData.rating && analysisData.rating.background_colour.hex,
     };
   });
   return {

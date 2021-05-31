@@ -68,6 +68,13 @@ func createDefaults(w http.ResponseWriter, r *http.Request) {
 
 	for i := range ratings {
 		ratings[i].SpaceID = uint(sID)
+		ratings[i].HTMLDescription, err = util.HTMLDescription(ratings[i].Description)
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot parse rating description", http.StatusUnprocessableEntity)))
+			return
+		}
 
 		if err != nil {
 			tx.Rollback()

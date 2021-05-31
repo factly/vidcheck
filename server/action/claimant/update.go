@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"reflect"
 	"strconv"
 
 	"github.com/factly/vidcheck/model"
@@ -85,6 +86,17 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var description string
+	// Store HTML description
+	if len(claimant.Description.RawMessage) > 0 && !reflect.DeepEqual(claimant.Description, util.NilJsonb()) {
+		description, err = util.HTMLDescription(claimant.Description)
+		if err != nil {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot parse claimant description", http.StatusUnprocessableEntity)))
+			return
+		}
+	}
+
 	tx := model.DB.Begin()
 
 	mediumID := &claimant.MediumID
@@ -101,12 +113,13 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = tx.Model(&result).Updates(model.Claimant{
-		Base:        model.Base{UpdatedByID: uint(uID)},
-		Name:        claimant.Name,
-		Slug:        claimant.Slug,
-		TagLine:     claimant.TagLine,
-		Description: claimant.Description,
-		MediumID:    mediumID,
+		Base:            model.Base{UpdatedByID: uint(uID)},
+		Name:            claimant.Name,
+		Slug:            claimant.Slug,
+		TagLine:         claimant.TagLine,
+		Description:     claimant.Description,
+		MediumID:        mediumID,
+		HTMLDescription: description,
 	}).Preload("Medium").First(&result).Error
 
 	if err != nil {

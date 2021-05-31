@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"reflect"
 
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
@@ -68,13 +69,25 @@ func create(w http.ResponseWriter, r *http.Request) {
 		mediumID = nil
 	}
 
+	var description string
+	// Store HTML description
+	if len(claimant.Description.RawMessage) > 0 && !reflect.DeepEqual(claimant.Description, util.NilJsonb()) {
+		description, err = util.HTMLDescription(claimant.Description)
+		if err != nil {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot parse claimant description", http.StatusUnprocessableEntity)))
+			return
+		}
+	}
+
 	result := &model.Claimant{
-		Name:        claimant.Name,
-		Slug:        claimant.Slug,
-		Description: claimant.Description,
-		SpaceID:     uint(sID),
-		TagLine:     claimant.TagLine,
-		MediumID:    mediumID,
+		Name:            claimant.Name,
+		Slug:            claimant.Slug,
+		Description:     claimant.Description,
+		SpaceID:         uint(sID),
+		TagLine:         claimant.TagLine,
+		MediumID:        mediumID,
+		HTMLDescription: description,
 	}
 
 	tx := model.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
