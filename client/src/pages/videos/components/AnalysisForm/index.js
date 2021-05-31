@@ -124,8 +124,8 @@ function AnalysisForm({
     setfactCheckReview((factCheck) => {
       let newData = [...factCheck];
 
-      const colour = ratings.find((each) => each.id === values.rating_id).colour
-        .hex;
+      const colour = ratings.find((each) => each.id === values.rating_id)
+        .background_colour.hex;
 
       const currentIndex = factCheck.findIndex(
         (each) => each.start_time === formData.start_time

@@ -18,7 +18,7 @@ export const resetClaim = () => ({
 export const addAnalysis = (data) => {
   const claims = data.claims.map((each) => ({
     ...each,
-    colour: each.rating.colour.hex,
+    colour: each.rating.background_colour.hex,
     slug: each.rating.slug,
   }));
   return {

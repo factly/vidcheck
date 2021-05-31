@@ -57,7 +57,9 @@ function HorizontalTimelineBar({
                     showBorder={
                       currentFormdata.id && currentFormdata.id === review.id
                     }
-                    backgroundColor={review.colour || review.rating.colour.hex}
+                    backgroundColor={
+                      review.colour || review.rating.background_colour.hex
+                    }
                     onClick={() => {
                       setCurrentFormData(review);
                     }}
@@ -98,7 +100,9 @@ function HorizontalTimelineBar({
                     showBorder={
                       currentFormdata.id && currentFormdata.id === review.id
                     }
-                    backgroundColor={review.colour || review.rating.colour.hex}
+                    backgroundColor={
+                      review.colour || review.rating.background_colour.hex
+                    }
                     onClick={() => {
                       setCurrentFormData(review);
                     }}
