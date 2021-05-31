@@ -5,7 +5,6 @@ import ReactPlayer from "react-player";
 import { useHistory } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { addVideo } from "../../actions/analysis";
-import parseEditorJsData from "../../utils/jsonToHTML";
 import {
   convertSecondsToTimeString,
   convertTimeStringToSeconds,
@@ -71,7 +70,7 @@ function Analysis({ onSubmit }) {
         end_time: form.getFieldValue("end_time"),
       })
     );
-    history.push("/analysis/claim");
+    history.push("/videos/claim");
   };
 
   const checkSelectedTime = (selectedTime) => {

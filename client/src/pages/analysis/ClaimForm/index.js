@@ -14,20 +14,18 @@ function ClaimForm() {
   const { video } = useSelector(({ videoClaims }) => videoClaims);
 
   if (!video.url) {
-    history.push("/analysis/create");
+    history.push("/videos/create");
   }
 
   const onCreate = (values) => {
     dispatch(addClaim(values));
-    if (video.id > 0) history.push(`/analysis/${video.id}/edit`);
-    else history.push("/analysis/create");
+    if (video.id > 0) history.push(`/videos/${video.id}/edit`);
+    else history.push("/videos/create");
   };
 
   return (
     <Space direction="vertical">
-      <Link
-        to={video.id > 0 ? `/analysis/${video.id}/edit` : "/analysis/create"}
-      >
+      <Link to={video.id > 0 ? `/videos/${video.id}/edit` : "/videos/create"}>
         <Button>Back</Button>
       </Link>
       <CreateClaimForm onCreate={onCreate} video={video} />

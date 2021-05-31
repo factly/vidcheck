@@ -21,8 +21,8 @@ import UploadMedium from "../pages/media/UploadMedium";
 import EditMedium from "../pages/media/EditMedium";
 
 //Videos
-import CreateVideo from "../pages/videos/CreateVideo";
-import EditVideo from "../pages/videos/EditVideo";
+// import CreateVideo from "../pages/videos/CreateVideo";
+// import EditVideo from "../pages/videos/EditVideo";
 
 import Preview from "../pages/preview";
 
@@ -33,22 +33,22 @@ import EditClaim from "../pages/analysis/EditClaim";
 
 const routes = [
   {
-    path: "/analysis/create",
+    path: "/videos/create",
     Component: CreateAnalysis,
     title: "Analysis",
   },
   {
-    path: "/analysis/:id/edit",
+    path: "/videos/:id/edit",
     Component: EditAnalysis,
     title: "Edit Analysis",
   },
   {
-    path: "/analysis/claim",
+    path: "/videos/claim",
     Component: Claim,
     title: "Claim",
   },
   {
-    path: "/analysis/claim/:id",
+    path: "/videos/claim/:id",
     Component: EditClaim,
     title: "Edit Claim",
   },
@@ -102,16 +102,16 @@ const routes = [
     Component: EditSpace,
     title: "Edit Space",
   },
-  {
-    path: "/videos/create",
-    Component: CreateVideo,
-    title: "Create Video",
-  },
-  {
-    path: "/videos/:id/edit",
-    Component: EditVideo,
-    title: "Edit Video",
-  },
+  // {
+  //   path: "/videos/create",
+  //   Component: CreateVideo,
+  //   title: "Create Video",
+  // },
+  // {
+  //   path: "/videos/:id/edit",
+  //   Component: EditVideo,
+  //   title: "Edit Video",
+  // },
   {
     path: "/preview/:id",
     Component: Preview,

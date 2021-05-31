@@ -17,17 +17,17 @@ function ClaimForm() {
   const { video, claims } = useSelector(({ videoClaims }) => videoClaims);
 
   if (!video.url || !claims[id]) {
-    history.push("/analysis/create");
+    history.push("/videos/create");
   }
 
   const onUpdate = (values) => {
     dispatch(addClaim(values));
-    history.push("/analysis/create");
+    history.push("/videos/create");
   };
 
   return (
     <Space direction="vertical">
-      <Link to={`/analysis/${video.id}/edit`}>
+      <Link to={`/videos/${video.id}/edit`}>
         <Button>Back</Button>
       </Link>
       <EditClaimForm
