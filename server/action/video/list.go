@@ -90,9 +90,9 @@ func list(w http.ResponseWriter, r *http.Request) {
 	}).Order("created_at " + sort)
 
 	if len(filteredVideoIDs) > 0 {
-		err = tx.Where(filteredVideoIDs).Count(&result.Total).Offset(offset).Limit(limit).Find(&result.Nodes).Error
+		err = tx.Where(filteredVideoIDs).Count(&result.Total).Offset(offset).Limit(limit).Find(&videos).Error
 	} else {
-		err = tx.Count(&result.Total).Offset(offset).Limit(limit).Find(&result.Nodes).Error
+		err = tx.Count(&result.Total).Offset(offset).Limit(limit).Find(&videos).Error
 	}
 
 	var ratingMap map[uint]model.Rating

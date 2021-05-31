@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"reflect"
 	"strconv"
 
+	"github.com/factly/dega-server/test"
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
@@ -71,6 +73,17 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Store HTML description
+	var description string
+	if len(rating.Description.RawMessage) > 0 && !reflect.DeepEqual(rating.Description, test.NilJsonb()) {
+		description, err = util.HTMLDescription(rating.Description)
+		if err != nil {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot parse rating description", http.StatusUnprocessableEntity)))
+			return
+		}
+	}
+
 	result := model.Rating{}
 	result.ID = uint(id)
 
@@ -134,6 +147,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		Description:      rating.Description,
 		NumericValue:     rating.NumericValue,
 		MediumID:         mediumID,
+		HTMLDescription:  description,
 	}).Preload("Medium").First(&result).Error
 
 	if err != nil {

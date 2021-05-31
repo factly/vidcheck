@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"reflect"
 
+	"github.com/factly/dega-server/test"
 	"github.com/factly/vidcheck/action/rating"
 
 	"github.com/factly/vidcheck/config"
@@ -123,20 +125,32 @@ func create(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// Store HTML description
+		var description string
+		if len(analysisBlock.Description.RawMessage) > 0 && !reflect.DeepEqual(analysisBlock.Description, test.NilJsonb()) {
+			description, err = util.HTMLDescription(analysisBlock.Description)
+			if err != nil {
+				loggerx.Error(err)
+				errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot parse analysisBlock description", http.StatusUnprocessableEntity)))
+				return
+			}
+		}
+
 		analysisBlockObj := model.Analysis{
-			VideoID:       videoObj.ID,
-			RatingID:      analysisBlock.RatingID,
-			Claim:         analysisBlock.Claim,
-			ClaimDate:     analysisBlock.ClaimDate,
-			CheckedDate:   analysisBlock.CheckedDate,
-			Fact:          analysisBlock.Fact,
-			Description:   analysisBlock.Description,
-			ClaimantID:    analysisBlock.ClaimantID,
-			ReviewSources: analysisBlock.ReviewSources,
-			ClaimSources:  analysisBlock.ClaimSources,
-			StartTime:     analysisBlock.StartTime,
-			EndTime:       analysisBlock.EndTime,
-			SpaceID:       uint(sID),
+			VideoID:         videoObj.ID,
+			RatingID:        analysisBlock.RatingID,
+			Claim:           analysisBlock.Claim,
+			ClaimDate:       analysisBlock.ClaimDate,
+			CheckedDate:     analysisBlock.CheckedDate,
+			Fact:            analysisBlock.Fact,
+			Description:     analysisBlock.Description,
+			ClaimantID:      analysisBlock.ClaimantID,
+			ReviewSources:   analysisBlock.ReviewSources,
+			ClaimSources:    analysisBlock.ClaimSources,
+			StartTime:       analysisBlock.StartTime,
+			EndTime:         analysisBlock.EndTime,
+			HTMLDescription: description,
+			SpaceID:         uint(sID),
 		}
 		analysisBlocks = append(analysisBlocks, analysisBlockObj)
 	}

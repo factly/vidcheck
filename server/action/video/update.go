@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"reflect"
 	"strconv"
 
+	"github.com/factly/dega-server/test"
 	"github.com/factly/vidcheck/action/rating"
 	"github.com/factly/vidcheck/config"
 	"github.com/factly/vidcheck/model"
@@ -151,19 +153,31 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 			analysisBlockObj := &model.Analysis{}
 			analysisBlockObj.ID = uint(analysisBlock.ID)
+
+			// Store HTML description
+			var description string
+			if len(analysisBlock.Description.RawMessage) > 0 && !reflect.DeepEqual(analysisBlock.Description, test.NilJsonb()) {
+				description, err = util.HTMLDescription(analysisBlock.Description)
+				if err != nil {
+					loggerx.Error(err)
+					errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot parse analysisBlock description", http.StatusUnprocessableEntity)))
+					return
+				}
+			}
 			tx.Model(&analysisBlockObj).Updates(model.Analysis{
-				Base:          model.Base{UpdatedByID: uint(uID)},
-				RatingID:      analysisBlock.RatingID,
-				Claim:         analysisBlock.Claim,
-				ClaimDate:     analysisBlock.ClaimDate,
-				CheckedDate:   analysisBlock.CheckedDate,
-				Fact:          analysisBlock.Fact,
-				Description:   analysisBlock.Description,
-				ReviewSources: analysisBlock.ReviewSources,
-				ClaimantID:    analysisBlock.ClaimantID,
-				ClaimSources:  analysisBlock.ClaimSources,
-				StartTime:     analysisBlock.StartTime,
-				EndTime:       analysisBlock.EndTime,
+				Base:            model.Base{UpdatedByID: uint(uID)},
+				RatingID:        analysisBlock.RatingID,
+				Claim:           analysisBlock.Claim,
+				ClaimDate:       analysisBlock.ClaimDate,
+				CheckedDate:     analysisBlock.CheckedDate,
+				Fact:            analysisBlock.Fact,
+				Description:     analysisBlock.Description,
+				ReviewSources:   analysisBlock.ReviewSources,
+				ClaimantID:      analysisBlock.ClaimantID,
+				ClaimSources:    analysisBlock.ClaimSources,
+				StartTime:       analysisBlock.StartTime,
+				EndTime:         analysisBlock.EndTime,
+				HTMLDescription: description,
 			})
 
 			err = updateAnalysisObjIntoMeili(*analysisBlockObj)
@@ -196,16 +210,28 @@ func update(w http.ResponseWriter, r *http.Request) {
 			}
 
 			analysisBlockObj := model.Analysis{}
+
+			// Store HTML description
+			var description string
+			if len(analysisBlock.Description.RawMessage) > 0 && !reflect.DeepEqual(analysisBlock.Description, test.NilJsonb()) {
+				description, err = util.HTMLDescription(analysisBlock.Description)
+				if err != nil {
+					loggerx.Error(err)
+					errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot parse analysisBlock description", http.StatusUnprocessableEntity)))
+					return
+				}
+			}
 			analysisBlockObj = model.Analysis{
-				VideoID:       videoObj.ID,
-				RatingID:      analysisBlock.RatingID,
-				ClaimantID:    analysisBlock.ClaimantID,
-				Claim:         analysisBlock.Claim,
-				Fact:          analysisBlock.Fact,
-				Description:   analysisBlock.Description,
-				ReviewSources: analysisBlock.ReviewSources,
-				StartTime:     analysisBlock.StartTime,
-				EndTime:       analysisBlock.EndTime,
+				VideoID:         videoObj.ID,
+				RatingID:        analysisBlock.RatingID,
+				ClaimantID:      analysisBlock.ClaimantID,
+				Claim:           analysisBlock.Claim,
+				Fact:            analysisBlock.Fact,
+				Description:     analysisBlock.Description,
+				ReviewSources:   analysisBlock.ReviewSources,
+				StartTime:       analysisBlock.StartTime,
+				EndTime:         analysisBlock.EndTime,
+				HTMLDescription: description,
 			}
 			err = tx.Model(&model.Analysis{}).Create(&analysisBlockObj).Error
 			if err != nil {

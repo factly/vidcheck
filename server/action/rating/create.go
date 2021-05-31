@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"reflect"
 
 	"gorm.io/gorm"
 
+	"github.com/factly/dega-server/test"
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
@@ -93,6 +95,17 @@ func create(w http.ResponseWriter, r *http.Request) {
 		mediumID = nil
 	}
 
+	// Store HTML description
+	var description string
+	if len(rating.Description.RawMessage) > 0 && !reflect.DeepEqual(rating.Description, test.NilJsonb()) {
+		description, err = util.HTMLDescription(rating.Description)
+		if err != nil {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot parse rating description", http.StatusUnprocessableEntity)))
+			return
+		}
+	}
+
 	result := &model.Rating{
 		Name:             rating.Name,
 		Slug:             rating.Slug,
@@ -102,6 +115,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		TextColour:       rating.TextColour,
 		SpaceID:          uint(sID),
 		MediumID:         mediumID,
+		HTMLDescription:  description,
 	}
 
 	tx := model.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
