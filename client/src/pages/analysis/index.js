@@ -282,7 +282,13 @@ function Analysis({ onSubmit }) {
               style={{ margin: 5 }}
               key={index}
               actions={[
-                <Link to={`/videos/claim/${index}`}>
+                <Link
+                  to={
+                    video.id
+                      ? `/videos/${video.id}/claim/${index}`
+                      : `/videos/claim/${index}`
+                  }
+                >
                   <EditOutlined key="edit" />
                 </Link>,
                 <Popconfirm

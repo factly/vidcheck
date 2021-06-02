@@ -48,7 +48,12 @@ const routes = [
     title: "Claim",
   },
   {
-    path: "/videos/claim/:id",
+    path: "/videos/:vid/claim/:index",
+    Component: EditClaim,
+    title: "Edit Claim",
+  },
+  {
+    path: "/videos/claim/:index",
     Component: EditClaim,
     title: "Edit Claim",
   },

@@ -96,8 +96,12 @@ function Claim({ onCreate, data, video }) {
         checked_date: data.checked_date ? moment(data.checked_date) : null,
       }
     : {
-        end_time: convertSecondsToTimeString(video.end_time),
-        start_time: convertSecondsToTimeString(video.start_time),
+        end_time: video?.end_time
+          ? convertSecondsToTimeString(video.end_time)
+          : null,
+        start_time: video?.start_time
+          ? convertSecondsToTimeString(video.start_time)
+          : null,
       };
 
   return (
