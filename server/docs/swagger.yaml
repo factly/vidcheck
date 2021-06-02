@@ -4,6 +4,8 @@ definitions:
     properties:
       description:
         type: string
+      medium_id:
+        type: integer
       name:
         type: string
       slug:
@@ -22,7 +24,54 @@ definitions:
       total:
         type: integer
     type: object
-  model.Analysis:
+  embed.paging:
+    properties:
+      nodes:
+        items:
+          $ref: '#/definitions/embed.videoResData'
+        type: array
+      total:
+        type: integer
+    type: object
+  embed.videoResData:
+    properties:
+      claims:
+        items:
+          $ref: '#/definitions/model.Claim'
+        type: array
+      video:
+        $ref: '#/definitions/model.Video'
+        type: object
+    type: object
+  medium.medium:
+    properties:
+      alt_text:
+        type: string
+      caption:
+        type: string
+      description:
+        type: string
+      dimensions:
+        type: string
+      file_size:
+        type: integer
+      name:
+        type: string
+      slug:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+      url:
+        type: string
+    required:
+    - dimensions
+    - file_size
+    - name
+    - type
+    type: object
+  model.Claim:
     properties:
       checked_date:
         type: string
@@ -34,38 +83,43 @@ definitions:
         type: string
       claimant:
         $ref: '#/definitions/model.Claimant'
+        type: object
       claimant_id:
         type: integer
       created_at:
         type: string
+      created_by_id:
+        type: integer
       deleted_at:
         type: string
       description:
         type: string
       end_time:
         type: integer
-      end_time_fraction:
-        type: number
       fact:
         type: string
-      html:
+      html_description:
         type: string
       id:
         type: integer
-      is_claim:
-        type: boolean
       rating:
         $ref: '#/definitions/model.Rating'
+        type: object
       rating_id:
         type: integer
       review_sources:
         type: string
+      space_id:
+        type: integer
       start_time:
         type: integer
       updated_at:
         type: string
+      updated_by_id:
+        type: integer
       video:
         $ref: '#/definitions/model.Video'
+        type: object
       video_id:
         type: integer
     type: object
@@ -73,11 +127,20 @@ definitions:
     properties:
       created_at:
         type: string
+      created_by_id:
+        type: integer
       deleted_at:
         type: string
       description:
         type: string
+      html_description:
+        type: string
       id:
+        type: integer
+      medium:
+        $ref: '#/definitions/model.Medium'
+        type: object
+      medium_id:
         type: integer
       name:
         type: string
@@ -89,18 +152,66 @@ definitions:
         type: string
       updated_at:
         type: string
+      updated_by_id:
+        type: integer
     type: object
-  model.Rating:
+  model.Medium:
     properties:
-      colour:
+      alt_text:
+        type: string
+      caption:
         type: string
       created_at:
         type: string
+      created_by_id:
+        type: integer
       deleted_at:
         type: string
       description:
         type: string
+      dimensions:
+        type: string
+      file_size:
+        type: integer
       id:
+        type: integer
+      name:
+        type: string
+      slug:
+        type: string
+      space_id:
+        type: integer
+      title:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+      updated_by_id:
+        type: integer
+      url:
+        type: string
+    type: object
+  model.Rating:
+    properties:
+      background_colour:
+        type: string
+      created_at:
+        type: string
+      created_by_id:
+        type: integer
+      deleted_at:
+        type: string
+      description:
+        type: string
+      html_description:
+        type: string
+      id:
+        type: integer
+      medium:
+        $ref: '#/definitions/model.Medium'
+        type: object
+      medium_id:
         type: integer
       name:
         type: string
@@ -110,20 +221,48 @@ definitions:
         type: string
       space_id:
         type: integer
+      text_colour:
+        type: string
       updated_at:
         type: string
+      updated_by_id:
+        type: integer
     type: object
   model.Space:
     properties:
+      analytics:
+        type: string
       contact_info:
         type: string
       created_at:
         type: string
+      created_by_id:
+        type: integer
       deleted_at:
         type: string
       description:
         type: string
+      fav_icon:
+        $ref: '#/definitions/model.Medium'
+        type: object
+      fav_icon_id:
+        type: integer
       id:
+        type: integer
+      logo:
+        $ref: '#/definitions/model.Medium'
+        type: object
+      logo_id:
+        type: integer
+      logo_mobile:
+        $ref: '#/definitions/model.Medium'
+        type: object
+      logo_mobile_id:
+        type: integer
+      mobile_icon:
+        $ref: '#/definitions/model.Medium'
+        type: object
+      mobile_icon_id:
         type: integer
       name:
         type: string
@@ -141,6 +280,8 @@ definitions:
         type: string
       updated_at:
         type: string
+      updated_by_id:
+        type: integer
       verification_codes:
         type: string
     type: object
@@ -148,6 +289,8 @@ definitions:
     properties:
       created_at:
         type: string
+      created_by_id:
+        type: integer
       deleted_at:
         type: string
       id:
@@ -160,8 +303,12 @@ definitions:
         type: string
       title:
         type: string
+      total_duration:
+        type: integer
       updated_at:
         type: string
+      updated_by_id:
+        type: integer
       url:
         type: string
       video_type:
@@ -178,30 +325,39 @@ definitions:
     type: object
   rating.rating:
     properties:
-      colour:
+      background_colour:
         type: string
       description:
         type: string
+      medium_id:
+        type: integer
       name:
         type: string
       numeric_value:
         type: integer
       slug:
         type: string
+      text_colour:
+        type: string
     required:
+    - background_colour
     - name
     - numeric_value
+    - text_colour
     type: object
   space.orgWithSpace:
     properties:
       created_at:
         type: string
+      created_by_id:
+        type: integer
       deleted_at:
         type: string
       id:
         type: integer
       permission:
         $ref: '#/definitions/space.organisationUser'
+        type: object
       slug:
         type: string
       spaces:
@@ -212,11 +368,15 @@ definitions:
         type: string
       updated_at:
         type: string
+      updated_by_id:
+        type: integer
     type: object
   space.organisationUser:
     properties:
       created_at:
         type: string
+      created_by_id:
+        type: integer
       deleted_at:
         type: string
       id:
@@ -225,13 +385,25 @@ definitions:
         type: string
       updated_at:
         type: string
+      updated_by_id:
+        type: integer
     type: object
   space.space:
     properties:
+      analytics:
+        type: string
       contact_info:
         type: string
       description:
         type: string
+      fav_icon_id:
+        type: integer
+      logo_id:
+        type: integer
+      logo_mobile_id:
+        type: integer
+      mobile_icon_id:
+        type: integer
       name:
         type: string
       organisation_id:
@@ -256,7 +428,7 @@ definitions:
     properties:
       nodes:
         items:
-          $ref: '#/definitions/video.videoanalysisData'
+          $ref: '#/definitions/video.videoResData'
         type: array
       total:
         type: integer
@@ -277,8 +449,32 @@ definitions:
         type: string
     required:
     - title
+    - total_duration
     - url
     - video_type
+    type: object
+  video.videoReqData:
+    properties:
+      claims:
+        items:
+          $ref: '#/definitions/video.videoanalysis'
+        type: array
+      video:
+        $ref: '#/definitions/video.video'
+        type: object
+    required:
+    - claims
+    - video
+    type: object
+  video.videoResData:
+    properties:
+      claims:
+        items:
+          $ref: '#/definitions/model.Claim'
+        type: array
+      video:
+        $ref: '#/definitions/model.Video'
+        type: object
     type: object
   video.videoanalysis:
     properties:
@@ -296,14 +492,10 @@ definitions:
         type: string
       end_time:
         type: integer
-      end_time_fraction:
-        type: number
       fact:
         type: string
       id:
         type: integer
-      is_claim:
-        type: boolean
       rating_id:
         type: integer
       review_sources:
@@ -313,96 +505,7 @@ definitions:
     required:
     - claimant_id
     - end_time
-    - end_time_fraction
     - rating_id
-    type: object
-  video.videoanalysisData:
-    properties:
-      analysis:
-        items:
-          $ref: '#/definitions/model.Analysis'
-        type: array
-      video:
-        $ref: '#/definitions/model.Video'
-    type: object
-  video.videoanalysisReqData:
-    properties:
-      analysis:
-        items:
-          $ref: '#/definitions/video.videoanalysis'
-        type: array
-      video:
-        $ref: '#/definitions/video.video'
-    required:
-    - analysis
-    - video
-    type: object
-  videoanalysis.paging:
-    properties:
-      nodes:
-        items:
-          $ref: '#/definitions/model.Analysis'
-        type: array
-      total:
-        type: integer
-    type: object
-  videoanalysis.video:
-    properties:
-      summary:
-        type: string
-      title:
-        type: string
-      url:
-        type: string
-      video_type:
-        type: string
-    required:
-    - title
-    - url
-    - video_type
-    type: object
-  videoanalysis.videoAnalysis:
-    properties:
-      checked_date:
-        type: string
-      claim:
-        type: string
-      claim_date:
-        type: string
-      claim_sources:
-        type: string
-      end_time:
-        type: integer
-      end_time_fraction:
-        type: number
-      fact:
-        type: string
-      id:
-        type: integer
-      is_claim:
-        type: boolean
-      rating_id:
-        type: integer
-      review_sources:
-        type: string
-      start_time:
-        type: integer
-    required:
-    - end_time
-    - end_time_fraction
-    - rating_id
-    type: object
-  videoanalysis.videoAnalysisApiData:
-    properties:
-      analysis:
-        items:
-          $ref: '#/definitions/videoanalysis.videoAnalysis'
-        type: array
-      video:
-        $ref: '#/definitions/videoanalysis.video'
-    required:
-    - analysis
-    - video
     type: object
 host: localhost:7740
 info:
@@ -417,199 +520,6 @@ info:
   title: VidCheck API
   version: "1.0"
 paths:
-  /analysis:
-    post:
-      description: Create videoAnalysis
-      operationId: add-video-analysis
-      parameters:
-      - description: User ID
-        in: header
-        name: X-User
-        required: true
-        type: string
-      - description: Organisation ID
-        in: header
-        name: X-Organisation
-        required: true
-        type: string
-      - description: Video Analysis Api Data
-        in: body
-        name: Data
-        required: true
-        schema:
-          $ref: '#/definitions/videoanalysis.videoAnalysisApiData'
-      responses:
-        "201":
-          description: Created
-          schema:
-            items:
-              $ref: '#/definitions/model.Analysis'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            items:
-              type: string
-            type: array
-      summary: Create videoAnalysis
-      tags:
-      - VideoAnalysis
-  /analysis/video/{video_id}/analysis/{video_analysis_id}:
-    delete:
-      description: Delete videoAnalysis by id
-      operationId: delete-video-analysis-by-id
-      parameters:
-      - description: User ID
-        in: header
-        name: X-User
-        required: true
-        type: string
-      - description: Organisation ID
-        in: header
-        name: X-Organisation
-        required: true
-        type: string
-      - description: Video ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Video Analysis ID
-        in: path
-        name: video_analysis_id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: ""
-        "400":
-          description: Bad Request
-          schema:
-            items:
-              type: string
-            type: array
-      summary: Delete a videoAnalysis by id
-      tags:
-      - VideoAnalysis
-    get:
-      description: Get videosAnalysis by ID
-      operationId: get-video-analysis-by-id
-      parameters:
-      - description: User ID
-        in: header
-        name: X-User
-        required: true
-        type: string
-      - description: Organisation ID
-        in: header
-        name: X-Organisation
-        required: true
-        type: string
-      - description: Video ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Video Analysis ID
-        in: path
-        name: video_analysis_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Analysis'
-        "400":
-          description: Bad Request
-          schema:
-            items:
-              type: string
-            type: array
-      summary: Show a videosAnalysis by id
-      tags:
-      - VideoAnalysis
-    put:
-      description: Update videosAnalysis by ID
-      operationId: update-video-analysis-by-id
-      parameters:
-      - description: User ID
-        in: header
-        name: X-User
-        required: true
-        type: string
-      - description: Organisation ID
-        in: header
-        name: X-Organisation
-        required: true
-        type: string
-      - description: Video ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Video Analysis ID
-        in: path
-        name: video_analysis_id
-        required: true
-        type: string
-      - description: Video Analysis Data
-        in: body
-        name: Data
-        required: true
-        schema:
-          $ref: '#/definitions/videoanalysis.videoAnalysis'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Analysis'
-        "400":
-          description: Bad Request
-          schema:
-            items:
-              type: string
-            type: array
-      summary: Update a videosAnalysis by id
-      tags:
-      - VideoAnalysis
-  /api/v1/analyse:
-    get:
-      description: Show all video analysis
-      operationId: get-all-video-analysis
-      parameters:
-      - description: User ID
-        in: header
-        name: X-User
-        required: true
-        type: string
-      - description: Organisation ID
-        in: header
-        name: X-Organisation
-        required: true
-        type: string
-      - description: limt per page
-        in: query
-        name: limit
-        type: string
-      - description: page number
-        in: query
-        name: page
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/videoanalysis.paging'
-      summary: Show all video analysis
-      tags:
-      - VideoAnalysis
   /claimants:
     get:
       description: Get all claimants
@@ -700,8 +610,7 @@ paths:
         required: true
         type: string
       responses:
-        "200":
-          description: ""
+        "200": {}
       summary: Delete a claimant
       tags:
       - Claimant
@@ -768,6 +677,177 @@ paths:
       summary: Update a claimant by id
       tags:
       - Claimant
+  /core/media:
+    get:
+      description: Get all media
+      operationId: get-all-media
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Query
+        in: query
+        name: q
+        type: string
+      - description: Sort
+        in: query
+        name: sort
+        type: string
+      - description: limit per page
+        in: query
+        name: limit
+        type: string
+      - description: page number
+        in: query
+        name: page
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Medium'
+            type: array
+      summary: Show all media
+      tags:
+      - Medium
+    post:
+      description: Create medium
+      operationId: add-medium
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Medium Object
+        in: body
+        name: Medium
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/medium.medium'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/model.Medium'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Create medium
+      tags:
+      - Medium
+  /core/media/{medium_id}:
+    delete:
+      description: Delete medium by ID
+      operationId: delete-medium-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Medium ID
+        in: path
+        name: medium_id
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      responses:
+        "200": {}
+      summary: Delete a medium
+      tags:
+      - Medium
+    get:
+      description: Get medium by ID
+      operationId: get-medium-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Medium ID
+        in: path
+        name: medium_id
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Medium'
+      summary: Show a medium by id
+      tags:
+      - Medium
+    put:
+      description: Update medium by ID
+      operationId: update-medium-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Medium ID
+        in: path
+        name: medium_id
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Medium
+        in: body
+        name: Medium
+        schema:
+          $ref: '#/definitions/medium.medium'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Medium'
+      summary: Update a medium by id
+      tags:
+      - Medium
   /ratings:
     get:
       description: Get all ratings
@@ -858,8 +938,7 @@ paths:
         required: true
         type: string
       responses:
-        "200":
-          description: ""
+        "200": {}
       summary: Delete a rating
       tags:
       - Rating
@@ -959,6 +1038,39 @@ paths:
       summary: Create Default Ratings
       tags:
       - Rating
+  /ratings/embed:
+    get:
+      description: Get all ratings
+      operationId: get-all-ratings
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: limt per page
+        in: query
+        name: limit
+        type: string
+      - description: page number
+        in: query
+        name: page
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/embed.paging'
+      summary: Show all ratings
+      tags:
+      - Ratings
   /spaces:
     get:
       description: Get all spaces
@@ -1031,8 +1143,7 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: ""
+        "200": {}
       summary: Delete space
       tags:
       - Space
@@ -1113,17 +1224,17 @@ paths:
         name: X-Space
         required: true
         type: string
-      - description: Video Analysis Api Data
+      - description: Video Api Data
         in: body
         name: Data
         required: true
         schema:
-          $ref: '#/definitions/video.videoanalysisReqData'
+          $ref: '#/definitions/video.videoReqData'
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/video.videoanalysisData'
+            $ref: '#/definitions/video.videoResData'
         "400":
           description: Bad Request
           schema:
@@ -1154,8 +1265,7 @@ paths:
         required: true
         type: string
       responses:
-        "200":
-          description: ""
+        "200": {}
         "400":
           description: Bad Request
           schema:
@@ -1190,7 +1300,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/video.videoanalysisData'
+            $ref: '#/definitions/video.videoResData'
         "400":
           description: Bad Request
           schema:
@@ -1224,7 +1334,7 @@ paths:
         name: Data
         required: true
         schema:
-          $ref: '#/definitions/video.videoanalysisReqData'
+          $ref: '#/definitions/video.videoReqData'
       produces:
       - application/json
       responses:
@@ -1267,7 +1377,76 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/video.videoanalysisData'
+            $ref: '#/definitions/video.videoResData'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Show a published video by id
+      tags:
+      - Videos
+  /videos/embed:
+    get:
+      description: Get all videos
+      operationId: get-all-videos
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: limt per page
+        in: query
+        name: limit
+        type: string
+      - description: page number
+        in: query
+        name: page
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/embed.paging'
+      summary: Show all videos
+      tags:
+      - Videos
+  /videos/embed/{video_id}:
+    get:
+      description: Get published video by ID
+      operationId: get-published-video-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Video ID
+        in: path
+        name: video_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/embed.videoResData'
         "400":
           description: Bad Request
           schema:

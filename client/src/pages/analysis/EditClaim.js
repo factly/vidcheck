@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
-import { addClaim } from "../../actions/analysis";
+import { addClaim } from "../../actions/claims";
 import { convertSecondsToTimeString } from "../../utils/analysis";
 
 import EditClaimForm from "./ClaimForm/Claim";
@@ -14,31 +14,24 @@ function ClaimForm() {
   const dispatch = useDispatch();
   const { id } = useParams();
 
-  const { video, claims } = useSelector(({ analysis }) => analysis);
+  const { video, claims } = useSelector(({ videoClaims }) => videoClaims);
 
   if (!video.url || !claims[id]) {
-    history.push("/analysis/create");
+    history.push("/videos/create");
   }
 
   const onUpdate = (values) => {
-    dispatch(addClaim(values));
-    history.push("/analysis/create");
+    dispatch(addClaim({ ...claims[id], ...values }));
+    if (video.id) history.push(`/videos/${video.id}/edit`);
+    else history.push("/videos/create");
   };
 
   return (
     <Space direction="vertical">
-      <Link to={`/analysis/${video.id}/edit`}>
+      <Link to={`/videos/${video.id}/edit`}>
         <Button>Back</Button>
       </Link>
-      <EditClaimForm
-        data={claims[id]}
-        onCreate={onUpdate}
-        startTime={
-          claims.length > 0
-            ? convertSecondsToTimeString(claims[claims.length - 1].end_time)
-            : "00:00"
-        }
-      />
+      <EditClaimForm data={claims[id]} onCreate={onUpdate} />
     </Space>
   );
 }

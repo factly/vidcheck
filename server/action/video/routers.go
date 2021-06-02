@@ -32,14 +32,14 @@ type videoanalysis struct {
 	EndTime       int            `json:"end_time" validate:"required"`
 }
 
-type videoanalysisReqData struct {
-	Video    video           `json:"video" validate:"required"`
-	Analysis []videoanalysis `json:"analysis" validate:"required"`
+type videoReqData struct {
+	Video  video           `json:"video" validate:"required"`
+	Claims []videoanalysis `json:"claims" validate:"required"`
 }
 
-type videoanalysisData struct {
-	Video    model.Video      `json:"video"`
-	Analysis []model.Analysis `json:"analysis"`
+type videoResData struct {
+	Video  model.Video   `json:"video"`
+	Claims []model.Claim `json:"claims"`
 }
 
 var userContext model.ContextKey = "video_user"

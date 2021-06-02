@@ -10,7 +10,6 @@ function CreateAnalysis() {
   const dispatch = useDispatch();
   const onCreate = (values) => {
     dispatch(addVideo(values)).then((res) => {
-      console.log({ res });
       history.push(`/preview/${res.video.id}`);
     });
   };

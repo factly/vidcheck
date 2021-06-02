@@ -30,7 +30,7 @@ import (
 // @Param X-User header string true "User ID"
 // @Param X-Space header string true "Space ID"
 // @Param video_id path string true "Video ID"
-// @Param Video Analysis Api Data body videoanalysisReqData true "Video Analysis Api Data"
+// @Param Video Analysis Api Data body videoReqData true "Video Analysis Api Data"
 // @Success 200 {object} model.Video
 // @Failure 400 {array} string
 // @Router /videos/{video_id} [put]
@@ -57,15 +57,15 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	videoAnalysisData := &videoanalysisReqData{}
-	err = json.NewDecoder(r.Body).Decode(&videoAnalysisData)
+	videoData := &videoReqData{}
+	err = json.NewDecoder(r.Body).Decode(&videoData)
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DecodeError()))
 		return
 	}
 
-	validationError := validationx.Check(videoAnalysisData)
+	validationError := validationx.Check(videoData)
 	if validationError != nil {
 		loggerx.Error(errors.New("validation error"))
 		errorx.Render(w, validationError)
@@ -101,10 +101,10 @@ func update(w http.ResponseWriter, r *http.Request) {
 	tx := model.DB.Begin()
 	tx.Model(&videoObj).Updates(model.Video{
 		Base:      model.Base{UpdatedByID: uint(uID)},
-		Title:     videoAnalysisData.Video.Title,
-		Summary:   videoAnalysisData.Video.Summary,
-		VideoType: videoAnalysisData.Video.VideoType,
-		Status:    videoAnalysisData.Video.Status,
+		Title:     videoData.Video.Title,
+		Summary:   videoData.Video.Summary,
+		VideoType: videoData.Video.VideoType,
+		Status:    videoData.Video.Status,
 	}).First(&videoObj)
 
 	meiliVideoObj := map[string]interface{}{
@@ -128,18 +128,18 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var updatedOrCreatedVideoBlock []uint
-	for _, analysisBlock := range videoAnalysisData.Analysis {
-		if analysisBlock.ID != uint(0) {
+	for _, claimBlock := range videoData.Claims {
+		if claimBlock.ID != uint(0) {
 			// check if new rating exist
 			if config.DegaIntegrated() {
-				if rat, found := degaRatingMap[analysisBlock.RatingID]; found {
-					ratingMap[analysisBlock.EndTime] = &rat
+				if rat, found := degaRatingMap[claimBlock.RatingID]; found {
+					ratingMap[claimBlock.EndTime] = &rat
 				} else {
 					err = errors.New(`rating does not exist in dega`)
 				}
 			} else {
 				rat := model.Rating{}
-				rat.ID = analysisBlock.RatingID
+				rat.ID = claimBlock.RatingID
 				err = tx.First(&rat).Error
 			}
 
@@ -150,54 +150,54 @@ func update(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			analysisBlockObj := &model.Analysis{}
-			analysisBlockObj.ID = uint(analysisBlock.ID)
+			claimBlockObj := &model.Claim{}
+			claimBlockObj.ID = uint(claimBlock.ID)
 
 			// Store HTML description
 			var description string
-			if len(analysisBlock.Description.RawMessage) > 0 && !reflect.DeepEqual(analysisBlock.Description, util.NilJsonb()) {
-				description, err = util.HTMLDescription(analysisBlock.Description)
+			if len(claimBlock.Description.RawMessage) > 0 && !reflect.DeepEqual(claimBlock.Description, util.NilJsonb()) {
+				description, err = util.HTMLDescription(claimBlock.Description)
 				if err != nil {
 					loggerx.Error(err)
-					errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot parse analysisBlock description", http.StatusUnprocessableEntity)))
+					errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot parse claimBlock description", http.StatusUnprocessableEntity)))
 					return
 				}
 			}
-			tx.Model(&analysisBlockObj).Updates(model.Analysis{
+			tx.Model(&claimBlockObj).Updates(model.Claim{
 				Base:            model.Base{UpdatedByID: uint(uID)},
-				RatingID:        analysisBlock.RatingID,
-				Claim:           analysisBlock.Claim,
-				ClaimDate:       analysisBlock.ClaimDate,
-				CheckedDate:     analysisBlock.CheckedDate,
-				Fact:            analysisBlock.Fact,
-				Description:     analysisBlock.Description,
-				ReviewSources:   analysisBlock.ReviewSources,
-				ClaimantID:      analysisBlock.ClaimantID,
-				ClaimSources:    analysisBlock.ClaimSources,
-				StartTime:       analysisBlock.StartTime,
-				EndTime:         analysisBlock.EndTime,
+				RatingID:        claimBlock.RatingID,
+				Claim:           claimBlock.Claim,
+				ClaimDate:       claimBlock.ClaimDate,
+				CheckedDate:     claimBlock.CheckedDate,
+				Fact:            claimBlock.Fact,
+				Description:     claimBlock.Description,
+				ReviewSources:   claimBlock.ReviewSources,
+				ClaimantID:      claimBlock.ClaimantID,
+				ClaimSources:    claimBlock.ClaimSources,
+				StartTime:       claimBlock.StartTime,
+				EndTime:         claimBlock.EndTime,
 				HTMLDescription: description,
 			})
 
-			err = updateAnalysisObjIntoMeili(*analysisBlockObj)
+			err = updateAnalysisObjIntoMeili(*claimBlockObj)
 			if err != nil {
 				tx.Rollback()
 				loggerx.Error(err)
 				errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
 				return
 			}
-			updatedOrCreatedVideoBlock = append(updatedOrCreatedVideoBlock, analysisBlockObj.ID)
+			updatedOrCreatedVideoBlock = append(updatedOrCreatedVideoBlock, claimBlockObj.ID)
 		} else {
 			// check if new rating exist
 			if config.DegaIntegrated() {
-				if rat, found := degaRatingMap[analysisBlock.RatingID]; found {
-					ratingMap[analysisBlock.EndTime] = &rat
+				if rat, found := degaRatingMap[claimBlock.RatingID]; found {
+					ratingMap[claimBlock.EndTime] = &rat
 				} else {
 					err = errors.New(`rating does not exist in dega`)
 				}
 			} else {
 				rat := model.Rating{}
-				rat.ID = analysisBlock.RatingID
+				rat.ID = claimBlock.RatingID
 				err = tx.First(&rat).Error
 			}
 
@@ -208,31 +208,31 @@ func update(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			analysisBlockObj := model.Analysis{}
+			claimBlockObj := model.Claim{}
 
 			// Store HTML description
 			var description string
-			if len(analysisBlock.Description.RawMessage) > 0 && !reflect.DeepEqual(analysisBlock.Description, util.NilJsonb()) {
-				description, err = util.HTMLDescription(analysisBlock.Description)
+			if len(claimBlock.Description.RawMessage) > 0 && !reflect.DeepEqual(claimBlock.Description, util.NilJsonb()) {
+				description, err = util.HTMLDescription(claimBlock.Description)
 				if err != nil {
 					loggerx.Error(err)
-					errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot parse analysisBlock description", http.StatusUnprocessableEntity)))
+					errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot parse claimBlock description", http.StatusUnprocessableEntity)))
 					return
 				}
 			}
-			analysisBlockObj = model.Analysis{
+			claimBlockObj = model.Claim{
 				VideoID:         videoObj.ID,
-				RatingID:        analysisBlock.RatingID,
-				ClaimantID:      analysisBlock.ClaimantID,
-				Claim:           analysisBlock.Claim,
-				Fact:            analysisBlock.Fact,
-				Description:     analysisBlock.Description,
-				ReviewSources:   analysisBlock.ReviewSources,
-				StartTime:       analysisBlock.StartTime,
-				EndTime:         analysisBlock.EndTime,
+				RatingID:        claimBlock.RatingID,
+				ClaimantID:      claimBlock.ClaimantID,
+				Claim:           claimBlock.Claim,
+				Fact:            claimBlock.Fact,
+				Description:     claimBlock.Description,
+				ReviewSources:   claimBlock.ReviewSources,
+				StartTime:       claimBlock.StartTime,
+				EndTime:         claimBlock.EndTime,
 				HTMLDescription: description,
 			}
-			err = tx.Model(&model.Analysis{}).Create(&analysisBlockObj).Error
+			err = tx.Model(&model.Claim{}).Create(&claimBlockObj).Error
 			if err != nil {
 				tx.Rollback()
 				loggerx.Error(err)
@@ -240,23 +240,23 @@ func update(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			err = updateAnalysisObjIntoMeili(analysisBlockObj)
+			err = updateAnalysisObjIntoMeili(claimBlockObj)
 			if err != nil {
 				tx.Rollback()
 				loggerx.Error(err)
 				errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
 				return
 			}
-			updatedOrCreatedVideoBlock = append(updatedOrCreatedVideoBlock, analysisBlockObj.ID)
+			updatedOrCreatedVideoBlock = append(updatedOrCreatedVideoBlock, claimBlockObj.ID)
 		}
 	}
 	// delete all the videoAnalysisBlocks which is neither updated/created.
 	if len(updatedOrCreatedVideoBlock) > 0 {
-		analysisBlocks := []model.Analysis{}
-		tx.Model(&model.Analysis{}).Not(updatedOrCreatedVideoBlock).Where("video_id = ?", uint(id)).Delete(&analysisBlocks)
+		claimBlocks := []model.Claim{}
+		tx.Model(&model.Claim{}).Not(updatedOrCreatedVideoBlock).Where("video_id = ?", uint(id)).Delete(&claimBlocks)
 
-		for _, analysis := range analysisBlocks {
-			err = meilisearchx.DeleteDocument("vidcheck", analysis.ID, "analysis")
+		for _, claim := range claimBlocks {
+			err = meilisearchx.DeleteDocument("vidcheck", claim.ID, "claim")
 			if err != nil {
 				tx.Rollback()
 				loggerx.Error(err)
@@ -268,51 +268,51 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	tx.Commit()
 
-	// Get all video analysisBlocks.
-	analysisBlocks := []model.Analysis{}
-	stmt := model.DB.Model(&model.Analysis{}).Order("start_time").Where("video_id = ?", uint(id)).Preload("Claimant")
+	// Get all video claimBlocks.
+	claimBlocks := []model.Claim{}
+	stmt := model.DB.Model(&model.Claim{}).Order("start_time").Where("video_id = ?", uint(id)).Preload("Claimant")
 
 	if !config.DegaIntegrated() {
 		stmt.Preload("Rating")
 	}
 
-	stmt.Find(&analysisBlocks)
+	stmt.Find(&claimBlocks)
 
 	if config.DegaIntegrated() {
-		analysisBlocks = AddDegaRatings(uID, sID, analysisBlocks, degaRatingMap)
+		claimBlocks = AddDegaRatings(uID, sID, claimBlocks, degaRatingMap)
 	}
 
-	result := videoanalysisData{
-		Video:    *videoObj,
-		Analysis: analysisBlocks,
+	result := videoResData{
+		Video:  *videoObj,
+		Claims: claimBlocks,
 	}
 	renderx.JSON(w, http.StatusOK, result)
 }
 
-func updateAnalysisObjIntoMeili(analysis model.Analysis) error {
+func updateAnalysisObjIntoMeili(claim model.Claim) error {
 	var claimMeiliDate int64 = 0
-	if analysis.ClaimDate != nil {
-		claimMeiliDate = analysis.ClaimDate.Unix()
+	if claim.ClaimDate != nil {
+		claimMeiliDate = claim.ClaimDate.Unix()
 	}
 	var checkedMeiliDate int64 = 0
-	if analysis.CheckedDate != nil {
-		checkedMeiliDate = analysis.CheckedDate.Unix()
+	if claim.CheckedDate != nil {
+		checkedMeiliDate = claim.CheckedDate.Unix()
 	}
 	meiliObj := map[string]interface{}{
-		"id":             analysis.ID,
-		"kind":           "analysis",
-		"video_id":       analysis.VideoID,
-		"rating_id":      analysis.RatingID,
-		"claim":          analysis.Claim,
-		"description":    analysis.Description,
+		"id":             claim.ID,
+		"kind":           "claim",
+		"video_id":       claim.VideoID,
+		"rating_id":      claim.RatingID,
+		"claim":          claim.Claim,
+		"description":    claim.Description,
 		"claim_date":     claimMeiliDate,
 		"checked_date":   checkedMeiliDate,
-		"fact":           analysis.Fact,
-		"claimant_id":    analysis.ClaimantID,
-		"review_sources": analysis.ReviewSources,
-		"end_time":       analysis.EndTime,
-		"start_time":     analysis.StartTime,
-		"space_id":       analysis.SpaceID,
+		"fact":           claim.Fact,
+		"claimant_id":    claim.ClaimantID,
+		"review_sources": claim.ReviewSources,
+		"end_time":       claim.EndTime,
+		"start_time":     claim.StartTime,
+		"space_id":       claim.SpaceID,
 	}
 
 	return meilisearchx.UpdateDocument("vidcheck", meiliObj)
