@@ -4,7 +4,7 @@ import { Button, Input, Form, Card, Popconfirm, Tooltip } from "antd";
 import ReactPlayer from "react-player";
 import { useHistory } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
-import { addVideo } from "../../actions/videos";
+import { addVideo } from "../../actions/claims";
 import {
   convertSecondsToTimeString,
   convertTimeStringToSeconds,

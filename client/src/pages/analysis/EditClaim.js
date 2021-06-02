@@ -21,8 +21,9 @@ function ClaimForm() {
   }
 
   const onUpdate = (values) => {
-    dispatch(addClaim(values));
-    history.push("/videos/create");
+    dispatch(addClaim({ ...claims[id], ...values }));
+    if (video.id) history.push(`/videos/${video.id}/edit`);
+    else history.push("/videos/create");
   };
 
   return (
@@ -30,15 +31,7 @@ function ClaimForm() {
       <Link to={`/videos/${video.id}/edit`}>
         <Button>Back</Button>
       </Link>
-      <EditClaimForm
-        data={claims[id]}
-        onCreate={onUpdate}
-        startTime={
-          claims.length > 0
-            ? convertSecondsToTimeString(claims[claims.length - 1].end_time)
-            : "00:00"
-        }
-      />
+      <EditClaimForm data={claims[id]} onCreate={onUpdate} />
     </Space>
   );
 }
