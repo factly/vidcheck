@@ -5,23 +5,22 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
 import { addClaim } from "../../actions/claims";
-import { convertSecondsToTimeString } from "../../utils/analysis";
 
 import EditClaimForm from "./ClaimForm/Claim";
 
 function ClaimForm() {
   const history = useHistory();
   const dispatch = useDispatch();
-  const { id } = useParams();
+  const { index, vid } = useParams();
 
   const { video, claims } = useSelector(({ videoClaims }) => videoClaims);
 
-  if (!video.url || !claims[id]) {
-    history.push("/videos/create");
+  if (!video.url || !claims[index]) {
+    history.push(vid ? `/videos/${vid}/edit` : "/videos/create");
   }
 
   const onUpdate = (values) => {
-    dispatch(addClaim({ ...claims[id], ...values }));
+    dispatch(addClaim({ ...claims[index], ...values }));
     if (video.id) history.push(`/videos/${video.id}/edit`);
     else history.push("/videos/create");
   };
@@ -31,7 +30,7 @@ function ClaimForm() {
       <Link to={`/videos/${video.id}/edit`}>
         <Button>Back</Button>
       </Link>
-      <EditClaimForm data={claims[id]} onCreate={onUpdate} />
+      <EditClaimForm data={claims[index]} onCreate={onUpdate} />
     </Space>
   );
 }
