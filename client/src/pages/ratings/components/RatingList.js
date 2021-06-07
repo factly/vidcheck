@@ -1,5 +1,5 @@
 import React from "react";
-import { Popconfirm, Button, Typography, Table, Tag } from "antd";
+import { Popconfirm, Button, Table } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import {
