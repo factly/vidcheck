@@ -61,10 +61,10 @@ module.exports = {
               label: 'Contact',
               to: 'mailto:admin@factly.in',
             },
-            {
-              label: 'Privacy Policy',
-              to: 'docs/privacy-policy',
-            },
+            // {
+            //   label: 'Privacy Policy',
+            //   to: 'docs/privacy-policy',
+            // },
           ],
         },
         {
@@ -116,14 +116,14 @@ module.exports = {
         {
           title: 'Resources',
           items: [
-            {
-              label: 'Guides',
-              to: 'docs/what-is-dega',
-            },
-            {
-              label: 'FAQ',
-              to: 'docs/faq',
-            },
+            // {
+            //   label: 'Guides',
+            //   to: 'docs/what-is-dega',
+            // },
+            // {
+            //   label: 'FAQ',
+            //   to: 'docs/faq',
+            // },
             {
               label: 'API',
               to: 'https://degacms.com/docs/api/intro',
