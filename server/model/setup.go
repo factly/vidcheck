@@ -56,6 +56,8 @@ func Migrate() {
 		&Rating{},
 		&Space{},
 		&Claimant{},
+		&SpacePermission{},
+		&OrganisationPermission{},
 	)
 
 }
