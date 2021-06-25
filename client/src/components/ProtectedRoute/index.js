@@ -12,8 +12,6 @@ function ProtectedRoute({
   index,
   ...rest
 }) {
-  console.log({ path, index });
-
   const spaces = useSelector((state) => {
     return state.spaces;
   });

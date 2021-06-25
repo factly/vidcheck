@@ -42,6 +42,10 @@ type videoResData struct {
 	Claims []model.Claim `json:"claims"`
 }
 
+type iFramelyRes struct {
+	ThumbnailURL string `json:"thumbnail_url,omitempty"`
+}
+
 var userContext model.ContextKey = "video_user"
 
 // Router - Group of video router
