@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/factly/vidcheck/action/author"
 	"github.com/factly/vidcheck/action/claimant"
 	"github.com/factly/vidcheck/action/medium"
 	"github.com/factly/vidcheck/action/permissions"
+	"github.com/factly/vidcheck/action/policy"
 	"github.com/factly/vidcheck/action/request"
 	"github.com/factly/vidcheck/action/request/organisation"
 	spaceRequest "github.com/factly/vidcheck/action/request/space"
+	"github.com/factly/vidcheck/action/user"
 
 	"github.com/factly/vidcheck/model"
 
@@ -59,6 +62,9 @@ func RegisterRoutes() http.Handler {
 		r.Mount("/media", medium.Router())
 		r.Mount("/permissions", permissions.Router())
 		r.Mount("/requests", request.Router())
+		r.Mount("/authors", author.Router())
+		r.Mount("/users", user.Router())
+		r.Mount("/policies", policy.Router())
 		if !config.DegaIntegrated() {
 			r.Mount("/spaces", space.Router())
 			r.Mount("/ratings", rating.Router())
