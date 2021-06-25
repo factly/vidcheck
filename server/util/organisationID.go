@@ -3,7 +3,6 @@ package util
 import (
 	"context"
 	"errors"
-	"log"
 	"net/http"
 	"strings"
 
@@ -19,15 +18,11 @@ const OrganisationIDKey ctxKeyOrganisationID = 0
 func GenerateOrganisation(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokens := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
-		log.Print("GenerateOrganisation", tokens)
 
 		if tokens[0] != "spaces" {
 
-			log.Print("GenerateOrganisation Inside", tokens)
 			ctx := r.Context()
 			sID, err := GetSpace(r.Context())
-
-			log.Print("GenerateOrganisation Inside", sID, err)
 
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)
@@ -43,8 +38,6 @@ func GenerateOrganisation(h http.Handler) http.Handler {
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
-
-			log.Println("GenerateOrganisation", space.ID)
 
 			ctx = context.WithValue(ctx, OrganisationIDKey, space.OrganisationID)
 			h.ServeHTTP(w, r.WithContext(ctx))
