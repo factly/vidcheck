@@ -19,14 +19,14 @@ function HomepageHeader() {
           <p className={styles.button}>
           <Link
             className="button button--success button--lg"
-            to="/docs/intro">
-            Join the program
+            to="/docs/introduction/what-is-vidcheck">
+            Request Access
           </Link>
           </p>
           <p className={styles.button}>
           <Link
             className="button button--secondary button--lg"
-            to="/docs/intro">
+            to="/docs/introduction/what-is-vidcheck">
             Documentation
           </Link>       
           </p>   
@@ -49,18 +49,7 @@ export default function Home() {
       <HomepageHeader />
       <main>
         <Introduction />       
-        <HomepageFeatures />
-        <form name="contact" netlify>
-          <p>
-            <label>Name <input type="text" name="name" /></label>
-          </p>
-          <p>
-            <label>Email <input type="email" name="email" /></label>
-          </p>
-          <p>
-            <button type="submit">Send</button>
-          </p>
-        </form>
+        {/* <HomepageFeatures /> */}
       </main>
     </Layout>
   );

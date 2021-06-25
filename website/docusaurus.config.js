@@ -22,7 +22,7 @@ module.exports = {
       items: [
         {
           type: 'doc',
-          docId: 'intro',
+          docId: 'introduction/what-is-vidcheck',
           position: 'right',
           label: 'Docs',
         },
