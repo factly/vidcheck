@@ -5,14 +5,18 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/factly/vidcheck/model"
+	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/meilisearchx"
 	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
+	"github.com/factly/x/slugx"
 	"github.com/factly/x/validationx"
+	"github.com/spf13/viper"
 )
 
 // create - Create space
@@ -30,7 +34,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 	uID, err := middlewarex.GetUser(r.Context())
 	if err != nil {
 		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
 
@@ -56,22 +60,63 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check if the user is owner of organisation
-	if isOwner(uID, space.OrganisationID) != nil {
-		errorx.Render(w, errorx.Parser(errorx.Message{
-			Code:    http.StatusUnauthorized,
-			Message: "operation not allowed for member",
-		}))
+	err = util.CheckSpaceKetoPermission("create", uint(space.OrganisationID), uint(uID))
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.GetMessage(err.Error(), http.StatusUnauthorized)))
 		return
+	}
+
+	var superOrgID int
+	if viper.GetBool("create_super_organisation") {
+		superOrgID, err = middlewarex.GetSuperOrganisationID("vidcheck")
+		if err != nil {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+			return
+		}
+
+		// Fetch organisation permissions
+		permission := model.OrganisationPermission{}
+		err = model.DB.Model(&model.OrganisationPermission{}).Where(&model.OrganisationPermission{
+			OrganisationID: uint(space.OrganisationID),
+		}).First(&permission).Error
+
+		if err != nil && space.OrganisationID != superOrgID {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot create more spaces", http.StatusUnprocessableEntity)))
+			return
+		}
+
+		if err == nil {
+			// Fetch total number of spaces in organisation
+			var totSpaces int64
+			model.DB.Model(&model.Space{}).Where(&model.Space{
+				OrganisationID: space.OrganisationID,
+			}).Count(&totSpaces)
+
+			if totSpaces >= permission.Spaces && permission.Spaces > 0 {
+				errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot create more spaces", http.StatusUnprocessableEntity)))
+				return
+			}
+		}
+	}
+
+	var spaceSlug string
+	if space.Slug != "" && slugx.Check(space.Slug) {
+		spaceSlug = space.Slug
+	} else {
+		spaceSlug = slugx.Make(space.Name)
 	}
 
 	result := model.Space{
 		Name:              space.Name,
 		SiteTitle:         space.SiteTitle,
-		Slug:              space.Slug,
+		Slug:              approveSpaceSlug(spaceSlug),
 		Description:       space.Description,
 		TagLine:           space.TagLine,
 		SiteAddress:       space.SiteAddress,
+		Analytics:         space.Analytics,
 		VerificationCodes: space.VerificationCodes,
 		SocialMediaURLs:   space.SocialMediaURLs,
 		OrganisationID:    space.OrganisationID,
@@ -86,6 +131,32 @@ func create(w http.ResponseWriter, r *http.Request) {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
+	}
+
+	if viper.GetBool("create_super_organisation") {
+		// Create SpacePermission for super organisation
+		var spacePermission model.SpacePermission
+		if superOrgID == space.OrganisationID {
+			spacePermission = model.SpacePermission{
+				SpaceID: result.ID,
+				Media:   -1,
+				Videos:  -1,
+			}
+		} else {
+			spacePermission = model.SpacePermission{
+				SpaceID: result.ID,
+				Media:   viper.GetInt64("default_number_of_media"),
+				Videos:  viper.GetInt64("default_number_of_vidoes"),
+			}
+		}
+		var spacePermContext model.ContextKey = "space_perm_user"
+		if err = tx.WithContext(context.WithValue(r.Context(), spacePermContext, uID)).Create(&spacePermission).Error; err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.DBError()))
+			return
+		}
+
 	}
 
 	// Insert into meili index
@@ -111,20 +182,35 @@ func create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tx.Commit()
+
 	renderx.JSON(w, http.StatusCreated, result)
 }
 
-func isOwner(uID, oID int) error {
-	// Check if the user is owner of organisation
-	allOrg, err := getMyOrganisations(uID)
-	if err != nil {
-		return err
-	}
+func approveSpaceSlug(slug string) string {
+	spaceList := make([]model.Space, 0)
+	model.DB.Model(&model.Space{}).Where("slug LIKE ? AND deleted_at IS NULL", slug+"%").Find(&spaceList)
 
-	for _, eachOrg := range allOrg {
-		if eachOrg.ID == uint(oID) && eachOrg.Permission.Role == "owner" {
-			return nil
+	count := 0
+	for {
+		flag := true
+		for _, each := range spaceList {
+			temp := slug
+			if count != 0 {
+				temp = temp + "-" + strconv.Itoa(count)
+			}
+			if each.Slug == temp {
+				flag = false
+				break
+			}
 		}
+		if flag {
+			break
+		}
+		count++
 	}
-	return errors.New("logged in user is not owner")
+	temp := slug
+	if count != 0 {
+		temp = temp + "-" + strconv.Itoa(count)
+	}
+	return temp
 }

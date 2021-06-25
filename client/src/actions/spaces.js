@@ -17,6 +17,7 @@ export const getSpaces = () => {
       .get(SPACES_API)
       .then((response) => {
         dispatch(getSpacesSuccess(response.data));
+        return response.data;
       })
       .catch((error) => {
         dispatch(addErrorNotification(error.message));

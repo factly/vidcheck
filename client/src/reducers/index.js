@@ -7,8 +7,22 @@ import videos from "./videosReducer";
 import claimants from "./claimantsReducer";
 import videoClaims from "./claimsReducer";
 import media from "./mediumReducer";
+import organisationPermissions from "./organisationPermissionReducer";
+import spacePermissions from "./spacePermissionReducer";
+import organisationRequests from "./organisationRequestReducer";
+import spaceRequests from "./spaceRequestReducer";
+import admin from "./adminReducer";
+import policies from "./policiesReducer";
+import authors from "./authorsReducer";
+import sidebar from "./sidebarReducer";
+import users from "./userReducer";
+import permissions from "./permissionsReducer";
 
 const rootReducer = combineReducers({
+  admin,
+  sidebar,
+  authors,
+  permissions,
   videoClaims,
   notifications,
   ratings,
@@ -17,6 +31,12 @@ const rootReducer = combineReducers({
   spaces,
   videos,
   media,
+  organisationPermissions,
+  spacePermissions,
+  organisationRequests,
+  spaceRequests,
+  policies,
+  users,
 });
 
 export default rootReducer;
