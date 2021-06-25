@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
-import { Popconfirm, Button, Table } from 'antd';
+import React from "react";
+import { Popconfirm, Button, Table } from "antd";
 
-import { useDispatch, useSelector } from 'react-redux';
-import { getSpaces, approveSpaceRequest } from '../../../../actions/spaceRequests';
-import { Link } from 'react-router-dom';
-import deepEqual from 'deep-equal';
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getSpaces,
+  approveSpaceRequest,
+} from "../../../../actions/spaceRequests";
+import { Link } from "react-router-dom";
+import deepEqual from "deep-equal";
 
 function RequestList() {
   const dispatch = useDispatch();
@@ -20,16 +23,23 @@ function RequestList() {
 
     if (node)
       return {
-        spaceRequests: node.data.map((element) => state.spaceRequests.details[element]),
+        spaceRequests: node.data.map(
+          (element) => state.spaceRequests.details[element]
+        ),
         total: node.total,
         loading: state.spaceRequests.loading,
       };
-    return { spaceRequests: [], total: 0, loading: state.spaceRequests.loading };
+    return {
+      spaceRequests: [],
+      total: 0,
+      loading: state.spaceRequests.loading,
+    };
   });
 
   const orgPermissions = useSelector(({ admin }) => admin);
 
-  let is_admin = !orgPermissions.loading && orgPermissions.organisation.is_admin;
+  let is_admin =
+    !orgPermissions.loading && orgPermissions.organisation.is_admin;
 
   React.useEffect(() => {
     fetchSpaceRequests();
@@ -42,58 +52,44 @@ function RequestList() {
 
   const columns = [
     {
-      title: 'Media',
-      dataIndex: 'media',
+      title: "Media",
+      dataIndex: "media",
       render: (_, record) => {
-        return record.media > 0 ? <p>{record.media ? record.media : 0}</p> : <p>Unlimited</p>;
-      },
-    },
-    {
-      title: 'Posts',
-      dataIndex: 'posts',
-      render: (_, record) => {
-        return record.posts > 0 ? <p>{record.posts ? record.posts : 0}</p> : <p>Unlimited</p>;
-      },
-    },
-    {
-      title: 'Episodes',
-      dataIndex: 'episodes',
-      render: (_, record) => {
-        return record.episodes > 0 ? (
-          <p>{record.episodes ? record.episodes : 0}</p>
+        return record.media > 0 ? (
+          <p>{record.media ? record.media : 0}</p>
         ) : (
           <p>Unlimited</p>
         );
       },
     },
     {
-      title: 'Fact Check',
-      dataIndex: 'fact_check',
+      title: "Videos",
+      dataIndex: "videos",
       render: (_, record) => {
-        return <p>{record.fact_check ? 'Enabled' : 'Disabled'}</p>;
+        return record.videos > 0 ? (
+          <p>{record.videos ? record.videos : 0}</p>
+        ) : (
+          <p>Unlimited</p>
+        );
       },
     },
-    {
-      title: 'Podcast',
-      dataIndex: 'podcast',
-      render: (_, record) => {
-        return <p>{record.podcast ? 'Enabled' : 'Disabled'}</p>;
-      },
-    },
-    { title: 'Status', dataIndex: 'status', key: 'status' },
+
+    { title: "Status", dataIndex: "status", key: "status" },
   ];
 
   if (is_admin) {
     columns.push({
-      title: 'Action',
-      dataIndex: 'operation',
+      title: "Action",
+      dataIndex: "operation",
       render: (_, record) => {
         return (
           <span>
             <Popconfirm
               title="Sure to Approve?"
               onConfirm={() =>
-                dispatch(approveSpaceRequest(record.id, 'approve')).then(() => fetchSpaceRequests())
+                dispatch(approveSpaceRequest(record.id, "approve")).then(() =>
+                  fetchSpaceRequests()
+                )
               }
             >
               <Button>Approve</Button>
@@ -101,7 +97,9 @@ function RequestList() {
             <Popconfirm
               title="Sure to Reject?"
               onConfirm={() =>
-                dispatch(approveSpaceRequest(record.id, 'reject')).then(() => fetchSpaceRequests())
+                dispatch(approveSpaceRequest(record.id, "reject")).then(() =>
+                  fetchSpaceRequests()
+                )
               }
             >
               <Link to="" className="ant-dropdown-link">
@@ -120,7 +118,7 @@ function RequestList() {
       columns={columns}
       dataSource={spaceRequests}
       loading={loading}
-      rowKey={'id'}
+      rowKey={"id"}
       pagination={{
         total: total,
         current: filters.page,

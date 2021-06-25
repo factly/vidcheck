@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { Button, Form, InputNumber, Space, Switch, Input, Select } from "antd";
+import React from "react";
+import { Button, Form, InputNumber, Space, Input, Select } from "antd";
+import { useSelector } from "react-redux";
 
 const layout = {
   labelCol: {
@@ -23,7 +24,7 @@ const RequestForm = ({ onCreate, data = {} }) => {
     form.resetFields();
   };
 
-  const { spaces, loading } = useState((state) => {
+  const { spaces, loading } = useSelector((state) => {
     const selectedOrg = state.spaces.orgs.find((item) =>
       item.spaces.includes(state.spaces.selected)
     );
@@ -82,8 +83,8 @@ const RequestForm = ({ onCreate, data = {} }) => {
         </Select>
       </Form.Item>
       <Form.Item
-        name="posts"
-        label="Posts"
+        name="videos"
+        label="Videos"
         rules={[
           {
             required: true,
@@ -93,18 +94,7 @@ const RequestForm = ({ onCreate, data = {} }) => {
       >
         <InputNumber min={-1} />
       </Form.Item>
-      <Form.Item
-        name="episodes"
-        label="Episodes"
-        rules={[
-          {
-            required: true,
-            message: "Please enter the numeric value!",
-          },
-        ]}
-      >
-        <InputNumber min={-1} />
-      </Form.Item>
+
       <Form.Item
         name="media"
         label="Media"
@@ -116,12 +106,6 @@ const RequestForm = ({ onCreate, data = {} }) => {
         ]}
       >
         <InputNumber min={-1} />
-      </Form.Item>
-      <Form.Item label="Fact Check" name="fact_check" valuePropName="checked">
-        <Switch />
-      </Form.Item>
-      <Form.Item label="Podcast" name="podcast" valuePropName="checked">
-        <Switch />
       </Form.Item>
       <Form.Item name="description" label="Description">
         <Input.TextArea />
