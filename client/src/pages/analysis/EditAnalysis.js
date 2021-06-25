@@ -16,7 +16,7 @@ function EditAnalysis() {
   const { video } = useSelector(({ videoClaims }) => videoClaims);
 
   React.useEffect(() => {
-    if (!video.id) {
+    if (video.id !== id) {
       dispatch(getVideo(id)).then((data) =>
         dispatch(addClaims({ video: data.video, claims: data.claims }))
       );
