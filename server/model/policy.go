@@ -28,4 +28,5 @@ type Policy struct {
 	Name        string       `json:"name"`
 	Description string       `json:"description"`
 	Permissions []Permission `json:"permissions"`
+	Users       []Author     `json:"users"`
 }
