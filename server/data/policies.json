@@ -1,0 +1,76 @@
+[
+    {
+        "name": "Editor",
+        "Description": "Editor",
+        "permissions": [
+            {
+                "resource": "media",
+                "actions": ["get", "create", "update", "delete"]
+            },
+            {
+                "resource": "claimants",
+                "actions": ["get", "create", "update", "delete"]
+            },
+            {
+                "resource": "ratings",
+                "actions": ["get", "create", "update", "delete"]
+            },
+            {
+                "resource": "fact-checks",
+                "actions": ["get", "create", "update", "delete"]
+            },
+            {
+                "resource": "policies",
+                "actions": ["get"]
+            }
+        ]
+    },
+    {
+        "name": "Author",
+        "Description": "Author",
+        "permissions": [
+            {
+                "resource": "media",
+                "actions": ["get", "create", "update"]
+            },
+            {
+                "resource": "claimants",
+                "actions": ["get", "create", "update"]
+            },
+            {
+                "resource": "ratings",
+                "actions": ["get"]
+            },
+            {
+                "resource": "fact-checks",
+                "actions": ["get", "create", "update"]
+            },
+            {
+                "resource": "policies",
+                "actions": ["get"]
+            }
+        ]
+    },
+    {
+        "name": "Contributor",
+        "Description": "Contributor",
+        "permissions": [
+            {
+                "resource": "media",
+                "actions": ["get", "create"]
+            },
+            {
+                "resource": "claimants",
+                "actions": ["get", "create"]
+            },
+            {
+                "resource": "ratings",
+                "actions": ["get"]
+            },
+            {
+                "resource": "fact-checks",
+                "actions": ["get", "create", "update"]
+            }
+        ]
+    }
+]
