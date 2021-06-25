@@ -5,6 +5,7 @@ import { Link, useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { deleteVideo, getVideos } from "../../../actions/videos";
 import HorizontalTimelineBar from "../components/AnalysisTimelineBar/HorizontalTimelineBar";
+import ImagePlaceholder from "../../../components/ImagePlaceholder";
 
 function VideoAnalysisCard({ data }) {
   const history = useHistory();
@@ -21,21 +22,19 @@ function VideoAnalysisCard({ data }) {
       }
     });
   getRatingsCount();
-
-  const getId = (url) => {
-    const index = url.indexOf("?v=") + 3;
-    return url.substring(index, url.length);
-  };
-
   return (
-    <React.Fragment>
+    <React.Fragment key={data.video.id}>
       <Row gutter={16}>
         <Col span={6}>
-          <img
-            width={"100%"}
-            alt="thumbnail"
-            src={`https://img.youtube.com/vi/${getId(data.video.url)}/0.jpg`}
-          />
+          {data.video.thumbnail_url ? (
+            <img
+              width={"100%"}
+              alt="thumbnail"
+              src={data.video.thumbnail_url}
+            />
+          ) : (
+            <ImagePlaceholder />
+          )}
         </Col>
         <Col span={18}>
           <Link to={`/preview/${data.video.id}`}>
