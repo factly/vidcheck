@@ -70,7 +70,7 @@ function Sidebar({ superOrg, permission, orgs, loading }) {
       }}
     >
       <Link to="/">
-        <div className="menu-header" style={{ backgroundColor: "#1890ff" }}>
+        <div className="menu-header" style={{ backgroundColor: "#ebebeb" }}>
           <img
             alt="logo"
             hidden={!collapsed}

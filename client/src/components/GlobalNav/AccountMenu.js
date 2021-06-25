@@ -9,7 +9,7 @@ const AccountMenu = () => {
       <Menu.Item>
         <a
           href={
-            process.env.REACT_APP_KRATOS_PUBLIC_URL +
+            window.REACT_APP_KRATOS_PUBLIC_URL +
             "/self-service/browser/flows/logout"
           }
         >
