@@ -81,7 +81,7 @@ function Sidebar({ superOrg, permission, orgs, loading }) {
             alt="logo"
             hidden={collapsed}
             src={require("../../assets/vidcheck.png")}
-            style={{ width: "40%" }}
+            style={{ width: "100%" }}
           />
         </div>
       </Link>
