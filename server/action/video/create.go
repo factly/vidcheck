@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"reflect"
 
 	"github.com/factly/vidcheck/action/rating"
+	"github.com/spf13/viper"
 
 	"github.com/factly/vidcheck/config"
 
@@ -61,6 +63,34 @@ func create(w http.ResponseWriter, r *http.Request) {
 		errorx.Render(w, validationError)
 		return
 	}
+
+	var path string
+
+	path = fmt.Sprintf("/oembed?url=%s&omit_script=1", videoData.Video.URL)
+
+	res, err := http.Get(viper.GetString("iframely_url") + path)
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	var iframelyres iFramelyRes
+	err = json.NewDecoder(res.Body).Decode(&iframelyres)
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.DecodeError()))
+		return
+	}
+
 	tx := model.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
 	videoObj := model.Video{}
 	videoObj = model.Video{
@@ -71,6 +101,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		TotalDuration: videoData.Video.TotalDuration,
 		Status:        "published", // status is set to published videoData.Video.Status
 		SpaceID:       uint(sID),
+		ThumbnailURL:  iframelyres.ThumbnailURL,
 	}
 	err = tx.Create(&videoObj).Error
 	if err != nil {

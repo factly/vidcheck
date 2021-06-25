@@ -1,6 +1,8 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 // Video model
 type Video struct {
@@ -12,6 +14,7 @@ type Video struct {
 	SpaceID       uint   `gorm:"column:space_id" json:"space_id"`
 	Status        string `gorm:"status" json:"status"`
 	TotalDuration int    `gorm:"total_duration" json:"total_duration"`
+	ThumbnailURL  string `gorm:"column:thumbnail_url" json:"thumbnail_url" `
 }
 
 var videoUser ContextKey = "video_user"
