@@ -4,8 +4,6 @@ import { Result, Button } from "antd";
 import { useSelector } from "react-redux";
 
 function AdminRoute({ component: Component, path, index, ...rest }) {
-  console.log({ path, index });
-
   const { loading, org, isOwner } = useSelector(({ admin, spaces }) => {
     let orgs = spaces.orgs.filter((each) => each.permission.role === "owner");
 

@@ -25,12 +25,6 @@ function HorizontalTimelineBar({
             let st = start_time;
             start_time = review.end_time + 1;
             end_time = review.start_time - 1;
-            console.log({
-              st,
-              end_time,
-              start_time,
-              width: ((end_time - st) / totalDuration) * 100,
-            });
 
             return (
               <>
