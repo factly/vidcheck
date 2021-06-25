@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/factly/vidcheck/model"
+	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/meilisearchx"
@@ -28,7 +29,7 @@ func delete(w http.ResponseWriter, r *http.Request) {
 	uID, err := middlewarex.GetUser(r.Context())
 	if err != nil {
 		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
 
@@ -55,12 +56,10 @@ func delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check if the user is owner of organisation
-	if isOwner(uID, result.OrganisationID) != nil {
-		errorx.Render(w, errorx.Parser(errorx.Message{
-			Code:    http.StatusUnauthorized,
-			Message: "operation not allowed for member",
-		}))
+	err = util.CheckSpaceKetoPermission("delete", uint(result.OrganisationID), uint(uID))
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.GetMessage(err.Error(), http.StatusUnauthorized)))
 		return
 	}
 

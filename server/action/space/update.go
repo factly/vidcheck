@@ -8,11 +8,13 @@ import (
 	"strconv"
 
 	"github.com/factly/vidcheck/model"
+	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/meilisearchx"
 	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
+	"github.com/factly/x/slugx"
 	"github.com/factly/x/validationx"
 	"github.com/go-chi/chi"
 )
@@ -33,7 +35,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 	uID, err := middlewarex.GetUser(r.Context())
 	if err != nil {
 		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
 
@@ -68,17 +70,24 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check if the user is owner of organisation
-	if isOwner(uID, space.OrganisationID) != nil {
-		errorx.Render(w, errorx.Parser(errorx.Message{
-			Code:    http.StatusUnauthorized,
-			Message: "operation not allowed for member",
-		}))
+	err = util.CheckSpaceKetoPermission("update", uint(space.OrganisationID), uint(uID))
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.GetMessage(err.Error(), http.StatusUnauthorized)))
 		return
 	}
 
 	result := model.Space{}
 	result.ID = uint(id)
+
+	// check record exists or not
+	err = model.DB.First(&result).Error
+
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.RecordNotFound()))
+		return
+	}
 
 	tx := model.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
 
@@ -134,20 +143,20 @@ func update(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// check record exists or not
-	err = tx.First(&result).Error
-
-	if err != nil {
-		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.RecordNotFound()))
-		return
+	var spaceSlug string
+	if result.Slug == space.Slug {
+		spaceSlug = result.Slug
+	} else if space.Slug != "" && slugx.Check(space.Slug) {
+		spaceSlug = approveSpaceSlug(space.Slug)
+	} else {
+		spaceSlug = approveSpaceSlug(slugx.Make(space.Name))
 	}
 
 	err = tx.Model(&result).Updates(model.Space{
 		Base:              model.Base{UpdatedByID: uint(uID)},
 		Name:              space.Name,
 		SiteTitle:         space.SiteTitle,
-		Slug:              space.Slug,
+		Slug:              spaceSlug,
 		Description:       space.Description,
 		TagLine:           space.TagLine,
 		SiteAddress:       space.SiteAddress,
@@ -162,6 +171,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}).Preload("Logo").Preload("LogoMobile").Preload("FavIcon").Preload("MobileIcon").First(&result).Error
 
 	if err != nil {
+		tx.Rollback()
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
@@ -179,10 +189,6 @@ func update(w http.ResponseWriter, r *http.Request) {
 		"tag_line":        result.TagLine,
 		"organisation_id": result.OrganisationID,
 		"analytics":       result.Analytics,
-		"logo_id":         logoID,
-		"fav_icon_id":     favIconID,
-		"mobile_icon_id":  mobileIconID,
-		"logo_mobile_id":  logoMobileID,
 	}
 
 	err = meilisearchx.UpdateDocument("vidcheck", meiliObj)
