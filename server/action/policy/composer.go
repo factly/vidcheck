@@ -23,7 +23,7 @@ func contains(s []string, e string) bool {
 
 // Composer create keto policy
 func Composer(oID int, sID int, inputPolicy policyReq) model.KetoPolicy {
-	allowedResources := []string{"media", "policies", "fact-checks", "ratings", "claimants"}
+	allowedResources := []string{"media", "policies", "fact-checks", "ratings", "claimants", "categories"}
 	allowedActions := []string{"get", "create", "update", "delete", "publish"}
 	result := model.KetoPolicy{}
 
