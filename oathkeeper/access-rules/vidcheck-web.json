@@ -1,12 +1,12 @@
 [
   {
-    "id": "vid-check:web:protected",
+    "id": "vidcheck:studio:protected",
     "upstream": {
       "preserve_host": true,
-      "url": "http://vid-check-web:3000/"
+      "url": "http://vidcheck-studio:3000/"
     },
     "match": {
-      "url": "http://127.0.0.1:4455/.factly/vid-check/web/<.*>",
+      "url": "http://127.0.0.1:4455/.factly/vidcheck/studio/<.*>",
       "methods": [
         "GET"
       ]
@@ -28,7 +28,8 @@
       {
         "handler": "redirect",
         "config": {
-          "to": "http://127.0.0.1:4455/.factly/kavach/web/auth/login"
+          "to": "http://127.0.0.1:4455/.factly/kavach/web/auth/login",
+          "return_to_query_param": "return_to"
         }
       }
     ]
