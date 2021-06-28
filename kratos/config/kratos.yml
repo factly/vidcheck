@@ -14,29 +14,11 @@ selfservice:
   default_browser_return_url: http://127.0.0.1:4455/.factly/kavach/web/organisation
   whitelisted_return_urls:
     - http://127.0.0.1:4455
+    - http://127.0.0.1:4455/.factly/vidcheck/studio/
 
   methods:
     password:
       enabled: true
-    oidc:
-      enabled: true
-      config:
-        providers:
-        - id: github
-          provider: github
-          client_id: 1a910f37e7971b1d4654
-          client_secret: e4fb18dd76b84911d0d22553cf19828f787a6f35
-          mapper_url: file:///etc/config/kratos/oidc.github.jsonnet
-          scope:
-            - user:email
-        - id: google
-          provider: google
-          client_id: 225949666356-67jer0i80gjfgf07ck93q1ci64hkj33t.apps.googleusercontent.com
-          client_secret: jQP33jffrdB1Rqhw9A_1H1Sz
-          mapper_url: file:///etc/config/kratos/oidc.google.jsonnet
-          scope:
-            - openid
-            - email
 
   flows:
     error:
