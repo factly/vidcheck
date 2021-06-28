@@ -31,6 +31,11 @@ const entities = [
     options: options,
   },
   {
+    name: 'tags',
+    label: 'Tags',
+    options: options,
+  },
+  {
     name: "media",
     label: "Media",
     options: options,
