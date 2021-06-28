@@ -529,6 +529,43 @@ definitions:
       videos:
         type: integer
     type: object
+  model.Tag:
+    properties:
+      created_at:
+        type: string
+      created_by_id:
+        type: integer
+      deleted_at:
+        type: string
+      description:
+        type: string
+      html_description:
+        type: string
+      id:
+        type: integer
+      is_featured:
+        type: boolean
+      name:
+        type: string
+      slug:
+        type: string
+      space:
+        $ref: '#/definitions/model.Space'
+        type: object
+      space_id:
+        type: integer
+      updated_at:
+        type: string
+      updated_by_id:
+        type: integer
+      videos:
+        items:
+          $ref: '#/definitions/model.Video'
+        type: array
+    required:
+    - name
+    - slug
+    type: object
   model.Video:
     properties:
       created_at:
@@ -904,6 +941,19 @@ definitions:
         type: integer
       verification_codes:
         type: string
+    type: object
+  tag.tag:
+    properties:
+      description:
+        type: string
+      is_featured:
+        type: boolean
+      name:
+        type: string
+      slug:
+        type: string
+    required:
+    - name
     type: object
   user.paging:
     properties:
@@ -2950,6 +3000,179 @@ paths:
       summary: Update space
       tags:
       - Space
+  /tags:
+    get:
+      description: Get all tags
+      operationId: get-all-tags
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: limit per page
+        in: query
+        name: limit
+        type: string
+      - description: page number
+        in: query
+        name: page
+        type: string
+      - description: Query
+        in: query
+        name: q
+        type: string
+      - description: Sort
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Tag'
+            type: array
+      summary: Show all tags
+      tags:
+      - Tag
+    post:
+      description: Create tag
+      operationId: add-tag
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Tag Object
+        in: body
+        name: Tag
+        required: true
+        schema:
+          $ref: '#/definitions/tag.tag'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Tag'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Create tag
+      tags:
+      - Tag
+  /tags/{tag_id}:
+    delete:
+      description: Delete tag by ID
+      operationId: delete-tag-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Tag ID
+        in: path
+        name: tag_id
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      responses:
+        "200": {}
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Delete a tag
+      tags:
+      - Tag
+    get:
+      description: Get tag by ID
+      operationId: get-tag-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Tag ID
+        in: path
+        name: tag_id
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Tag'
+      summary: Show a tag by id
+      tags:
+      - Tag
+    put:
+      description: Update tag by ID
+      operationId: update-tag-by-id
+      parameters:
+      - description: User ID
+        in: header
+        name: X-User
+        required: true
+        type: string
+      - description: Tag ID
+        in: path
+        name: tag_id
+        required: true
+        type: string
+      - description: Space ID
+        in: header
+        name: X-Space
+        required: true
+        type: string
+      - description: Tag
+        in: body
+        name: Tag
+        schema:
+          $ref: '#/definitions/tag.tag'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Tag'
+      summary: Update a tag by id
+      tags:
+      - Tag
   /videos:
     get:
       description: Get all videos
