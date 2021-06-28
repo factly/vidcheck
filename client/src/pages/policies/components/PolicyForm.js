@@ -16,11 +16,6 @@ const entities = [
     options: options,
   },
   {
-    name: "media",
-    label: "Media",
-    options: options,
-  },
-  {
     name: "claimants",
     label: "Claimants",
     options: options,
@@ -28,6 +23,16 @@ const entities = [
   {
     name: "ratings",
     label: "Ratings",
+    options: options,
+  },
+  {
+    name: 'categories',
+    label: 'Categories',
+    options: options,
+  },
+  {
+    name: "media",
+    label: "Media",
     options: options,
   },
   {
