@@ -61,6 +61,7 @@ func Migrate() {
 		&OrganisationPermission{},
 		&OrganisationPermissionRequest{},
 		&SpacePermissionRequest{},
+		&Tag{},
 	)
 
 }
