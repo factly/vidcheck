@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   ###########################################################################
-  #######                       DB SERVICES                           #######
+  #######             DB SERVICES                                     #######
   ###########################################################################
   postgres:
     image: postgres:11.7-alpine
@@ -16,7 +16,42 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_MULTIPLE_DATABASES=kratos,keto,kavach,vidcheck
     networks:
-      - intranet
+      - vidcheck
+
+  ###########################################################################
+  #######                         IMGPROXY                            #######
+  ###########################################################################
+  imgproxy:
+    image: darthsim/imgproxy:v2.15.0
+    ports:
+      - 8080:8080
+    environment:
+      - IMGPROXY_BASE_URL=http://minio:9000/
+      - IMGPROXY_TTL=31536000
+    networks:
+      - vidcheck
+
+  nginx:
+    image: nginx:1.19.0-alpine
+    ports:
+      - 7001:80
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    restart: unless-stopped
+    depends_on:
+      - imgproxy
+    networks:
+      - vidcheck
+
+  ###########################################################################
+  #######             UPLOAD SERVICES                                 #######
+  ###########################################################################
+  companion:
+    image: transloadit/companion
+    ports:
+      - "3020:3020"
+    env_file:
+      - ./companion/.env
 
   ###########################################################################
   #######                        MINIO                                #######
@@ -32,7 +67,7 @@ services:
       - MINIO_ACCESS_KEY=miniokey
       - MINIO_SECRET_KEY=miniosecret
     networks:
-      - intranet
+      - vidcheck
     command: server /export
 
   createbuckets:
@@ -42,7 +77,7 @@ services:
     volumes:
       - ./wait-for-it.sh:/usr/local/bin/wait-for-it.sh
     networks:
-      - intranet
+      - vidcheck
     entrypoint: >
       /bin/sh -c "
       apk add --no-cache bash;
@@ -53,82 +88,36 @@ services:
       exit 0;
       "
 
-
   ###########################################################################
-  #######                         IMGPROXY                            #######
+  #######             SMTP SERVICES                                 #######
   ###########################################################################
-  imgproxy:
-    image: darthsim/imgproxy:v2.15.0
+  mailslurper:
+    image: oryd/mailslurper:latest-smtps
     ports:
-      - 8080:8080
-    environment:
-      - IMGPROXY_BASE_URL=http://minio:9000/
-      - IMGPROXY_TTL=31536000
+      - "4436:4436"
+      - "4437:4437"
     networks:
-      - intranet
+      - vidcheck
 
   ###########################################################################
-  #######                         IFRAMELY                            #######
+  #######             SEARCH SERVICES                                 #######
   ###########################################################################
-  iframely:
-    image: factly/iframely:v1.5.0-102820
+  meilisearch:
+    image: getmeili/meilisearch:v0.16.0
     ports:
-      - "8061:8061" 
+      - "7700:7700"
     volumes:
-      - ./iframely/config.local.js:/iframely/config.local.js
-    networks:
-      - intranet
-
-  ###########################################################################
-  #######                            NGINX                            #######
-  ###########################################################################
-  nginx:
-    image: nginx:1.19.0-alpine
-    ports:
-      - 7001:80
-    volumes:
-      - ./nginx:/etc/nginx/conf.d
-    restart: unless-stopped
-    depends_on:
-      - imgproxy
-    networks:
-      - intranet
-
-  ###########################################################################
-  #######             UPLOAD SERVICES                                 #######
-  ###########################################################################
-  companion:
-    image: transloadit/companion:latest
-    ports:
-      - "3020:3020"
-    env_file:
-      - ./companion/.env
-
-  ###########################################################################
-  #######               KRATOS AND OATHKEEPER                         #######
-  ###########################################################################
-  keto-migrate:
-    image: oryd/keto:latest
+      - ~/factly/vidcheck/meilisearch-0-14-0/data.ms/:/data.ms
     environment:
-      - LOG_LEVEL=debug
-    depends_on:
-      - postgres
-    command: migrate sql postgres://postgres:postgres@postgres:5432/keto?sslmode=disable
-    restart: on-failure
+      # To put an upper limit of 100MB for the payload size during indexing
+      - MEILI_HTTP_PAYLOAD_SIZE_LIMIT=104857600
+      - MEILI_MASTER_KEY=password
     networks:
-      - intranet
+      - vidcheck
 
-  keto:
-    image: oryd/keto:latest
-    ports:
-      - "4466:4466"
-    depends_on:
-      - keto-migrate
-    environment:
-      - DSN=postgres://postgres:postgres@postgres:5432/keto?sslmode=disable
-    networks:
-      - intranet
-
+  ###########################################################################
+  #######             KRATOS, KETO AND OATHKEEPER                     #######
+  ###########################################################################
   kratos-migrate:
     depends_on:
       - postgres
@@ -137,15 +126,12 @@ services:
       - DSN=postgres://postgres:postgres@postgres:5432/kratos?sslmode=disable
     volumes:
       - type: bind
-        source: ./kratos/sqlite
-        target: /home/ory/sqlite
-      - type: bind
         source: ./kratos/config
         target: /etc/config/kratos
     command: -c /etc/config/kratos/kratos.yml migrate sql -e --yes
     restart: on-failure
     networks:
-      - intranet
+      - vidcheck
 
   kratos:
     depends_on:
@@ -158,15 +144,34 @@ services:
       - DSN=postgres://postgres:postgres@postgres:5432/kratos?sslmode=disable
     volumes:
       - type: bind
-        source: ./kratos/sqlite
-        target: /home/ory/sqlite
-      - type: bind
         source: ./kratos/config
         target: /etc/config/kratos
     command: serve -c /etc/config/kratos/kratos.yml --dev
     restart: unless-stopped
     networks:
-      - intranet
+      - vidcheck
+
+  keto-migrate:
+    image: oryd/keto:v0.5.7
+    environment:
+      - LOG_LEVEL=debug
+    depends_on:
+      - postgres
+    command: migrate sql postgres://postgres:postgres@postgres:5432/keto?sslmode=disable
+    restart: on-failure
+    networks:
+      - vidcheck
+
+  keto:
+    image: oryd/keto:v0.5.7
+    ports:
+      - "4466:4466"
+    depends_on:
+      - keto-migrate
+    environment:
+      - DSN=postgres://postgres:postgres@postgres:5432/keto?sslmode=disable
+    networks:
+      - vidcheck
 
   oathkeeper:
     image: oryd/oathkeeper:latest-alpine
@@ -184,7 +189,7 @@ services:
     command: serve proxy -c "/etc/config/oathkeeper/.oathkeeper.yml"
     restart: on-failure
     networks:
-      - intranet
+      - vidcheck
 
   ###########################################################################
   #######             KAVACH                                          #######
@@ -197,58 +202,60 @@ services:
       - kavach-migrate
     ports:
       - 5000:8000
-    build:
-      context: ./kavach/kavach-server
-      dockerfile: Dockerfile.dev
+    image: factly/kavach-server
     environment:
-      - CONFIG_FILE=kavach-server.yml
       - WAIT_HOSTS=postgres:5432, kratos:4434 , keto:4466
-    volumes:
-      - type: bind
-        source: ./kavach/kavach-server
-        target: /app
-    restart: always
+      - KAVACH_DATABASE_HOST=postgres 
+      - KAVACH_DATABASE_USER=postgres
+      - KAVACH_DATABASE_PASSWORD=postgres
+      - KAVACH_DATABASE_NAME=kavach 
+      - KAVACH_DATABASE_PORT=5432 
+      - KAVACH_DATABASE_SSL_MODE=disable
+      - KAVACH_KETO_URL=http://keto:4466
+      - KAVACH_KRATOS_ADMIN_URL=http://kratos:4434
+      - KAVACH_MODE=development
+      - KAVACH_IMAGEPROXY_URL=http://127.0.0.1:7001
+    restart: unless-stopped
     networks:
-      - intranet
+      - vidcheck
   
   kavach-migrate:
     depends_on:
       - postgres
       - keto
       - kratos
-    build:
-      context: ./kavach/kavach-server
-      dockerfile: Dockerfile.migrate
+    image: factly/kavach-server
     environment:
       - WAIT_HOSTS=postgres:5432, kratos:4434 , keto:4466
-    volumes:
-      - type: bind
-        source: ./kavach/kavach-server
-        target: /app
+      - KAVACH_DATABASE_HOST=postgres 
+      - KAVACH_DATABASE_USER=postgres
+      - KAVACH_DATABASE_PASSWORD=postgres
+      - KAVACH_DATABASE_NAME=kavach 
+      - KAVACH_DATABASE_PORT=5432 
+      - KAVACH_DATABASE_SSL_MODE=disable
+      - KAVACH_KETO_URL=http://keto:4466
+      - KAVACH_KRATOS_ADMIN_URL=http://kratos:4434
+      - KAVACH_MODE=development
+      - KAVACH_IMAGEPROXY_URL=http://127.0.0.1:7001
+    entrypoint: /app/kavach-server migrate
     networks:
-      - intranet
+      - vidcheck
 
   kavach-web:
-    build:
-      context: ./kavach/kavach-web
-      dockerfile: Dockerfile
+    image: factly/kavach-web:dev
     environment:
       - PUBLIC_URL=http://127.0.0.1:4455/.factly/kavach/web
       - REACT_APP_DEGA_PUBLIC_URL=http://127.0.0.1:4455/.factly/dega/studio
       - REACT_APP_BINDU_PUBLIC_URL=http://127.0.0.1:4455/.factly/bindu/studio
-    volumes:
-      - type: bind
-        source: ./kavach/kavach-web
-        target: /app
-      - /app/node_modules
     restart: unless-stopped
     networks:
-      - intranet
+      - vidcheck
+
 
   ###########################################################################
   #######                       VID CHECK                             #######
   ###########################################################################
-  vid-check-server:
+  vidcheck-server:
     depends_on:
       - postgres
     ports:
@@ -262,9 +269,9 @@ services:
     volumes:
       - ./server:/app
     networks:
-      - intranet
+      - vidcheck
 
-  vid-check-migrate:
+  vidcheck-migrate:
     depends_on:
       - postgres
     build:
@@ -275,24 +282,24 @@ services:
     volumes:
       - ./server:/app
     networks:
-      - intranet
+      - vidcheck
 
-  vid-check-web:
+  vidcheck-studio:
     build:
       context: ./client
       dockerfile: Dockerfile
     volumes:
-      - ./client:/app
-      - /app/node_modules/
-    ports:
-      - 3000:3000
+      - type: bind
+        source: ./client
+        target: /app
+      - /app/node_modules
     environment:
-      - PUBLIC_URL=http://127.0.0.1:4455/.factly/vid-check/web
-      - REACT_APP_API_URL=http://127.0.0.1:4455/.factly/vid-check/server
+      - PUBLIC_URL=http://127.0.0.1:4455/.factly/vidcheck/studio
+      - REACT_APP_API_URL=http://127.0.0.1:4455/.factly/vidcheck/server
       - CHOKIDAR_USEPOLLING=true
     stdin_open: true
     networks:
-      - intranet
+      - vidcheck
 
 networks:
-  intranet:
+  vidcheck:
