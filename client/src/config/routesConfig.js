@@ -63,6 +63,11 @@ import CreateSpaceRequest from "../pages/requests/spaces/CreateSpaceRequest";
 import Dashboard from "../pages/dashboard";
 import Analytics from "../pages/analytics";
 
+//Tags
+import Tags from '../pages/tags';
+import CreateTag from '../pages/tags/CreateTag';
+import EditTag from '../pages/tags/EditTag';
+
 // Users & Permissions
 import Users from "../pages/users";
 import PermissionList from "../pages/users/PermissionList";
@@ -391,6 +396,33 @@ const routes = {
     title: "Create",
     isOwner: true,
   },
+  tags: {
+    path: '/tags',
+    Component: Tags,
+    title: 'Tags',
+    permission: {
+      resource: 'tags',
+      action: 'get',
+    },
+  },
+  createTag: {
+    path: '/tags/create',
+    Component: CreateTag,
+    title: 'Create',
+    permission: {
+      resource: 'tags',
+      action: 'create',
+    },
+  },
+  editTag: {
+    path: '/tags/:id/edit',
+    Component: EditTag,
+    title: 'Edit',
+    permission: {
+      resource: 'tags',
+      action: 'update',
+    },
+  },
 };
 
 export const sidebarMenu = [
@@ -402,7 +434,7 @@ export const sidebarMenu = [
   {
     title: "FACT CHECKING",
     Icon: CheckCircleOutlined,
-    children: [routes.videos, routes.claimants, routes.ratings, routes.categories],
+    children: [routes.videos, routes.claimants, routes.ratings, routes.categories, routes.tags],
   },
   {
     title: "ADMINSTRATION",

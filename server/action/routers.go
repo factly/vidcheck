@@ -13,6 +13,7 @@ import (
 	"github.com/factly/vidcheck/action/request"
 	"github.com/factly/vidcheck/action/request/organisation"
 	spaceRequest "github.com/factly/vidcheck/action/request/space"
+	"github.com/factly/vidcheck/action/tag"
 	"github.com/factly/vidcheck/action/user"
 
 	"github.com/factly/vidcheck/model"
@@ -67,6 +68,7 @@ func RegisterRoutes() http.Handler {
 		r.Mount("/authors", author.Router())
 		r.Mount("/users", user.Router())
 		r.Mount("/policies", policy.Router())
+		r.Mount("/tags", tag.Router())
 		if !config.DegaIntegrated() {
 			r.Mount("/spaces", space.Router())
 			r.Mount("/ratings", rating.Router())

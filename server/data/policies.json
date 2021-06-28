@@ -24,6 +24,10 @@
                 "actions": ["get", "create", "update", "delete"]
             },
             {
+                "resource": "tags",
+                "actions": ["get", "create", "update", "delete"]
+            },
+            {
                 "resource": "policies",
                 "actions": ["get"]
             }
@@ -52,6 +56,10 @@
             {
                 "resource": "fact-checks",
                 "actions": ["get", "create", "update"]
+            },
+            {
+                "resource": "tags",
+                "actions": ["get", "create", "update", "delete"]
             },
             {
                 "resource": "policies",
