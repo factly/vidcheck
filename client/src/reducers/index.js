@@ -18,6 +18,7 @@ import sidebar from "./sidebarReducer";
 import users from "./userReducer";
 import permissions from "./permissionsReducer";
 import categories from "./categoriesReducer";
+import tags from "./tagsReducer"
 
 const rootReducer = combineReducers({
   admin,
@@ -39,6 +40,7 @@ const rootReducer = combineReducers({
   spaceRequests,
   policies,
   users,
+  tags,
 });
 
 export default rootReducer;
