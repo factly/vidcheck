@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/factly/vidcheck/action/author"
+	"github.com/factly/vidcheck/action/category"
 	"github.com/factly/vidcheck/action/claimant"
 	"github.com/factly/vidcheck/action/medium"
 	"github.com/factly/vidcheck/action/permissions"
@@ -58,6 +59,7 @@ func RegisterRoutes() http.Handler {
 
 	r.With(middlewarex.CheckUser, util.CheckSpace, util.GenerateOrganisation).Group(func(r chi.Router) {
 		r.Mount("/videos", video.Router())
+		r.Mount("/categories", category.Router())
 		r.Mount("/claimants", claimant.Router())
 		r.Mount("/media", medium.Router())
 		r.Mount("/permissions", permissions.Router())

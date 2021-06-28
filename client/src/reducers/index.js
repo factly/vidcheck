@@ -17,9 +17,11 @@ import authors from "./authorsReducer";
 import sidebar from "./sidebarReducer";
 import users from "./userReducer";
 import permissions from "./permissionsReducer";
+import categories from "./categoriesReducer";
 
 const rootReducer = combineReducers({
   admin,
+  categories,
   sidebar,
   authors,
   permissions,

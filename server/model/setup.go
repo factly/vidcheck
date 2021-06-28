@@ -5,13 +5,13 @@ import (
 	"log"
 	"time"
 
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm/logger"
 
 	"github.com/factly/x/loggerx"
 	"github.com/spf13/viper"
 	"gorm.io/gorm/schema"
 
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -56,6 +56,7 @@ func Migrate() {
 		&Rating{},
 		&Space{},
 		&Claimant{},
+		&Category{},
 		&SpacePermission{},
 		&OrganisationPermission{},
 		&OrganisationPermissionRequest{},

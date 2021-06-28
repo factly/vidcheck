@@ -1,5 +1,10 @@
 import Videos from "../pages/videos";
 
+//Categories
+import Categories from '../pages/categories';
+import CreateCategory from '../pages/categories/CreateCategory';
+import EditCategory from '../pages/categories/EditCategory';
+
 //Ratings
 import Ratings from "../pages/ratings";
 import CreateRating from "../pages/ratings/CreateRating";
@@ -136,6 +141,33 @@ const routes = {
     permission: {
       resource: "fact-checks",
       action: "get",
+    },
+  },
+  categories: {
+    path: '/categories',
+    Component: Categories,
+    title: 'Categories',
+    permission: {
+      resource: 'categories',
+      action: 'get',
+    },
+  },
+  createCategory: {
+    path: '/categories/create',
+    Component: CreateCategory,
+    title: 'Create',
+    permission: {
+      resource: 'categories',
+      action: 'create',
+    },
+  },
+  editCategory: {
+    path: '/categories/:id/edit',
+    Component: EditCategory,
+    title: 'Edit',
+    permission: {
+      resource: 'categories',
+      action: 'update',
     },
   },
   ratings: {
@@ -370,7 +402,7 @@ export const sidebarMenu = [
   {
     title: "FACT CHECKING",
     Icon: CheckCircleOutlined,
-    children: [routes.videos, routes.claimants, routes.ratings],
+    children: [routes.videos, routes.claimants, routes.ratings, routes.categories],
   },
   {
     title: "ADMINSTRATION",

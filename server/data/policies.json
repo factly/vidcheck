@@ -8,6 +8,10 @@
                 "actions": ["get", "create", "update", "delete"]
             },
             {
+                "resource": "categories",
+                "actions": ["get", "create", "update", "delete"]
+            },
+            {
                 "resource": "claimants",
                 "actions": ["get", "create", "update", "delete"]
             },
@@ -32,6 +36,10 @@
             {
                 "resource": "media",
                 "actions": ["get", "create", "update"]
+            },
+            {
+                "resource": "categories",
+                "actions": ["get", "create", "update", "delete"]
             },
             {
                 "resource": "claimants",

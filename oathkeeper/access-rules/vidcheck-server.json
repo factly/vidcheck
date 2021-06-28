@@ -34,7 +34,7 @@
       "strip_path": ".factly/vidcheck/server"
     },
     "match": {
-      "url": "http://127.0.0.1:4455/.factly/vidcheck/server/<(videos|media|ratings|ratings/default|claimants|spaces|permissions(/organisations|/spaces)(|/my)|requests(/organisations|/spaces)(|/my))(|/\\d+)(|/)>",
+      "url": "http://127.0.0.1:4455/.factly/vidcheck/server/<(policies(|/default)|authors|users(|/\\d+/permissions)|videos|media|categories|ratings|ratings/default|claimants|spaces|permissions(/organisations|/spaces)(|/my)|requests(/organisations|/spaces)(|/my)(|/\\d+(/approve|/reject)))(|/\\d+)(|/)>",
       "methods": [
         "GET",
         "POST",
