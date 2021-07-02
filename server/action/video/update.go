@@ -3,14 +3,17 @@ package video
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"reflect"
 	"strconv"
 
+	"github.com/factly/vidcheck/action/author"
 	"github.com/factly/vidcheck/action/rating"
 	"github.com/factly/vidcheck/config"
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
+	"github.com/factly/vidcheck/util/arrays"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/meilisearchx"
@@ -74,6 +77,18 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	videoObj := &model.Video{}
 	videoObj.ID = uint(id)
+	result := videoResData{}
+	result.Video.Authors = make([]model.Author, 0)
+
+	videoAuthors := []model.VideoAuthor{}
+
+	// fetch all authors
+	authors, err := author.All(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
 
 	// Check if video exist
 	err = model.DB.Where(&model.Video{
@@ -99,13 +114,108 @@ func update(w http.ResponseWriter, r *http.Request) {
 	ratingMap := make(map[int]*model.Rating)
 
 	tx := model.DB.Begin()
+
+	newTags := make([]model.Tag, 0)
+	if len(videoData.Video.TagIDs) > 0 {
+		model.DB.Model(&model.Tag{}).Where(videoData.Video.TagIDs).Find(&newTags)
+		if err = tx.Model(&videoObj).Association("Tags").Replace(&newTags); err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.DBError()))
+			return
+		}
+	} else {
+		_ = model.DB.Model(&videoObj).Association("Tags").Clear()
+	}
+
+	newCategories := make([]model.Category, 0)
+	if len(videoData.Video.CategoryIDs) > 0 {
+		model.DB.Model(&model.Category{}).Where(videoData.Video.CategoryIDs).Find(&newCategories)
+		if err = tx.Model(&videoObj).Association("Categories").Replace(&newCategories); err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.DBError()))
+			return
+		}
+	} else {
+		_ = model.DB.Model(&videoObj).Association("Categories").Clear()
+	}
+
 	tx.Model(&videoObj).Updates(model.Video{
 		Base:      model.Base{UpdatedByID: uint(uID)},
 		Title:     videoData.Video.Title,
 		Summary:   videoData.Video.Summary,
 		VideoType: videoData.Video.VideoType,
+		Slug:      videoData.Video.Slug,
 		Status:    videoData.Video.Status,
-	}).First(&videoObj)
+	}).Preload("Tags").Preload("Categories").First(&videoObj)
+
+	result.Video.Video = *videoObj
+
+	// fetch existing video authors
+	model.DB.Model(&model.VideoAuthor{}).Where(&model.VideoAuthor{
+		VideoID: uint(id),
+	}).Find(&videoAuthors)
+
+	prevAuthorIDs := make([]uint, 0)
+	mapperVideoAuthor := map[uint]model.VideoAuthor{}
+	videoAuthorIDs := make([]uint, 0)
+
+	for _, videoAuthor := range videoAuthors {
+		mapperVideoAuthor[videoAuthor.AuthorID] = videoAuthor
+		prevAuthorIDs = append(prevAuthorIDs, videoAuthor.AuthorID)
+	}
+
+	toCreateIDs, toDeleteIDs := arrays.Difference(prevAuthorIDs, videoData.Video.AuthorIDs)
+
+	// map video author ids
+	for _, id := range toDeleteIDs {
+		videoAuthorIDs = append(videoAuthorIDs, mapperVideoAuthor[id].ID)
+	}
+
+	// delete video authors
+	if len(videoAuthorIDs) > 0 {
+		err = tx.Where(&videoAuthorIDs).Delete(&model.VideoAuthor{}).Error
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.DBError()))
+			return
+		}
+	}
+
+	// creating new video authors
+	for _, id := range toCreateIDs {
+		if id != 0 {
+			videoAuthor := &model.VideoAuthor{}
+			videoAuthor.AuthorID = uint(id)
+			videoAuthor.VideoID = result.Video.ID
+
+			err = tx.Model(&model.VideoAuthor{}).Create(&videoAuthor).Error
+
+			if err != nil {
+				tx.Rollback()
+				loggerx.Error(err)
+				errorx.Render(w, errorx.Parser(errorx.DBError()))
+				return
+			}
+		}
+	}
+
+	// fetch existing video authors
+	updatedVideoAuthors := []model.VideoAuthor{}
+	tx.Model(&model.VideoAuthor{}).Where(&model.VideoAuthor{
+		VideoID: uint(id),
+	}).Find(&updatedVideoAuthors)
+
+	// appending previous video authors to result
+	for _, videoAuthor := range updatedVideoAuthors {
+		aID := fmt.Sprint(videoAuthor.AuthorID)
+
+		if author, found := authors[aID]; found {
+			result.Video.Authors = append(result.Video.Authors, author)
+		}
+	}
 
 	meiliVideoObj := map[string]interface{}{
 		"id":             videoObj.ID,
@@ -117,6 +227,9 @@ func update(w http.ResponseWriter, r *http.Request) {
 		"status":         videoObj.Status,
 		"total_duration": videoObj.TotalDuration,
 		"space_id":       videoObj.SpaceID,
+		"tag_ids":        videoData.Video.TagIDs,
+		"category_ids":   videoData.Video.CategoryIDs,
+		"author_ids":     videoData.Video.AuthorIDs,
 	}
 
 	err = meilisearchx.UpdateDocument("vidcheck", meiliVideoObj)
@@ -282,10 +395,8 @@ func update(w http.ResponseWriter, r *http.Request) {
 		claimBlocks = AddDegaRatings(uID, sID, claimBlocks, degaRatingMap)
 	}
 
-	result := videoResData{
-		Video:  *videoObj,
-		Claims: claimBlocks,
-	}
+	result.Claims = claimBlocks
+
 	renderx.JSON(w, http.StatusOK, result)
 }
 

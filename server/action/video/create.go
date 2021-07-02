@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"net/http"
 	"reflect"
+	"time"
 
+	"github.com/factly/vidcheck/action/author"
 	"github.com/factly/vidcheck/action/rating"
 	"github.com/spf13/viper"
 
@@ -49,6 +51,13 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	oID, err := util.GetOrganisation(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
+		return
+	}
+
 	videoData := &videoReqData{}
 	err = json.NewDecoder(r.Body).Decode(&videoData)
 	if err != nil {
@@ -62,6 +71,30 @@ func create(w http.ResponseWriter, r *http.Request) {
 		loggerx.Error(errors.New("validation error"))
 		errorx.Render(w, validationError)
 		return
+	}
+	var status string = "draft"
+
+	if videoData.Video.Status == "publish" {
+
+		if len(videoData.Video.AuthorIDs) == 0 {
+			errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot publish post without author", http.StatusUnprocessableEntity)))
+			return
+		}
+
+		stat, err := getPublishPermissions(oID, sID, uID)
+		if err != nil {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
+			return
+		}
+
+		if stat == http.StatusOK {
+			status = "publish"
+		}
+	}
+
+	if videoData.Video.Status == "ready" {
+		status = "ready"
 	}
 
 	var path string
@@ -91,11 +124,16 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	result := videoResData{}
+
 	tx := model.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
 	videoObj := model.Video{}
+	videoObj.Tags = make([]model.Tag, 0)
+	videoObj.Categories = make([]model.Category, 0)
 	videoObj = model.Video{
 		URL:           videoData.Video.URL,
 		Title:         videoData.Video.Title,
+		Slug:          videoData.Video.Slug,
 		Summary:       videoData.Video.Summary,
 		VideoType:     videoData.Video.VideoType,
 		TotalDuration: videoData.Video.TotalDuration,
@@ -103,12 +141,56 @@ func create(w http.ResponseWriter, r *http.Request) {
 		SpaceID:       uint(sID),
 		ThumbnailURL:  iframelyres.ThumbnailURL,
 	}
-	err = tx.Create(&videoObj).Error
+
+	if status == "publish" {
+		if videoData.Video.PublishedDate == nil {
+			currTime := time.Now()
+			result.Video.PublishedDate = &currTime
+		} else {
+			result.Video.PublishedDate = videoData.Video.PublishedDate
+		}
+	} else {
+		result.Video.PublishedDate = nil
+	}
+
+	if len(videoData.Video.TagIDs) > 0 {
+		model.DB.Model(&model.Tag{}).Where(videoData.Video.TagIDs).Find(&videoObj.Tags)
+	}
+	if len(videoData.Video.CategoryIDs) > 0 {
+		model.DB.Model(&model.Category{}).Where(videoData.Video.CategoryIDs).Find(&videoObj.Categories)
+	}
+
+	err = tx.Preload("Tags").Preload("Categories").Create(&videoObj).Error
 	if err != nil {
 		tx.Rollback()
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.DBError()))
 		return
+	}
+
+	result.Video.Video = videoObj
+
+	// Adding author
+	authors, err := author.All(r.Context())
+
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	for _, id := range videoData.Video.AuthorIDs {
+		aID := fmt.Sprint(id)
+		if _, found := authors[aID]; found && id != 0 {
+			author := model.VideoAuthor{
+				AuthorID: id,
+				VideoID:  videoObj.ID,
+			}
+			err := tx.Model(&model.VideoAuthor{}).Create(&author).Error
+			if err == nil {
+				result.Video.Authors = append(result.Video.Authors, authors[aID])
+			}
+		}
 	}
 
 	err = insertVideoIntoMeili(videoObj)
@@ -227,10 +309,8 @@ func create(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	result := videoResData{
-		Video:  videoObj,
-		Claims: claimBlocks,
-	}
+	result.Claims = claimBlocks
+
 	renderx.JSON(w, http.StatusCreated, result)
 }
 
@@ -239,6 +319,7 @@ func insertVideoIntoMeili(video model.Video) error {
 		"id":             video.ID,
 		"kind":           "video",
 		"title":          video.Title,
+		"slug":           video.Slug,
 		"url":            video.URL,
 		"summary":        video.Summary,
 		"video_type":     video.VideoType,
@@ -269,4 +350,24 @@ func insertClaimIntoMeili(claim model.Claim, claimMeiliDate int64, checkedMeiliD
 	}
 
 	return meilisearchx.AddDocument("vidcheck", meiliObj)
+}
+
+func getPublishPermissions(oID, sID, uID int) (int, error) {
+	commonString := fmt.Sprint(":org:", oID, ":app:vidcheck:space:", sID, ":")
+
+	kresource := fmt.Sprint("resources", commonString, "fact-checks")
+	kaction := fmt.Sprint("actions", commonString, "fact-checks:publish")
+
+	result := util.KetoAllowed{}
+
+	result.Action = kaction
+	result.Resource = kresource
+	result.Subject = fmt.Sprint(uID)
+
+	resStatus, err := util.IsAllowed(result)
+	if err != nil {
+		return 0, err
+	}
+
+	return resStatus, nil
 }
