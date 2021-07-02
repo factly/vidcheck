@@ -204,15 +204,15 @@ function Analysis({ onSubmit }) {
             >
               <Input.TextArea
                 bordered={false}
-                placeholder="Add title for the post"
+                placeholder="Add Title"
                 onChange={(e) => onTitleChange(e.target.value)}
                 style={{
-                  fontSize: '2.5rem',
+                  fontSize: '2rem',
                   fontWeight: 'bold',
-                  textAlign: 'center',
                   resize: 'none',
                 }}
-                autoSize={{ minRows: 2, maxRows: 6 }}
+                autoSize
+                maxLength={150}
               />
             </Form.Item>
             <Form.Item
@@ -227,22 +227,19 @@ function Analysis({ onSubmit }) {
                 { max: 150, message: 'Title must be maximum 150 characters.' },
               ]}
             >
-              <Input.TextArea
-                bordered={false}
+              <Input
                 placeholder="Paste url here"
                 style={{
                   fontSize: '1.5rem',
-                  textAlign: 'center',
-                  resize: 'none',
+                  maxWidth: '600px'
                 }}
-                autoSize={{ maxRows: 2 }}
                 onChange={(e) => setURL(e.target.value)}
               />
             </Form.Item>
 
             {url ? (
               <>
-                <div style={{ marginLeft: "20%", padding: 20 }}>
+                <div style={{ padding: '20px 0' }}>
                   <ReactPlayer
                     //onPlay={setPlay(true)}
                     url={url}
@@ -260,21 +257,23 @@ function Analysis({ onSubmit }) {
 
                         }))
                     }
+                    style={{ marginRight: 'auto', width: '720', height: '405px' }}
                     visible={true}
                   />
                 </div>
-                <Form layout={"vertical"} form={form}>
+                <Form layout={"inline"} form={form} style={{ maxWidth: '100%' }}>
                   <Form.Item
                     style={{
                       marginBottom: 0,
                       display: "flex",
-                      "justify-content": "flex-end",
+                      justifyContent: "flex-end",
+                      alignItems: "flex-end"
                     }}
                   >
                     <Form.Item
                       name="start_time"
                       label="Start time"
-                      style={{ display: "inline-block", width: "50%" }}
+                      style={{ display: "inline-block", width: "50%", maxWidth: '120px' }}
                       rules={[
                         {
                           pattern: new RegExp(/^[0-2]?[0-9]?[0-9]:[0-5][0-9]$/),
@@ -323,7 +322,7 @@ function Analysis({ onSubmit }) {
                           },
                         }),
                       ]}
-                      style={{ display: "inline-block", width: "50%" }}
+                      style={{ display: "inline-block", width: "50%", maxWidth: '120px' }}
                     >
                       <Input
                         addonAfter={
@@ -338,7 +337,7 @@ function Analysis({ onSubmit }) {
                       />
                     </Form.Item>
                   </Form.Item>
-                  <Form.Item>
+                  <Form.Item noStyle>
                     <Button
                       htmlType="submit"
                       onClick={() => {
@@ -356,6 +355,7 @@ function Analysis({ onSubmit }) {
                           convertTimeStringToSeconds(form.getFieldValue("end_time"))
                         );
                       }}
+                      style={{ alignSelf: 'flex-end' }}
                     >
                       Add Claim
                     </Button>
@@ -476,7 +476,7 @@ function Analysis({ onSubmit }) {
       onClose={onClose}
       visible={claim.drawerVisible}
       getContainer={false}
-      width={"80%"}
+      width={"50%"}
       bodyStyle={{ paddingBottom: 40 }}
       headerStyle={{ fontWeight: 'bold' }}
       maskClosable={false}
