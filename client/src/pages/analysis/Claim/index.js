@@ -11,11 +11,9 @@ import {
   convertSecondsToTimeString,
   convertTimeStringToSeconds,
 } from "../../../utils/analysis";
-import { Prompt } from "react-router-dom";
 
-function Claim({ onCreate, data, video }) {
-  const [shouldBlockNavigation, setShouldBlockNavigation] =
-    React.useState(false);
+
+function Claim({ onCreate, claim, setClaim }) {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const [filters, setFilters] = React.useState({
@@ -55,20 +53,6 @@ function Claim({ onCreate, data, video }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  React.useEffect(() => {
-    const handleBeforeUnload = () => {
-      if (shouldBlockNavigation) {
-        window.onbeforeunload = () => true;
-      } else {
-        window.onbeforeunload = undefined;
-      }
-    };
-    handleBeforeUnload();
-    return () => {
-      window.removeEventListener("onbeforeunload", handleBeforeUnload);
-    };
-  }, [shouldBlockNavigation]);
-
   const fetchRatings = () => {
     dispatch(getRatings(filters));
   };
@@ -78,47 +62,58 @@ function Claim({ onCreate, data, video }) {
 
   const onReset = () => {
     const start_time = form.getFieldValue("start_time");
+    const end_time = form.getFieldValue("end_time");
     form.resetFields();
 
-    form.setFieldsValue({ start_time });
+    form.setFieldsValue({ start_time, end_time });
   };
 
   const layout = {
     labelCol: { span: 8 },
     wrapperCol: { span: 24 },
   };
-  const initialValues = data
-    ? {
-      ...data,
-      end_time: convertSecondsToTimeString(data.end_time),
-      start_time: convertSecondsToTimeString(data.start_time),
-      claim_date: data.claim_date ? moment(data.claim_date) : null,
-      checked_date: data.checked_date ? moment(data.checked_date) : null,
-    }
-    : {
-      end_time: video?.end_time
-        ? convertSecondsToTimeString(video.end_time)
-        : null,
-      start_time: video?.start_time
-        ? convertSecondsToTimeString(video.start_time)
-        : null,
-    };
+
+  // const initialValues = claim
+  //   ? {
+  //     ...claim,
+  //     end_time: convertSecondsToTimeString(claim.end_time),
+  //     start_time: convertSecondsToTimeString(claim.start_time),
+  //     claim_date: claim.claim_date ? moment(claim.claim_date) : null,
+  //     checked_date: claim.checked_date ? moment(claim.checked_date) : null,
+  //   }
+  //   : {
+  //     end_time: video?.end_time
+  //       ? convertSecondsToTimeString(video.end_time)
+  //       : null,
+  //     start_time: video?.start_time
+  //       ? convertSecondsToTimeString(video.start_time)
+  //       : null,
+  //   };
+
+  // form.setFieldsValue({
+  //   ...claim.data,
+  //   ...form.getFieldValue(),
+  // })
 
   return (
     <>
-      {/* <Prompt
-        when={shouldBlockNavigation}
-        message="You have unsaved changes, are you sure you want to leave?"
-      /> */}
       <Form
         {...layout}
-        initialValues={initialValues}
-        form={form}
-        onValuesChange={() => {
-          setShouldBlockNavigation(true);
+        initialValues={{
+          ...claim.data,
+          end_time: convertSecondsToTimeString(claim.data.end_time),
+          start_time: convertSecondsToTimeString(claim.data.start_time),
+          claim_date: claim.data.claim_date ? moment(claim.data.claim_date) : null,
+          checked_date: claim.data.checked_date ? moment(claim.data.checked_date) : null,
         }}
+        form={form}
+        onValuesChange={() => setClaim({
+          ...claim, data: {
+            ...form.getFieldsValue(), end_time: convertTimeStringToSeconds(form.getFieldValue("end_time")), start_time: convertTimeStringToSeconds(form.getFieldValue("start_time")), claim_date: form.getFieldValue("claim_date") ? moment(form.getFieldValue("claim_date")) : null,
+            checked_date: form.getFieldValue("checked_date") ? moment(form.getFieldValue("checked_date")) : null,
+          }
+        })}
         onFinish={(values) => {
-          setShouldBlockNavigation(false);
           const rating = ratings.find((each) => each.id === values.rating_id);
           onCreate({
             ...values,
@@ -127,10 +122,24 @@ function Claim({ onCreate, data, video }) {
             start_time: convertTimeStringToSeconds(values.start_time),
             end_time: convertTimeStringToSeconds(values["end_time"]),
           });
+          form.resetFields();
+          setClaim({ drawerVisible: false, index: -1 });
         }}
         name="control-hooks"
         layout={"vertical"}
       >
+        <Form.Item>
+          <div style={{ "justify-content": "flex-end", display: "flex" }}>
+            <Button
+              htmlType="submit"
+              type="primary"
+              style={{ "margin-right": "15px" }}
+            >
+              {claim.index > -1 ? "Update Claim" : "Add Claim"}
+            </Button>
+            <Button onClick={onReset}>Reset Claim</Button>
+          </div>
+        </Form.Item>
         <Form.Item
           style={{
             marginBottom: 0,
@@ -266,18 +275,7 @@ function Claim({ onCreate, data, video }) {
           )}
         </Form.List>
 
-        <Form.Item>
-          <div style={{ "justify-content": "flex-start", display: "flex" }}>
-            <Button
-              htmlType="submit"
-              type="primary"
-              style={{ "margin-right": "15px" }}
-            >
-              {data && data.start_time > -1 ? "Update Claim" : "Add Claim"}
-            </Button>
-            <Button onClick={onReset}>Reset Claim</Button>
-          </div>
-        </Form.Item>
+
       </Form>
     </>
   );
