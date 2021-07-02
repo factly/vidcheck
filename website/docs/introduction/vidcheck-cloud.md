@@ -2,13 +2,14 @@
 sidebar_position: 2
 ---
 
-# Managed Service
+# VidCheck Cloud
 
-## What is offered as a part of managed service?
+## What is VidCheck Cloud?
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer volutpat ante eu condimentum pharetra. Nulla luctus tortor velit, in bibendum augue accumsan eget. Mauris porta in mi eget fermentum. Sed ultricies consectetur placerat. Aliquam tincidunt enim a neque elementum convallis. Nam eu hendrerit leo, in pellentesque nisl. Etiam eget fringilla diam. Aliquam maximus tristique enim quis maximus. Etiam sit amet placerat erat, eget cursus tellus. Mauris non cursus ex. Sed commodo nec enim ac rutrum.
+VidCheck Cloud is Factly's managed service offering that eliminates the need for organizations/individuals to install and manage VidCheck on their own. This is the easiest way to get started with VidCheck where a highly available and scalable production ready instance is setup by the Factly team. The team also provides support for the organizations/individuals to get started with VidCheck and make the best use of the platform.
+VidCheck Cloud scales with your need and you pay based on the usage.
 
-Nulla eu ullamcorper dui, eget tincidunt ligula. Aenean a vestibulum leo, sed efficitur erat. Ut sit amet turpis at risus ultricies lobortis eu at mi. Cras vitae interdum est. Suspendisse a porta urna. Nunc in quam quis justo lacinia pulvinar. Integer a ante in tellus facilisis luctus at quis turpis. Nullam tincidunt orci vulputate, sollicitudin nunc vel, condimentum velit. Morbi gravida, lectus vel lacinia blandit, ex ex aliquam velit, quis ornare nibh leo sed dui.
+Currently VidCheck Cloud is still in Beta and is available as invite-only. Please write to **vidcheck@factly.in** if you want to enroll as one of the early adopters for VidCheck Cloud and some one from the team will get back to you at the earliest.
 
 ## Should you choose our managed service?
 

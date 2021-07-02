@@ -16,8 +16,8 @@ You should also read the chapter if you are interested to learn the architecture
 
 In this chapter, you learn about the following:
 
-- All the open source projects from Factly and how they fit into larger scheme of our Journalism Technology
-- Overview of Factly's overall philosophy and Tech philosophy
+- All the open source projects from Factly and how they fit into larger scheme of Journalism Technology
+- Overview of our philosophy on technology and journalism
 - Quick overview of VidCheck's architecture
 - Roadmap of VidCheck in particular and also other relevant projects 
 - Information on how you can get involved in any of the projects that you are interested to contribute or explore further

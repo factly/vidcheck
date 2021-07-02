@@ -4,24 +4,75 @@ sidebar_position: 2
 
 # Projects
 
-## What is VidCheck?
+Factly Tech Labs works on developing and managing various applications that will increase access to public data and information by making it easy, interactive and intuitive. [Counting India](https://countingindia.com) is Factly’s first tool in its beta version that focuses on accessibility and data visualization of Census-2011 data. Factly is currently working on various applications that are in different stages of development.
 
-VidCheck is a web platform that makes video fact-checking more standardized for fact-checkers, easy to read and understand for audiences, and scalable for platforms & fact-checkers. VidCheck can be used in cases where claims being fact-checked are part of the video such as political speeches, news content, documentaries, any other type of commentary, manipulated content, etc.
+## Maturity Levels
 
-The current model of fact-checking claims in videos is to pick specific parts of the video where claims are seen or where manipulations are made and fact-check them. Usually, fact-checkers use timestamps in their article to identify the claims/manipulations if it's a longer video. They then fact-check the identified claims. This process has certain drawbacks such as fact-checkers going through lengthy videos to identify claims, audiences opening the video, and navigating to specific parts of the video.
+We use the following phases to define the projects maturity:
 
-VidCheck aims to solve these issues and present a refreshingly new & intuitive UI for these types of fact-checks. 
+- **Sandbox:** Applications that are in an experimental phases. Completed PoC, but haven't deployed a usable product yet. Expect breaking changes and not suitable for Production usage.
+- **Incubating:** Deployed in Production at Factly or one major organization for less than a year. Developed & maintained actively. High likelihood of breaking changes for backward compatability. Please reach out to the Factly Team on the [slack channel](https://slack.factly.org) before using the applications in a Production setting.
+- **Graduated:** Deployed in Production at Factly or multiple other organizations for over a year. Developed & maintained actively. Suitable for usage in Production.
+- **Retired:** Not actively developed and supported. Users will be provided enough notice before a service is ever retired.
 
-## How does it benefit Fact-Checkers?
+## Dega
 
-Fact-checkers need to identify the timestamps (from & to) where claims are made in the video that is to be fact-checked. They enter these timelines in VidCheck and the specific claim being made at that specific time. VidCheck then enables them to write their research, fact-check for these claims. In the case of manipulated videos or out-of-context videos, fact-checkers will identify & enter the time frames used for the purpose of evidence or clues. The relevant clip or the GIF will automatically be a part of the fact-check without having to manually embed or take screenshots. We also plan to integrate all this into the original videos so that reading the fact-check becomes a seamless exercise. Claim Review schema is populated automatically for published fact checks.
+Dega is a lightweight, scalable & high performant open-source publishing platform for small and medium scale news media organizations. The platform has various features built-in for fact-checking organizations. Dega supports managing multiple organizations and sites from the same portal. It is developed for modern web features with all the publishing best practices built-in. The tool is written in Go & React.
 
-## How does it benefit Audience?
+**GitHub Repositories:**
+- https://github.com/factly/dega-server
+- https://github.com/factly/dega-studio
+- https://github.com/factly/dega-api
+- https://github.com/factly/dega-themes
 
-For the audience, this will be a completely new & refreshing experience. If it's a political speech, especially the ones made during election campaigns, the reader will be able to watch the specific clip where the claim is made, read the claim, and the fact-check, all at one place without having to go back & forth in the video. The audiences can read the fact-check claim by claim where they can watch the clip, read the fact-check in a refreshingly new UI. They don't need to watch lengthy videos just to see where the claim is made. In the case of manipulated or out-of-context videos, the audience can watch the clip where relevant evidence or clues are identified by the fact-checker. They can also watch GIFs generated with the identified evidence or clue used for fact-checking. Audience can jump to a certain claim in the video by clicking through the list of claims & also get a graphical view of all the ratings for the claims. Readers can also send URLs to the videos to fact-checkers specifying the timings of the claims they would like to fact-check. Fact-checkers will receive the submissions in their queue and can choose to publish a fact check for the same.
+**License:** [MIT](https://github.com/factly/dega/blob/master/LICENSE) <br/>
+**Maturity:** Incubating
 
-## How does it benefit Platforms? 
+## VidCheck
 
-VidCheck solves an important problem for platforms as far as misinformation with videos is concerned. It is immensely useful for a platform like YouTube because all the information entered in VidCheck is exposed as an API which can be used to add additional context and information in the videos presented on the platform.
+VidCheck is a web application that makes video fact-checking more standardized for fact-checkers, easy to read and understand for audiences, and scalable for platforms & fact-checkers. The application can be used in cases where claims being fact-checked are part of the video such as political speeches, news content, documentaries, any other type of commentary, manipulated content etc. VidCheck is written in Go & React.
 
-All in all, VidCheck makes this entire process a part of the fact-checking workflow. Hence without any additional efforts, the entire ecosystem will benefit.
+**GitHub Repository:** https://github.com/factly/vidcheck <br/>
+**License:** [MIT](https://github.com/factly/vidcheck/blob/develop/LICENSE) <br/>
+**Maturity:** Incubating
+
+## Kavach
+
+Kavach is an open-source identity and access management solution. It is a lightweight solution with features to manage organizations, users, permissions and can be configured easily to support applications required multitenancy. Kavach is written in Go, React and is built on ORY stack of services.
+
+**GitHub Repository:** https://github.com/factly/kavach <br/>
+**License:** [MIT](https://github.com/factly/kavach/blob/develop/LICENSE) <br/>
+**Maturity:** Incubating
+
+## MandE
+
+MandE is an open-source application to develop data portals to publish datasets in various formats. It provides features to publish private datasets and has e-commerce features specific to datasets. Datasets will be available for access as APIs and can be integrated with visualization platforms. MandE is written in Go for the backend and React for the frontend.
+
+**GitHub Repository:** https://github.com/factly/mande <br/>
+**License:** [MIT](https://github.com/factly/mande/blob/develop/LICENSE) <br/>
+**Maturity:** Incubating
+
+## Bindu
+
+Bindu is a modern open-source Data visualization platform built on Vega, Vega-Lite. It provides the ability for analysts to create charts and dashboards from a rich set of chart templates. The access policies can be set at the chart level, providing ability to share it with a set of users or publish it for the general public. The backend for Bindu is written in Go and the frontend in React.
+
+**GitHub Repository:** https://github.com/factly/bindu <br/>
+**License:** [AGPL3](https://github.com/factly/bindu/blob/develop/LICENSE) <br/>
+**Maturity:** Sandbox
+
+## Parlens
+
+Parlens is a tool for searching data that is indexed from Indian parliament datasets. <br/>
+**Maturity:** Sandbox
+
+## Counting India
+
+Counting India (CI) is the first major application developed as an initiative of Factly Tech Labs. CI makes data related to the States/Districts in India more accessible and understandable. The primary source of data for CI is the Census of India 2011 and other official sources. In CI, one can compare any two States/Districts side by side. One can also embed, access or download the data.
+
+We envision that every person who is interested in using data in their sphere of work will value CI’s platform. CI will also be a reliable resource for policy makers, journalists and researchers to explore and discover stories of public interest in India.
+
+CI code is licensed under the MIT License. CI has been modeled on tools like Wazimap Kenya, Census Reporter and as inspired by NepalMap.
+
+**GitHub Repository:** https://github.com/factly/janaganana <br/>
+**License:** [MIT](https://github.com/factly/janaganana/blob/master/LICENSE) <br/>
+**Maturity:** Graduated

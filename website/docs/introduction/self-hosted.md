@@ -6,7 +6,7 @@ sidebar_position: 3
 
 ## Is self-hosted version Free?
 
-VidCheck is open source and has a ["free as in free speech"](https://www.gnu.org/philosophy/free-sw.en.html) version of the platform for self-hosting with a very permissive [MIT License](https://github.com/factly/vidcheck/blob/develop/LICENSE) like most of our other projects. In fact, all the features available in the self-hosted version are exactly the same as the managed service.
+VidCheck is open source and has a ["free as in free speech"](https://www.gnu.org/philosophy/free-sw.en.html) version of the platform for self-hosting with a very permissive [MIT License](https://github.com/factly/vidcheck/blob/develop/LICENSE) like most of our [other projects](/docs/ecosystem/projects). In fact, all the features available in the self-hosted version are exactly the same as the managed service.
 
 As mentioned in our [philosophy](/docs/ecosystem/philosophy), we strongly believe in developing open source software in the domain of journalism technology that adheres to the following four essential freedoms as [outlined](https://www.gnu.org/philosophy/free-sw.en.html) by the [Free Software Foundation.](https://www.fsf.org/)
 - The freedom to run the program as you wish, for any purpose (freedom 0).
