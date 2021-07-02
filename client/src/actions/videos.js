@@ -8,6 +8,9 @@ import {
   VIDEOS_API,
 } from "../constants/videos";
 import { addErrorNotification, addSuccessNotification } from "./notifications";
+import { addCategories } from './categories';
+import { addAuthors } from './authors';
+import { addTags } from './tags';
 
 export const getVideos = (query) => {
   return (dispatch) => {
@@ -17,7 +20,52 @@ export const getVideos = (query) => {
         params: query,
       })
       .then((response) => {
-        dispatch(addVideosList(response.data.nodes));
+        dispatch(
+          addAuthors(
+            response.data.nodes
+              .filter((data) => data.video.authors.length > 0)
+              .map((data) => {
+                return data.video.authors;
+              })
+              .flat(1),
+          ),
+        );
+        dispatch(
+          addTags(
+            response.data.nodes
+              .filter((data) => data.video.tags.length > 0)
+              .map((data) => {
+                return data.video.tags;
+              })
+              .flat(1),
+          ),
+        );
+        dispatch(
+          addCategories(
+            response.data.nodes
+              .filter((data) => data.video.categories.length > 0)
+              .map((data) => {
+                return data.video.categories;
+              })
+              .flat(1),
+          ),
+        );
+        dispatch(
+          addVideosList(
+            response.data.nodes.map((each) => {
+              return {
+                video: {
+                  ...each.video,
+                  categories: each.video.categories.map((category) => category.id),
+                  tags: each.video.tags.map((tag) => tag.id),
+                  authors: each.video.authors.map((author) => author.id),
+                },
+                claims: each.claims
+              };
+            }),
+          ),
+        );
+
         dispatch(
           addVideosRequest({
             data: response.data.nodes.map((item) => item.video.id),
@@ -39,10 +87,23 @@ export const getVideo = (id) => {
     return axios
       .get(VIDEOS_API + "/" + id)
       .then((response) => {
-        dispatch(getVideoByID(response.data));
+        let data = response.data;
+        dispatch(addTags(data.video.tags));
+        dispatch(addAuthors(data.video.authors));
+        dispatch(addCategories(data.video.categories));
+        const videoObj = {
+          video: {
+            ...data.video,
+            categories: data.video.categories.map((category) => category.id),
+            tags: data.video.tags.map((tag) => tag.id),
+            authors: data.video.authors.map((author) => author.id),
+          },
+          claims: data.claims
+        }
+        dispatch(getVideoByID(videoObj));
         dispatch(stopVideosLoading());
 
-        return response.data;
+        return videoObj;
       })
       .catch((error) => {
         dispatch(addErrorNotification(error.message));
@@ -72,7 +133,19 @@ export const updateVideo = (data) => {
     return axios
       .put(VIDEOS_API + "/" + data.video.id, data)
       .then((response) => {
-        dispatch(getVideoByID(response.data));
+        let data = response.data;
+        dispatch(addTags(data.video.tags));
+        dispatch(addAuthors(data.video.authors));
+        dispatch(addCategories(data.video.categories));
+        dispatch(getVideoByID({
+          video: {
+            ...data.video,
+            categories: data.video.categories.map((category) => category.id),
+            tags: data.video.tags.map((tag) => tag.id),
+            authors: data.video.authors.map((author) => author.id),
+          },
+          claims: data.claims
+        }));
         dispatch(stopVideosLoading());
         dispatch(addSuccessNotification("Video updated"));
         return response.data;

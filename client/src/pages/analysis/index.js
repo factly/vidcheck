@@ -147,11 +147,7 @@ function Analysis({ onSubmit }) {
             ? moment(values.published_date).format('YYYY-MM-DDTHH:mm:ssZ')
             : moment(Date.now()).format('YYYY-MM-DDTHH:mm:ssZ'))
           : (values.published_date = null);
-        onSubmit({ video: { ...values, total_duration: video.total_duration, video_type: video.video_type }, claims });
-      }}
-      onValuesChange={() => {
-        // setShouldBlockNavigation(true);
-        // setValueChange(true);
+        onSubmit({ video: { ...video, ...values, total_duration: video.total_duration, video_type: video.video_type }, claims });
       }}
       layout="vertical"
       name="factcheck"
@@ -233,16 +229,20 @@ function Analysis({ onSubmit }) {
                   fontSize: '1.5rem',
                   maxWidth: '600px'
                 }}
-                onChange={(e) => setURL(e.target.value)}
+                onChange={(e) => dispatch(
+                  addVideo({
+                    ...video,
+                    url: e.target.value
+                  }))}
               />
             </Form.Item>
 
-            {url ? (
+            {video.url ? (
               <>
                 <div style={{ padding: '20px 0' }}>
                   <ReactPlayer
                     //onPlay={setPlay(true)}
-                    url={url}
+                    url={video.url}
                     playing={true}
                     controls={true}
                     ref={player}
