@@ -73,27 +73,6 @@ function Claim({ onCreate, claim, setClaim }) {
     wrapperCol: { span: 24 },
   };
 
-  // const initialValues = claim
-  //   ? {
-  //     ...claim,
-  //     end_time: convertSecondsToTimeString(claim.end_time),
-  //     start_time: convertSecondsToTimeString(claim.start_time),
-  //     claim_date: claim.claim_date ? moment(claim.claim_date) : null,
-  //     checked_date: claim.checked_date ? moment(claim.checked_date) : null,
-  //   }
-  //   : {
-  //     end_time: video?.end_time
-  //       ? convertSecondsToTimeString(video.end_time)
-  //       : null,
-  //     start_time: video?.start_time
-  //       ? convertSecondsToTimeString(video.start_time)
-  //       : null,
-  //   };
-
-  // form.setFieldsValue({
-  //   ...claim.data,
-  //   ...form.getFieldValue(),
-  // })
 
   return (
     <>
@@ -128,18 +107,7 @@ function Claim({ onCreate, claim, setClaim }) {
         name="control-hooks"
         layout={"vertical"}
       >
-        <Form.Item>
-          <div style={{ "justify-content": "flex-end", display: "flex" }}>
-            <Button
-              htmlType="submit"
-              type="primary"
-              style={{ "margin-right": "15px" }}
-            >
-              {claim.index > -1 ? "Update Claim" : "Add Claim"}
-            </Button>
-            <Button onClick={onReset}>Reset Claim</Button>
-          </div>
-        </Form.Item>
+
         <Form.Item
           style={{
             marginBottom: 0,
@@ -274,7 +242,18 @@ function Claim({ onCreate, claim, setClaim }) {
             </>
           )}
         </Form.List>
-
+        <Form.Item>
+          <div style={{ "justify-content": "flex-start", display: "flex" }}>
+            <Button
+              htmlType="submit"
+              type="primary"
+              style={{ "margin-right": "15px" }}
+            >
+              {claim.index > -1 ? "Update Claim" : "Add Claim"}
+            </Button>
+            <Button onClick={onReset}>Reset Claim</Button>
+          </div>
+        </Form.Item>
 
       </Form>
     </>

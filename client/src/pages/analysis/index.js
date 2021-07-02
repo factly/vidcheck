@@ -5,7 +5,6 @@ import {
   DatePicker, Space, Menu, Switch, Dropdown, Row, Col
 } from "antd";
 import ReactPlayer from "react-player";
-import { useHistory } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { addVideo, addClaim } from "../../actions/claims";
 import {
@@ -19,32 +18,56 @@ import {
   FieldTimeOutlined,
   SettingFilled
 } from "@ant-design/icons";
-import { Link } from "react-router-dom";
 import { deleteVideo } from "../../actions/claims";
+import moment from "moment";
 
 import Selector from "../../components/Selector";
 import Claim from "./Claim";
 
 
 function Analysis({ onSubmit }) {
-  const history = useHistory();
   const [form] = Form.useForm();
+  const [claimform] = Form.useForm();
 
+  const [url, setURL] = useState('');
 
+  const [settingsDrawerVisible, setSettingsDrawerVisible] = useState(false);
   const [claim, setClaim] = useState({ index: -1, data: {}, drawerVisible: false });
 
-  const showDrawer = () => {
-    setClaim({ ...claim, drawerVisible: true });
+  const showSettings = () => {
+    setSettingsDrawerVisible(true);
   };
   const onClose = () => {
     setClaim({ ...claim, drawerVisible: false });
   };
+  const onCloseSettings = () => {
+    setSettingsDrawerVisible(false);
+  };
 
   const { video, claims } = useSelector(({ videoClaims }) => videoClaims);
-  const [status, setStatus] = useState(video.status ? video.status : 'draft');
+  const [status, setStatus] = useState('draft');
   const dispatch = useDispatch();
 
   const player = useRef(null);
+
+  const onTitleChange = (string) => {
+    if (status !== 'publish') {
+      claimform.setFieldsValue({
+        slug: maker(string),
+      });
+    }
+  };
+
+  const checkSelectedTime = (selectedTime) => {
+    return (
+      claims.filter(
+        (each) =>
+          convertTimeStringToSeconds(selectedTime) >= each.start_time &&
+          convertTimeStringToSeconds(selectedTime) <= each.end_time
+      ).length === 0
+    );
+  };
+
 
   const fillCurrentTime = (field) => {
     const currentPlayedTime = player.current.getCurrentTime();
@@ -83,14 +106,6 @@ function Analysis({ onSubmit }) {
       return;
     }
 
-    dispatch(
-      addVideo({
-        ...video,
-        start_time: form.getFieldValue("start_time"),
-        end_time: form.getFieldValue("end_time"),
-      })
-    );
-
     setClaim({
       ...claim,
       data: {
@@ -99,24 +114,6 @@ function Analysis({ onSubmit }) {
       },
       drawerVisible: true
     })
-  };
-
-  const checkSelectedTime = (selectedTime) => {
-    return (
-      claims.filter(
-        (each) =>
-          convertTimeStringToSeconds(selectedTime) >= each.start_time &&
-          convertTimeStringToSeconds(selectedTime) <= each.end_time
-      ).length === 0
-    );
-  };
-
-  const onTitleChange = (string) => {
-    if (status !== 'publish') {
-      form.setFieldsValue({
-        slug: maker(string),
-      });
-    }
   };
 
 
@@ -134,285 +131,359 @@ function Analysis({ onSubmit }) {
     </Menu>
   );
 
-  return <Form
-    form={form}
-    initialValues={{ ...video }}
-    style={{ maxWidth: '100%', width: '100%' }}
-    onFinish={(values) => console.log(values)}
-    onValuesChange={() => {
-      // setShouldBlockNavigation(true);
-      // setValueChange(true);
-    }}
-    layout="vertical"
-  >
-    <Space direction="vertical">
-      <div style={{ float: 'right' }}>
-        <Space direction="horizontal">
-          <Form.Item name="draft">
-            <Dropdown overlay={readyToPublish}>
-              <Button
-                // disabled={!valueChange}
-                type="secondary"
-                htmlType="submit"
-                onClick={() => (status === 'ready' ? setStatus('ready') : setStatus('draft'))}
-              >
-                Save
-              </Button>
-            </Dropdown>
-          </Form.Item>
-          {/* {actions.includes('admin') || actions.includes('publish') ? ( */}
-          {true ? (
-            <Form.Item name="submit">
-              <Button type="secondary" htmlType="submit" onClick={() => setStatus('publish')}>
-                {video.id && status === 'publish' ? 'Update' : 'Publish'}
+  return <>
+    <Form
+      form={claimform}
+      initialValues={{ ...video }}
+      style={{ maxWidth: '100%', width: '100%' }}
+      onFinish={(values) => {
+
+        values.category_ids = values.categories || [];
+        values.tag_ids = values.tags || [];
+        values.author_ids = values.authors || [];
+        values.status = status;
+        values.status === 'publish'
+          ? (values.published_date = values.published_date
+            ? moment(values.published_date).format('YYYY-MM-DDTHH:mm:ssZ')
+            : moment(Date.now()).format('YYYY-MM-DDTHH:mm:ssZ'))
+          : (values.published_date = null);
+        onSubmit({ video: { ...values, total_duration: video.total_duration, video_type: video.video_type }, claims });
+      }}
+      onValuesChange={() => {
+        // setShouldBlockNavigation(true);
+        // setValueChange(true);
+      }}
+      layout="vertical"
+      name="factcheck"
+    >
+      <Space direction="vertical">
+        <div style={{ float: 'right' }}>
+          <Space direction="horizontal">
+            <Form.Item name="draft">
+              <Dropdown overlay={readyToPublish}>
+                <Button
+                  // disabled={!valueChange}
+                  type="secondary"
+                  htmlType="submit"
+                  onClick={() => (status === 'ready' ? setStatus('ready') : setStatus('draft'))}
+                >
+                  Save
+                </Button>
+              </Dropdown>
+            </Form.Item>
+            {/* {actions.includes('admin') || actions.includes('publish') ? ( */}
+            {true ? (
+              <Form.Item name="submit">
+                <Button type="secondary" htmlType="submit" onClick={() => {
+                  console.log("OnSubmit")
+                  setStatus('publish')
+                }}>
+                  {video.id && status === 'publish' ? 'Update' : 'Publish'}
+                </Button>
+              </Form.Item>
+            ) : null}
+            <Form.Item name="drawerOpen">
+              <Button type="secondary" onClick={showSettings}>
+                <SettingFilled />
               </Button>
             </Form.Item>
-          ) : null}
-          <Form.Item name="drawerOpen">
-            <Button type="secondary" onClick={showDrawer}>
-              <SettingFilled />
-            </Button>
-          </Form.Item>
-        </Space>
-      </div>
-      <Row gutter={16}>
-        <Col xs={{ span: 24 }} xl={{ span: 18, offset: 3 }} xxl={{ span: 12, offset: 6 }}>
-          <Form.Item
-            name="title"
-            rules={[
-              {
-                required: true,
-                message: 'Please input the title!',
-              },
-              { min: 3, message: 'Title must be minimum 3 characters.' },
-              { max: 150, message: 'Title must be maximum 150 characters.' },
-            ]}
-          >
-            <Input.TextArea
-              bordered={false}
-              placeholder="Add title for the post"
-              onChange={(e) => onTitleChange(e.target.value)}
-              style={{
-                fontSize: '2.5rem',
-                fontWeight: 'bold',
-                textAlign: 'center',
-                resize: 'none',
-              }}
-              autoSize={{ minRows: 2, maxRows: 6 }}
-            />
-          </Form.Item>
-          <Form.Item
-            name="url"
-            label="URL"
-            rules={[
-              {
-                required: true,
-                message: 'Please input the title!',
-              },
-              { min: 3, message: 'Title must be minimum 3 characters.' },
-              { max: 150, message: 'Title must be maximum 150 characters.' },
-            ]}
-          >
-            <Input.TextArea
-              bordered={false}
-              placeholder="Paste url here"
-              onChange={(e) =>
-                dispatch(addVideo({ ...video, url: e.target.value }))
-              }
-              style={{
-                fontSize: '1.5rem',
-                textAlign: 'center',
-                resize: 'none',
-              }}
-              defaultValue={video.url ? video.url : ""}
-              autoSize={{ maxRows: 2 }}
-            />
-          </Form.Item>
+          </Space>
+        </div>
+        <Row gutter={16}>
+          <Col span={24}>
+            <Form.Item
+              name="title"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please input the title!',
+                },
+                { min: 3, message: 'Title must be minimum 3 characters.' },
+                { max: 150, message: 'Title must be maximum 150 characters.' },
+              ]}
+            >
+              <Input.TextArea
+                bordered={false}
+                placeholder="Add title for the post"
+                onChange={(e) => onTitleChange(e.target.value)}
+                style={{
+                  fontSize: '2.5rem',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                  resize: 'none',
+                }}
+                autoSize={{ minRows: 2, maxRows: 6 }}
+              />
+            </Form.Item>
+            <Form.Item
+              name="url"
+              label="URL"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please input the title!',
+                },
+                { min: 3, message: 'Title must be minimum 3 characters.' },
+                { max: 150, message: 'Title must be maximum 150 characters.' },
+              ]}
+            >
+              <Input.TextArea
+                bordered={false}
+                placeholder="Paste url here"
+                style={{
+                  fontSize: '1.5rem',
+                  textAlign: 'center',
+                  resize: 'none',
+                }}
+                autoSize={{ maxRows: 2 }}
+                onChange={(e) => setURL(e.target.value)}
+              />
+            </Form.Item>
 
-          {video.url ? (
-            <>
-              <div style={{ marginLeft: "20%", padding: 20 }}>
-                <ReactPlayer
-                  //onPlay={setPlay(true)}
-                  url={video.url}
-                  playing={true}
-                  controls={true}
-                  ref={player}
-                  volume={0}
-                  // onProgress={handleProgress}
-                  onDuration={(value) =>
-                    dispatch(
-                      addVideo({
-                        ...video,
-                        total_duration: value,
-                        video_type: "youtube",
-                      })
-                    )
-                  }
-                  visible={true}
-                />
-              </div>
-              <Form layout={"vertical"} form={form}>
-                <Form.Item
-                  style={{
-                    marginBottom: 0,
-                    display: "flex",
-                    "justify-content": "flex-end",
-                  }}
-                >
+            {url ? (
+              <>
+                <div style={{ marginLeft: "20%", padding: 20 }}>
+                  <ReactPlayer
+                    //onPlay={setPlay(true)}
+                    url={url}
+                    playing={true}
+                    controls={true}
+                    ref={player}
+                    volume={0}
+                    // onProgress={handleProgress}
+                    onDuration={(value) =>
+                      dispatch(
+                        addVideo({
+                          ...video,
+                          total_duration: value,
+                          video_type: "youtube",
+
+                        }))
+                    }
+                    visible={true}
+                  />
+                </div>
+                <Form layout={"vertical"} form={form}>
                   <Form.Item
-                    name="start_time"
-                    label="Start time"
-                    style={{ display: "inline-block", width: "50%" }}
-                    rules={[
-                      {
-                        pattern: new RegExp(/^[0-2]?[0-9]?[0-9]:[0-5][0-9]$/),
-                        message: "Wrong format! (mm:ss)",
-                      },
-                      () => ({
-                        validator(_, value) {
-                          if (checkSelectedTime(value)) {
-                            return Promise.resolve();
-                          }
-                          return Promise.reject(
-                            new Error("Selected start time is part of other claim")
-                          );
-                        },
-                      }),
-                    ]}
-                  >
-                    <Input
-                      addonAfter={
-                        <Tooltip placement="top" title="Now">
-                          {
-                            <FieldTimeOutlined
-                              onClick={() => fillCurrentTime("start_time")}
-                            />
-                          }
-                        </Tooltip>
-                      }
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    name="end_time"
-                    label="End time"
-                    rules={[
-                      {
-                        pattern: new RegExp(/^[0-2]?[0-9]?[0-9]:[0-5][0-9]$/),
-                        message: "Wrong format! (mm:ss)",
-                      },
-                      () => ({
-                        validator(_, value) {
-                          if (checkSelectedTime(value)) {
-                            return Promise.resolve();
-                          }
-                          return Promise.reject(
-                            new Error("Selected end time is part of other claim")
-                          );
-                        },
-                      }),
-                    ]}
-                    style={{ display: "inline-block", width: "50%" }}
-                  >
-                    <Input
-                      addonAfter={
-                        <Tooltip placement="top" title="Now">
-                          {
-                            <FieldTimeOutlined
-                              onClick={() => fillCurrentTime("end_time")}
-                            />
-                          }
-                        </Tooltip>
-                      }
-                    />
-                  </Form.Item>
-                </Form.Item>
-                <Form.Item>
-                  <Button
-                    htmlType="submit"
-                    onClick={() => {
-                      if (
-                        !form.getFieldValue("start_time") ||
-                        !form.getFieldValue("end_time")
-                      ) {
-                        alert("select start and end time");
-                        return;
-                      }
-                      isEndTimeValid(
-                        convertTimeStringToSeconds(
-                          form.getFieldValue("start_time")
-                        ),
-                        convertTimeStringToSeconds(form.getFieldValue("end_time"))
-                      );
+                    style={{
+                      marginBottom: 0,
+                      display: "flex",
+                      "justify-content": "flex-end",
                     }}
                   >
-                    Add Claim
-                  </Button>
-                </Form.Item>
-              </Form>
-              {claims.map((each, index) => (
-                <Card
-                  style={{ margin: 5 }}
-                  key={index}
-                  actions={[
-                    <EditOutlined key="edit" onClick={() => {
-                      setClaim({ data: each, index, drawerVisible: true });
-                    }} />,
-                    <Popconfirm
-                      title="Sure to Delete?"
-                      onConfirm={() => dispatch(deleteVideo(index))}
+                    <Form.Item
+                      name="start_time"
+                      label="Start time"
+                      style={{ display: "inline-block", width: "50%" }}
+                      rules={[
+                        {
+                          pattern: new RegExp(/^[0-2]?[0-9]?[0-9]:[0-5][0-9]$/),
+                          message: "Wrong format! (mm:ss)",
+                        },
+                        () => ({
+                          validator(_, value) {
+                            if (checkSelectedTime(value)) {
+                              return Promise.resolve();
+                            }
+                            return Promise.reject(
+                              new Error("Selected start time is part of other claim")
+                            );
+                          },
+                        }),
+                      ]}
                     >
-                      <DeleteOutlined key="delete" />
-                    </Popconfirm>,
-                  ]}
-                >
-                  <p>Duration: </p>
-                  <p>
-                    {convertSecondsToTimeString(each.start_time) +
-                      " - " +
-                      convertSecondsToTimeString(each.end_time)}
-                  </p>
-                  {each.slug !== "not-a-claim" ? (
-                    <>
-                      <p>Claim: </p>
-                      <p>{each.claim}</p>
-                      <br />
+                      <Input
+                        addonAfter={
+                          <Tooltip placement="top" title="Now">
+                            {
+                              <FieldTimeOutlined
+                                onClick={() => fillCurrentTime("start_time")}
+                              />
+                            }
+                          </Tooltip>
+                        }
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name="end_time"
+                      label="End time"
+                      rules={[
+                        {
+                          pattern: new RegExp(/^[0-2]?[0-9]?[0-9]:[0-5][0-9]$/),
+                          message: "Wrong format! (mm:ss)",
+                        },
+                        () => ({
+                          validator(_, value) {
+                            if (checkSelectedTime(value)) {
+                              return Promise.resolve();
+                            }
+                            return Promise.reject(
+                              new Error("Selected end time is part of other claim")
+                            );
+                          },
+                        }),
+                      ]}
+                      style={{ display: "inline-block", width: "50%" }}
+                    >
+                      <Input
+                        addonAfter={
+                          <Tooltip placement="top" title="Now">
+                            {
+                              <FieldTimeOutlined
+                                onClick={() => fillCurrentTime("end_time")}
+                              />
+                            }
+                          </Tooltip>
+                        }
+                      />
+                    </Form.Item>
+                  </Form.Item>
+                  <Form.Item>
+                    <Button
+                      htmlType="submit"
+                      onClick={() => {
+                        if (
+                          !form.getFieldValue("start_time") ||
+                          !form.getFieldValue("end_time")
+                        ) {
+                          alert("select start and end time");
+                          return;
+                        }
+                        isEndTimeValid(
+                          convertTimeStringToSeconds(
+                            form.getFieldValue("start_time")
+                          ),
+                          convertTimeStringToSeconds(form.getFieldValue("end_time"))
+                        );
+                      }}
+                    >
+                      Add Claim
+                    </Button>
+                  </Form.Item>
+                </Form>
 
-                      {each.fact ? (
-                        <>
-                          <p>Fact:</p>
-                          <div style={{ color: each.colour || "black" }}>
-                            {each.fact}
-                          </div>
-                        </>
-                      ) : null}
-                    </>
-                  ) : (
-                    <p>NO CLAIM IN THIS DURATION</p>
-                  )}
-                </Card>
-              ))}
-            </>
-          ) : null}
 
-          <Drawer
-            title={<h4 style={{ fontWeight: 'bold' }}>Claim</h4>}
-            placement="right"
-            closable={true}
-            onClose={onClose}
-            visible={claim.drawerVisible}
-            getContainer={false}
-            width={"80%"}
-            bodyStyle={{ paddingBottom: 40 }}
-            headerStyle={{ fontWeight: 'bold' }}
-            maskClosable={false}
-          >
-            {claim.drawerVisible ? <Claim onCreate={onSubmitClaim} claim={claim} setClaim={setClaim} /> : null}
-          </Drawer>
-        </Col>
-      </Row>
-    </Space>
-  </Form>
+                {claims.map((each, index) => (
+                  <Card
+                    style={{ margin: 5 }}
+                    key={index}
+                    actions={[
+                      <EditOutlined key="edit" onClick={() => {
+                        setClaim({ data: each, index, drawerVisible: true });
+                      }} />,
+                      <Popconfirm
+                        title="Sure to Delete?"
+                        onConfirm={() => dispatch(deleteVideo(index))}
+                      >
+                        <DeleteOutlined key="delete" />
+                      </Popconfirm>,
+                    ]}
+                  >
+                    <p>Duration: </p>
+                    <p>
+                      {convertSecondsToTimeString(each.start_time) +
+                        " - " +
+                        convertSecondsToTimeString(each.end_time)}
+                    </p>
+                    {each.slug !== "not-a-claim" ? (
+                      <>
+                        <p>Claim: </p>
+                        <p>{each.claim}</p>
+                        <br />
+
+                        {each.fact ? (
+                          <>
+                            <p>Fact:</p>
+                            <div style={{ color: each.colour || "black" }}>
+                              {each.fact}
+                            </div>
+                          </>
+                        ) : null}
+                      </>
+                    ) : (
+                      <p>NO CLAIM IN THIS DURATION</p>
+                    )}
+                  </Card>
+                ))}
+              </>
+            ) : null}
+
+            <Drawer
+              title={<h4 style={{ fontWeight: 'bold' }}>Settings</h4>}
+              placement="right"
+              onClose={onCloseSettings}
+              visible={settingsDrawerVisible}
+              getContainer={false}
+              width={"25%"}
+              bodyStyle={{ paddingBottom: 40 }}
+              headerStyle={{ fontWeight: 'bold' }}
+
+            >
+              <Form.Item
+                name="excerpt"
+                label="Excerpt"
+                rules={[
+                  { min: 3, message: 'Title must be minimum 3 characters.' },
+                  { max: 5000, message: 'Excerpt must be a maximum of 5000 characters.' },
+                  {
+                    message: 'Add Excerpt',
+                  },
+                ]}
+              >
+                <Input.TextArea rows={4} placeholder="Excerpt" style={{ fontSize: 'medium' }} />
+              </Form.Item>
+              <Form.Item
+                name="slug"
+                label="Slug"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please input the slug!',
+                  },
+                  {
+                    pattern: checker,
+                    message: 'Please enter valid slug!',
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item name="published_date" label="Published Date">
+                <DatePicker />
+              </Form.Item>
+              <Form.Item name="categories" label="Categories">
+                <Selector mode="multiple" action="Categories" createEntity="Category" />
+              </Form.Item>
+
+              <Form.Item name="tags" label="Tags">
+                <Selector mode="multiple" action="Tags" createEntity="Tag" />
+              </Form.Item>
+              <Form.Item name="authors" label="Authors">
+                <Selector mode="multiple" display={'email'} action="Authors" />
+              </Form.Item>
+            </Drawer>
+
+
+          </Col>
+        </Row>
+      </Space>
+    </Form>
+
+    <Drawer
+      title={<h4 style={{ fontWeight: 'bold' }}>Claim</h4>}
+      placement="right"
+      closable={true}
+      onClose={onClose}
+      visible={claim.drawerVisible}
+      getContainer={false}
+      width={"80%"}
+      bodyStyle={{ paddingBottom: 40 }}
+      headerStyle={{ fontWeight: 'bold' }}
+      maskClosable={false}
+    >
+      {claim.drawerVisible ? <Claim onCreate={onSubmitClaim} claim={claim} setClaim={setClaim} /> : null}
+    </Drawer>
+  </>
 
 }
 
