@@ -68,6 +68,10 @@ func delete(w http.ResponseWriter, r *http.Request) {
 		_ = tx.Model(&result).Association("Categories").Delete(result.Categories)
 	}
 
+	tx.Model(&model.VideoAuthor{}).Where(&model.VideoAuthor{
+		VideoID: uint(id),
+	}).Delete(&model.VideoAuthor{})
+
 	err = tx.Delete(&result).Error
 	if err != nil {
 		tx.Rollback()

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/factly/vidcheck/action/author"
 	"github.com/factly/vidcheck/action/rating"
 	"github.com/factly/vidcheck/config"
 
@@ -106,9 +107,46 @@ func list(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	var videoIDs []uint
+	for _, p := range videos {
+		videoIDs = append(videoIDs, p.ID)
+	}
+
+	// fetch all authors
+	authors, err := author.All(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	// fetch all authors related to videos
+	videoAuthors := []model.VideoAuthor{}
+	model.DB.Model(&model.VideoAuthor{}).Where("video_id in (?)", videoIDs).Find(&videoAuthors)
+
+	videoAuthorMap := make(map[uint][]uint)
+	for _, videoAuthor := range videoAuthors {
+		if _, found := videoAuthorMap[videoAuthor.VideoID]; !found {
+			videoAuthorMap[videoAuthor.VideoID] = make([]uint, 0)
+		}
+		videoAuthorMap[videoAuthor.VideoID] = append(videoAuthorMap[videoAuthor.VideoID], videoAuthor.AuthorID)
+	}
+
 	for _, video := range videos {
 		var claimData videoResData
-		claimData.Video = video
+		claimData.Video.Video = video
+		claimData.Video.Authors = make([]model.Author, 0)
+
+		videoAuthors, hasEle := videoAuthorMap[video.ID]
+
+		if hasEle {
+			for _, videoAuthor := range videoAuthors {
+				aID := fmt.Sprint(videoAuthor)
+				if author, found := authors[aID]; found {
+					claimData.Video.Authors = append(claimData.Video.Authors, author)
+				}
+			}
+		}
 		stmt := model.DB.Model(&model.Claim{}).Order("start_time").Where("video_id = ?", video.ID).Preload("Claimant")
 
 		if !config.DegaIntegrated() {

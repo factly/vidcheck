@@ -9,14 +9,17 @@ import (
 )
 
 type video struct {
-	URL           string `json:"url" validate:"required"`
-	Title         string `json:"title" validate:"required"`
-	Summary       string `json:"summary"`
-	VideoType     string `json:"video_type" validate:"required"`
-	Status        string `json:"status"`
-	TotalDuration int    `json:"total_duration" validate:"required"`
-	CategoryIDs   []uint `json:"category_ids"`
-	TagIDs        []uint `json:"tag_ids"`
+	URL           string     `json:"url" validate:"required"`
+	Title         string     `json:"title" validate:"required"`
+	Slug          string     `json:"slug" validate:"required"`
+	Summary       string     `json:"summary"`
+	VideoType     string     `json:"video_type" validate:"required"`
+	Status        string     `json:"status"`
+	TotalDuration int        `json:"total_duration" validate:"required"`
+	CategoryIDs   []uint     `json:"category_ids"`
+	TagIDs        []uint     `json:"tag_ids"`
+	AuthorIDs     []uint     `json:"author_ids"`
+	PublishedDate *time.Time `json:"published_date"`
 }
 
 type videoanalysis struct {
@@ -34,13 +37,18 @@ type videoanalysis struct {
 	EndTime       int            `json:"end_time" validate:"required"`
 }
 
+type VideoData struct {
+	model.Video
+	Authors []model.Author `json:"authors"`
+}
+
 type videoReqData struct {
 	Video  video           `json:"video" validate:"required"`
 	Claims []videoanalysis `json:"claims" validate:"required"`
 }
 
 type videoResData struct {
-	Video  model.Video   `json:"video"`
+	Video  VideoData     `json:"video"`
 	Claims []model.Claim `json:"claims"`
 }
 

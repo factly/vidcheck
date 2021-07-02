@@ -2,11 +2,13 @@ package video
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/factly/vidcheck/config"
 
+	"github.com/factly/vidcheck/action/author"
 	"github.com/factly/vidcheck/action/rating"
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
@@ -53,11 +55,14 @@ func details(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	result := videoResData{}
+
 	videoObj := &model.Video{}
 	videoObj.Tags = make([]model.Tag, 0)
 	videoObj.Categories = make([]model.Category, 0)
 	videoObj.ID = uint(id)
 	claimBlocks := []model.Claim{}
+	videoAuthors := []model.VideoAuthor{}
 
 	err = model.DB.Model(&model.Video{}).Where(&model.Video{
 		SpaceID: uint(sID),
@@ -66,6 +71,27 @@ func details(w http.ResponseWriter, r *http.Request) {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.RecordNotFound()))
 		return
+	}
+
+	result.Video.Video = *videoObj
+
+	// fetch all authors
+	model.DB.Model(&model.VideoAuthor{}).Where(&model.VideoAuthor{
+		VideoID: uint(id),
+	}).Find(&videoAuthors)
+
+	// Adding author
+	authors, err := author.All(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+	for _, videoAuthor := range videoAuthors {
+		aID := fmt.Sprint(videoAuthor.AuthorID)
+		if author, found := authors[aID]; found {
+			result.Video.Authors = append(result.Video.Authors, author)
+		}
 	}
 
 	stmt := model.DB.Model(&model.Claim{}).Order("start_time").Where("video_id = ?", uint(id)).Preload("Claimant")
@@ -101,10 +127,8 @@ func details(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	result := videoResData{
-		Video:  *videoObj,
-		Claims: claimBlocks,
-	}
+	result.Claims = claimBlocks
+
 	renderx.JSON(w, http.StatusOK, result)
 }
 

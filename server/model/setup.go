@@ -62,6 +62,7 @@ func Migrate() {
 		&OrganisationPermissionRequest{},
 		&SpacePermissionRequest{},
 		&Tag{},
+		&VideoAuthor{},
 	)
 
 }
