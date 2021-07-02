@@ -15,6 +15,8 @@ type video struct {
 	VideoType     string `json:"video_type" validate:"required"`
 	Status        string `json:"status"`
 	TotalDuration int    `json:"total_duration" validate:"required"`
+	CategoryIDs   []uint `json:"category_ids"`
+	TagIDs        []uint `json:"tag_ids"`
 }
 
 type videoanalysis struct {

@@ -48,7 +48,7 @@ func publishedDetails(w http.ResponseWriter, r *http.Request) {
 	err = model.DB.Model(&model.Video{}).Where(&model.Video{
 		SpaceID: uint(sID),
 		Status:  "published",
-	}).First(&videoObj).Error
+	}).Preload("Tags").Preload("Categories").First(&videoObj).Error
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.RecordNotFound()))

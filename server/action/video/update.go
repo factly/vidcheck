@@ -99,13 +99,40 @@ func update(w http.ResponseWriter, r *http.Request) {
 	ratingMap := make(map[int]*model.Rating)
 
 	tx := model.DB.Begin()
+
+	newTags := make([]model.Tag, 0)
+	if len(videoData.Video.TagIDs) > 0 {
+		model.DB.Model(&model.Tag{}).Where(videoData.Video.TagIDs).Find(&newTags)
+		if err = tx.Model(&videoObj).Association("Tags").Replace(&newTags); err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.DBError()))
+			return
+		}
+	} else {
+		_ = model.DB.Model(&videoObj).Association("Tags").Clear()
+	}
+
+	newCategories := make([]model.Category, 0)
+	if len(videoData.Video.CategoryIDs) > 0 {
+		model.DB.Model(&model.Category{}).Where(videoData.Video.CategoryIDs).Find(&newCategories)
+		if err = tx.Model(&videoObj).Association("Categories").Replace(&newCategories); err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.DBError()))
+			return
+		}
+	} else {
+		_ = model.DB.Model(&videoObj).Association("Categories").Clear()
+	}
+
 	tx.Model(&videoObj).Updates(model.Video{
 		Base:      model.Base{UpdatedByID: uint(uID)},
 		Title:     videoData.Video.Title,
 		Summary:   videoData.Video.Summary,
 		VideoType: videoData.Video.VideoType,
 		Status:    videoData.Video.Status,
-	}).First(&videoObj)
+	}).Preload("Tags").Preload("Categories").First(&videoObj)
 
 	meiliVideoObj := map[string]interface{}{
 		"id":             videoObj.ID,
@@ -117,6 +144,8 @@ func update(w http.ResponseWriter, r *http.Request) {
 		"status":         videoObj.Status,
 		"total_duration": videoObj.TotalDuration,
 		"space_id":       videoObj.SpaceID,
+		"tag_ids":        videoData.Video.TagIDs,
+		"category_ids":   videoData.Video.CategoryIDs,
 	}
 
 	err = meilisearchx.UpdateDocument("vidcheck", meiliVideoObj)

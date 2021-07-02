@@ -87,7 +87,7 @@ func list(w http.ResponseWriter, r *http.Request) {
 
 	tx := model.DB.Model(&model.Video{}).Where(&model.Video{
 		SpaceID: uint(sID),
-	}).Order("created_at " + sort)
+	}).Preload("Tags").Preload("Categories").Order("created_at " + sort)
 
 	if len(filteredVideoIDs) > 0 {
 		err = tx.Where(filteredVideoIDs).Count(&result.Total).Offset(offset).Limit(limit).Find(&videos).Error

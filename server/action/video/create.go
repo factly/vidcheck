@@ -93,6 +93,8 @@ func create(w http.ResponseWriter, r *http.Request) {
 
 	tx := model.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
 	videoObj := model.Video{}
+	videoObj.Tags = make([]model.Tag, 0)
+	videoObj.Categories = make([]model.Category, 0)
 	videoObj = model.Video{
 		URL:           videoData.Video.URL,
 		Title:         videoData.Video.Title,
@@ -103,7 +105,15 @@ func create(w http.ResponseWriter, r *http.Request) {
 		SpaceID:       uint(sID),
 		ThumbnailURL:  iframelyres.ThumbnailURL,
 	}
-	err = tx.Create(&videoObj).Error
+
+	if len(videoData.Video.TagIDs) > 0 {
+		model.DB.Model(&model.Tag{}).Where(videoData.Video.TagIDs).Find(&videoObj.Tags)
+	}
+	if len(videoData.Video.CategoryIDs) > 0 {
+		model.DB.Model(&model.Category{}).Where(videoData.Video.CategoryIDs).Find(&videoObj.Categories)
+	}
+
+	err = tx.Preload("Tags").Preload("Categories").Create(&videoObj).Error
 	if err != nil {
 		tx.Rollback()
 		loggerx.Error(err)

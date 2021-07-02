@@ -54,12 +54,14 @@ func details(w http.ResponseWriter, r *http.Request) {
 	}
 
 	videoObj := &model.Video{}
+	videoObj.Tags = make([]model.Tag, 0)
+	videoObj.Categories = make([]model.Category, 0)
 	videoObj.ID = uint(id)
 	claimBlocks := []model.Claim{}
 
 	err = model.DB.Model(&model.Video{}).Where(&model.Video{
 		SpaceID: uint(sID),
-	}).First(&videoObj).Error
+	}).Preload("Tags").Preload("Categories").First(&videoObj).Error
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.RecordNotFound()))

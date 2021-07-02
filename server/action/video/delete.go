@@ -51,7 +51,7 @@ func delete(w http.ResponseWriter, r *http.Request) {
 	// check record exists or not
 	err = model.DB.Where(&model.Video{
 		SpaceID: uint(sID),
-	}).First(&result).Error
+	}).Preload("Tags").Preload("Categories").First(&result).Error
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.RecordNotFound()))
@@ -59,6 +59,14 @@ func delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tx := model.DB.Begin()
+
+	// delete all associations
+	if len(result.Tags) > 0 {
+		_ = tx.Model(&result).Association("Tags").Delete(result.Tags)
+	}
+	if len(result.Categories) > 0 {
+		_ = tx.Model(&result).Association("Categories").Delete(result.Categories)
+	}
 
 	err = tx.Delete(&result).Error
 	if err != nil {
