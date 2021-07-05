@@ -246,7 +246,7 @@ const routes = {
   //   title: "Edit Video",
   // },
   videoPreview: {
-    path: "/preview/:id",
+    path: "/fact-checks/:id/preview",
     Component: Preview,
     title: "Preview",
     permission: {

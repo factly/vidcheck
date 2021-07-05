@@ -37,7 +37,7 @@ function VideoAnalysisCard({ data }) {
           )}
         </Col>
         <Col span={18}>
-          <Link to={`/preview/${data.video.id}`}>
+          <Link to={`/fact-checks/${data.video.id}/preview`}>
             <Typography.Title level={4}>{data.video.title}</Typography.Title>
           </Link>
 
@@ -55,11 +55,11 @@ function VideoAnalysisCard({ data }) {
             {data.video.summary}
           </Typography.Paragraph>
           <div style={{ marginBottom: "auto" }}>
-            <Button onClick={() => history.push(`/preview/${data.video.id}`)}>
+            <Button onClick={() => history.push(`/fact-checks/${data.video.id}/preview`)}>
               Preview
             </Button>
             <Button
-              onClick={() => history.push(`/videos/${data.video.id}/edit`)}
+              onClick={() => history.push(`/fact-checks/${data.video.id}/edit`)}
             >
               Edit
             </Button>

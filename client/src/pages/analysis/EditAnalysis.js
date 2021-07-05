@@ -27,7 +27,7 @@ function EditAnalysis() {
 
   const onUpdate = (values) => {
     dispatch(updateVideo(values)).then((res) =>
-      history.push(`/preview/${res.video.id}`)
+      history.push(`/fact-checks/${res.video.id}/preview`)
     );
   };
 
