@@ -25,16 +25,11 @@ import Media from "../pages/media";
 import UploadMedium from "../pages/media/UploadMedium";
 import EditMedium from "../pages/media/EditMedium";
 
-//Videos
-// import CreateVideo from "../pages/videos/CreateVideo";
-// import EditVideo from "../pages/videos/EditVideo";
 
 import Preview from "../pages/preview";
 
-import CreateAnalysis from "../pages/analysis/CreateAnalysis";
-import EditAnalysis from "../pages/analysis/EditAnalysis";
-import Claim from "../pages/analysis/ClaimForm";
-import EditClaim from "../pages/analysis/EditClaim";
+import CreateFactCheck from "../pages/fact-checks/CreateFactCheck";
+import EditFactCheck from "../pages/fact-checks/EditFactCheck";
 
 //Policies
 import Policies from "../pages/policies";
@@ -94,53 +89,26 @@ const routes = {
     Component: Analytics,
     title: "Analytics",
   },
-  createVideo: {
-    path: "/videos/create",
-    Component: CreateAnalysis,
-    title: "Analysis",
+  createFactCheck: {
+    path: "/fact-checks/create",
+    Component: CreateFactCheck,
+    title: "Fact Checks",
     permission: {
       resource: "fact-checks",
       action: "create",
     },
   },
-  editVideo: {
-    path: "/videos/:id/edit",
-    Component: EditAnalysis,
-    title: "Edit Analysis",
+  editFactCheck: {
+    path: "/fact-checks/:id/edit",
+    Component: EditFactCheck,
+    title: "Edit Fact Check",
     permission: {
       resource: "fact-checks",
       action: "create",
     },
   },
-  videosClaim: {
-    path: "/videos/claim",
-    Component: Claim,
-    title: "Claim",
-    permission: {
-      resource: "fact-checks",
-      action: "create",
-    },
-  },
-  videoClaimEdit: {
-    path: "/videos/:vid/claim/:index",
-    Component: EditClaim,
-    title: "Edit Claim",
-    permission: {
-      resource: "fact-checks",
-      action: "edit",
-    },
-  },
-  videoEditClaim: {
-    path: "/videos/claim/:index",
-    Component: EditClaim,
-    title: "Edit Claim",
-    permission: {
-      resource: "fact-checks",
-      action: "create",
-    },
-  },
-  videos: {
-    path: "/videos",
+  factCheck: {
+    path: "/fact-checks",
     Component: Videos,
     title: "Fact-Checks",
     permission: {
@@ -267,18 +235,8 @@ const routes = {
       action: "get",
     },
   },
-  // {
-  //   path: "/videos/create",
-  //   Component: CreateVideo,
-  //   title: "Create Video",
-  // },
-  // {
-  //   path: "/videos/:id/edit",
-  //   Component: EditVideo,
-  //   title: "Edit Video",
-  // },
   videoPreview: {
-    path: "/preview/:id",
+    path: "/fact-checks/:id/preview",
     Component: Preview,
     title: "Preview",
     permission: {
@@ -434,7 +392,7 @@ export const sidebarMenu = [
   {
     title: "FACT CHECKING",
     Icon: CheckCircleOutlined,
-    children: [routes.videos, routes.claimants, routes.ratings, routes.categories, routes.tags],
+    children: [routes.factCheck, routes.claimants, routes.ratings, routes.categories, routes.tags],
   },
   {
     title: "ADMINSTRATION",

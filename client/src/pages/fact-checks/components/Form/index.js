@@ -6,30 +6,28 @@ import {
 } from "antd";
 import ReactPlayer from "react-player";
 import { useDispatch, useSelector } from "react-redux";
-import { addVideo, addClaim } from "../../actions/claims";
+import { addVideo, addClaim } from "../../../../actions/claims";
 import {
   convertSecondsToTimeString,
   convertTimeStringToSeconds,
-} from "../../utils/analysis";
-import { checker, maker } from '../../utils/sluger';
+} from "../../../../utils/analysis";
+import { checker, maker } from '../../../../utils/sluger';
 import {
   DeleteOutlined,
   EditOutlined,
   FieldTimeOutlined,
   SettingFilled
 } from "@ant-design/icons";
-import { deleteVideo } from "../../actions/claims";
+import { deleteVideo } from "../../../../actions/claims";
 import moment from "moment";
 
-import Selector from "../../components/Selector";
-import Claim from "./Claim";
+import Selector from "../../../../components/Selector";
+import Claim from "../Claim";
 
 
 function Analysis({ onSubmit }) {
   const [form] = Form.useForm();
   const [claimform] = Form.useForm();
-
-  const [url, setURL] = useState('');
 
   const [settingsDrawerVisible, setSettingsDrawerVisible] = useState(false);
   const [claim, setClaim] = useState({ index: -1, data: {}, drawerVisible: false });
@@ -200,7 +198,7 @@ function Analysis({ onSubmit }) {
             >
               <Input.TextArea
                 bordered={false}
-                placeholder="Add Title"
+                placeholder="Fact check title"
                 onChange={(e) => onTitleChange(e.target.value)}
                 style={{
                   fontSize: '2rem',
@@ -213,7 +211,6 @@ function Analysis({ onSubmit }) {
             </Form.Item>
             <Form.Item
               name="url"
-              label="URL"
               rules={[
                 {
                   required: true,
@@ -224,7 +221,8 @@ function Analysis({ onSubmit }) {
               ]}
             >
               <Input
-                placeholder="Paste url here"
+                bordered={false}
+                placeholder="Video URL"
                 style={{
                   fontSize: '1.5rem',
                   maxWidth: '600px'

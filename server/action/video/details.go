@@ -74,6 +74,7 @@ func details(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result.Video.Video = *videoObj
+	result.Video.Authors = make([]model.Author, 0)
 
 	// fetch all authors
 	model.DB.Model(&model.VideoAuthor{}).Where(&model.VideoAuthor{

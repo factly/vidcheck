@@ -4,9 +4,9 @@ import { useHistory, useParams } from "react-router";
 import { addClaims } from "../../actions/claims";
 import { getVideo, updateVideo } from "../../actions/videos";
 import { Skeleton } from "antd";
-import EditAnalysisForm from "./index";
+import EditFactCheckForm from "./components/Form/index";
 
-function EditAnalysis() {
+function EditFactCheck() {
   const history = useHistory();
   const dispatch = useDispatch();
   const { id } = useParams();
@@ -27,11 +27,11 @@ function EditAnalysis() {
 
   const onUpdate = (values) => {
     dispatch(updateVideo(values)).then((res) =>
-      history.push(`/preview/${res.video.id}`)
+      history.push(`/fact-checks/${res.video.id}/preview`)
     );
   };
 
-  return <EditAnalysisForm onSubmit={onUpdate} />;
+  return <EditFactCheckForm onSubmit={onUpdate} />;
 }
 
-export default EditAnalysis;
+export default EditFactCheck;

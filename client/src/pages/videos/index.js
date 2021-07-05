@@ -9,7 +9,7 @@ function Dashboard() {
   const dispatch = useDispatch();
   return (
     <Space direction="vertical">
-      <Link to="/videos/create">
+      <Link to="/fact-checks/create">
         <Button onClick={() => dispatch(resetClaim())}>Create New</Button>
       </Link>
       <VideoList />
