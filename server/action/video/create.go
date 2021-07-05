@@ -138,7 +138,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		Summary:       videoData.Video.Summary,
 		VideoType:     videoData.Video.VideoType,
 		TotalDuration: videoData.Video.TotalDuration,
-		Status:        "published", // status is set to published videoData.Video.Status
+		Status:        status,
 		SpaceID:       uint(sID),
 		ThumbnailURL:  iframelyres.ThumbnailURL,
 	}

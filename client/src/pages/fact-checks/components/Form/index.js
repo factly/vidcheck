@@ -43,7 +43,7 @@ function Analysis({ onSubmit }) {
   };
 
   const { video, claims } = useSelector(({ videoClaims }) => videoClaims);
-  const [status, setStatus] = useState('draft');
+  const [status, setStatus] = useState(video.status || 'draft');
   const dispatch = useDispatch();
 
   const player = useRef(null);

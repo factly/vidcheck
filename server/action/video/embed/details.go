@@ -39,7 +39,7 @@ func publishedDetails(w http.ResponseWriter, r *http.Request) {
 	videoObj.ID = uint(id)
 	claimBlocks := make([]model.Claim, 0)
 	err = model.DB.Model(&model.Video{}).Where(&model.Video{
-		Status: "published",
+		Status: "publish",
 	}).First(&videoObj).Error
 	if err != nil {
 		loggerx.Error(err)

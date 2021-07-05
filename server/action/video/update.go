@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"reflect"
 	"strconv"
+	"time"
 
 	"github.com/factly/vidcheck/action/author"
 	"github.com/factly/vidcheck/action/rating"
@@ -49,6 +50,13 @@ func update(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	oID, err := util.GetOrganisation(r.Context())
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 		return
 	}
 
@@ -141,13 +149,68 @@ func update(w http.ResponseWriter, r *http.Request) {
 		_ = model.DB.Model(&videoObj).Association("Categories").Clear()
 	}
 
+	var videoStatus string = videoObj.Status
+	var publishDate time.Time
+
+	// Check if post status is changed back to draft from published
+	if videoObj.Status == "publish" && videoData.Video.Status == "draft" {
+		status, err := getPublishPermissions(oID, sID, uID)
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
+			return
+		}
+		if status == http.StatusOK {
+			videoStatus = "draft"
+			tx.Model(&videoObj).Select("PublishedDate").Omit("Tags", "Categories").Updates(model.Video{PublishedDate: nil})
+		} else {
+			tx.Rollback()
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+
+	} else if videoData.Video.Status == "publish" {
+		// Check if authors are not added while publishing post
+		if len(videoData.Video.AuthorIDs) == 0 {
+			errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot publish post without author", http.StatusUnprocessableEntity)))
+			return
+		}
+
+		status, err := getPublishPermissions(oID, sID, uID)
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
+			return
+		}
+		if status == http.StatusOK {
+			videoStatus = "publish"
+			if videoObj.PublishedDate == nil {
+				currTime := time.Now()
+				publishDate = currTime
+			} else {
+				publishDate = *videoObj.PublishedDate
+			}
+			tx.Model(&videoObj).Select("PublishedDate").Omit("Tags", "Categories").Updates(model.Video{PublishedDate: &publishDate})
+		} else {
+			tx.Rollback()
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+	} else if videoData.Video.Status == "ready" {
+		videoStatus = "ready"
+	} else if videoObj.Status == "ready" && videoData.Video.Status == "draft" {
+		videoStatus = "draft"
+	}
+
 	tx.Model(&videoObj).Updates(model.Video{
 		Base:      model.Base{UpdatedByID: uint(uID)},
 		Title:     videoData.Video.Title,
 		Summary:   videoData.Video.Summary,
 		VideoType: videoData.Video.VideoType,
 		Slug:      videoData.Video.Slug,
-		Status:    videoData.Video.Status,
+		Status:    videoStatus,
 	}).Preload("Tags").Preload("Categories").First(&videoObj)
 
 	result.Video.Video = *videoObj
@@ -217,19 +280,27 @@ func update(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Update into meili index
+	var meiliPublishDate int64
+	if videoObj.Status == "publish" {
+		meiliPublishDate = videoObj.PublishedDate.Unix()
+	}
+
 	meiliVideoObj := map[string]interface{}{
-		"id":             videoObj.ID,
-		"kind":           "video",
-		"title":          videoObj.Title,
-		"url":            videoObj.URL,
-		"summary":        videoObj.Summary,
-		"video_type":     videoObj.VideoType,
-		"status":         videoObj.Status,
-		"total_duration": videoObj.TotalDuration,
-		"space_id":       videoObj.SpaceID,
-		"tag_ids":        videoData.Video.TagIDs,
-		"category_ids":   videoData.Video.CategoryIDs,
-		"author_ids":     videoData.Video.AuthorIDs,
+		"id":                 videoObj.ID,
+		"kind":               "video",
+		"title":              videoObj.Title,
+		"slug":               videoObj.Slug,
+		"url":                videoObj.URL,
+		"summary":            videoObj.Summary,
+		"video_type":         videoObj.VideoType,
+		"status":             videoObj.Status,
+		"total_duration":     videoObj.TotalDuration,
+		"published_duration": meiliPublishDate,
+		"space_id":           videoObj.SpaceID,
+		"tag_ids":            videoData.Video.TagIDs,
+		"category_ids":       videoData.Video.CategoryIDs,
+		"author_ids":         videoData.Video.AuthorIDs,
 	}
 
 	err = meilisearchx.UpdateDocument("vidcheck", meiliVideoObj)
