@@ -21,7 +21,7 @@ var Data = map[string]interface{}{
 	"title":      "Test Video",
 	"summary":    "test summary",
 	"video_type": "mp4",
-	"status":     "published",
+	"status":     "publish",
 	"space_id":   1,
 }
 
@@ -31,7 +31,7 @@ var videolist = []map[string]interface{}{
 		"title":      "Test Video 1",
 		"summary":    "test summary 1",
 		"video_type": "mp4",
-		"status":     "published",
+		"status":     "publish",
 		"space_id":   1,
 	},
 	{
@@ -39,7 +39,7 @@ var videolist = []map[string]interface{}{
 		"title":      "Test Video 2",
 		"summary":    "test summary 2",
 		"video_type": "mp4",
-		"status":     "published",
+		"status":     "publish",
 		"space_id":   1,
 	},
 }
@@ -62,7 +62,7 @@ var requestData = map[string]interface{}{
 		"title":      "Test Video",
 		"summary":    "test summary",
 		"video_type": "mp4",
-		"status":     "published",
+		"status":     "publish",
 		"space_id":   1,
 	},
 	"analysis": []map[string]interface{}{

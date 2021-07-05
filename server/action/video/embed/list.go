@@ -45,7 +45,7 @@ func list(w http.ResponseWriter, r *http.Request) {
 
 	model.DB.Model(&model.Video{}).Where(&model.Video{
 		SpaceID: uint(sID),
-		Status:  "published",
+		Status:  "publish",
 	}).Count(&result.Total).Offset(offset).Limit(limit).Find(&videos)
 
 	for _, video := range videos {

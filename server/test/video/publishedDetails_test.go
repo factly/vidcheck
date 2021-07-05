@@ -24,7 +24,7 @@ func TestPublishedVideoDetails(t *testing.T) {
 	t.Run("get video details", func(t *testing.T) {
 		test.CheckSpaceMock(mock)
 
-		SelectQuery(mock, "published", 1, 1)
+		SelectQuery(mock, "publish", 1, 1)
 
 		analysisSelectQuery(mock, 1)
 
@@ -56,7 +56,7 @@ func TestPublishedVideoDetails(t *testing.T) {
 		test.CheckSpaceMock(mock)
 
 		mock.ExpectQuery(selectQuery).
-			WithArgs("published", 1, 1).
+			WithArgs("publish", 1, 1).
 			WillReturnRows(sqlmock.NewRows(Columns))
 
 		e.GET(publishedDetailsPath).

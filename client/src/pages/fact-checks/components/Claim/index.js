@@ -189,9 +189,8 @@ function Claim({ onCreate, claim, setClaim }) {
         <Form.Item
           name="fact"
           label="Fact"
-          autoSize={{ minRows: 4, maxRows: 7 }}
         >
-          <Input.TextArea />
+          <Input.TextArea autoSize={{ minRows: 4, maxRows: 7 }} />
         </Form.Item>
         <Form.Item name={"description"} label={"Description"}>
           <Editor />
