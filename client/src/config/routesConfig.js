@@ -90,7 +90,7 @@ const routes = {
     title: "Analytics",
   },
   createVideo: {
-    path: "/videos/create",
+    path: "/fact-checks/create",
     Component: CreateAnalysis,
     title: "Analysis",
     permission: {
@@ -99,7 +99,7 @@ const routes = {
     },
   },
   editVideo: {
-    path: "/videos/:id/edit",
+    path: "/fact-checks/:id/edit",
     Component: EditAnalysis,
     title: "Edit Analysis",
     permission: {
@@ -108,7 +108,7 @@ const routes = {
     },
   },
   videos: {
-    path: "/videos",
+    path: "/fact-checks",
     Component: Videos,
     title: "Fact-Checks",
     permission: {
@@ -235,16 +235,6 @@ const routes = {
       action: "get",
     },
   },
-  // {
-  //   path: "/videos/create",
-  //   Component: CreateVideo,
-  //   title: "Create Video",
-  // },
-  // {
-  //   path: "/videos/:id/edit",
-  //   Component: EditVideo,
-  //   title: "Edit Video",
-  // },
   videoPreview: {
     path: "/fact-checks/:id/preview",
     Component: Preview,
