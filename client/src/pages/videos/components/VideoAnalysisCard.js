@@ -16,12 +16,14 @@ function VideoAnalysisCard({ data }) {
   const getRatingsCount = () =>
     data.claims?.map((each) => {
       if (ratingsCount[each.rating.name]) {
-        ratingsCount[each.rating.name] += 1;
+        ratingsCount[each.rating.name].count += 1;
       } else {
-        ratingsCount = { ...ratingsCount, [each.rating.name]: { count: 1 } };
+        ratingsCount = { ...ratingsCount, [each.rating.name]: { count: 1, colour: each.rating.background_colour.hex } };
       }
     });
   getRatingsCount();
+
+
   return (
     <React.Fragment key={data.video.id}>
       <Row gutter={16}>
@@ -50,6 +52,18 @@ function VideoAnalysisCard({ data }) {
             />
           </div>
           <br />
+
+          {Object.keys(ratingsCount).map((rating) => (
+            <div
+              style={{
+                color: ratingsCount[rating].colour,
+                fontWeight: "bold",
+                textTransform: "uppercase",
+              }}
+            >
+              {ratingsCount[rating].count} {rating}
+            </div>
+          ))}
 
           <Typography.Paragraph ellipsis={true}>
             {data.video.summary}
