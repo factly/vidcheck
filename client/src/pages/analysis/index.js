@@ -200,7 +200,7 @@ function Analysis({ onSubmit }) {
             >
               <Input.TextArea
                 bordered={false}
-                placeholder="Add Title"
+                placeholder="Fact check title"
                 onChange={(e) => onTitleChange(e.target.value)}
                 style={{
                   fontSize: '2rem',
@@ -213,7 +213,6 @@ function Analysis({ onSubmit }) {
             </Form.Item>
             <Form.Item
               name="url"
-              label="URL"
               rules={[
                 {
                   required: true,
@@ -224,7 +223,8 @@ function Analysis({ onSubmit }) {
               ]}
             >
               <Input
-                placeholder="Paste url here"
+                bordered={false}
+                placeholder="Video URL"
                 style={{
                   fontSize: '1.5rem',
                   maxWidth: '600px'
