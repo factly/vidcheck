@@ -6,30 +6,28 @@ import {
 } from "antd";
 import ReactPlayer from "react-player";
 import { useDispatch, useSelector } from "react-redux";
-import { addVideo, addClaim } from "../../actions/claims";
+import { addVideo, addClaim } from "../../../../actions/claims";
 import {
   convertSecondsToTimeString,
   convertTimeStringToSeconds,
-} from "../../utils/analysis";
-import { checker, maker } from '../../utils/sluger';
+} from "../../../../utils/analysis";
+import { checker, maker } from '../../../../utils/sluger';
 import {
   DeleteOutlined,
   EditOutlined,
   FieldTimeOutlined,
   SettingFilled
 } from "@ant-design/icons";
-import { deleteVideo } from "../../actions/claims";
+import { deleteVideo } from "../../../../actions/claims";
 import moment from "moment";
 
-import Selector from "../../components/Selector";
-import Claim from "./Claim";
+import Selector from "../../../../components/Selector";
+import Claim from "../Claim";
 
 
 function Analysis({ onSubmit }) {
   const [form] = Form.useForm();
   const [claimform] = Form.useForm();
-
-  const [url, setURL] = useState('');
 
   const [settingsDrawerVisible, setSettingsDrawerVisible] = useState(false);
   const [claim, setClaim] = useState({ index: -1, data: {}, drawerVisible: false });

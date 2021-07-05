@@ -28,8 +28,8 @@ import EditMedium from "../pages/media/EditMedium";
 
 import Preview from "../pages/preview";
 
-import CreateAnalysis from "../pages/analysis/CreateAnalysis";
-import EditAnalysis from "../pages/analysis/EditAnalysis";
+import CreateFactCheck from "../pages/fact-checks/CreateFactCheck";
+import EditAnalysis from "../pages/fact-checks/EditFactCheck";
 
 //Policies
 import Policies from "../pages/policies";
@@ -89,16 +89,16 @@ const routes = {
     Component: Analytics,
     title: "Analytics",
   },
-  createVideo: {
+  createFactCheck: {
     path: "/fact-checks/create",
-    Component: CreateAnalysis,
+    Component: CreateFactCheck,
     title: "Analysis",
     permission: {
       resource: "fact-checks",
       action: "create",
     },
   },
-  editVideo: {
+  editFactCheck: {
     path: "/fact-checks/:id/edit",
     Component: EditAnalysis,
     title: "Edit Analysis",
@@ -107,7 +107,7 @@ const routes = {
       action: "create",
     },
   },
-  videos: {
+  factCheck: {
     path: "/fact-checks",
     Component: Videos,
     title: "Fact-Checks",
@@ -392,7 +392,7 @@ export const sidebarMenu = [
   {
     title: "FACT CHECKING",
     Icon: CheckCircleOutlined,
-    children: [routes.videos, routes.claimants, routes.ratings, routes.categories, routes.tags],
+    children: [routes.factCheck, routes.claimants, routes.ratings, routes.categories, routes.tags],
   },
   {
     title: "ADMINSTRATION",

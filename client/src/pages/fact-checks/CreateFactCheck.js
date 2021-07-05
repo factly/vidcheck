@@ -1,10 +1,10 @@
 import React from "react";
-import AnalysisCreateForm from "./index";
+import FactCheckCreateForm from "./components/Form/index";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router";
 import { addVideo } from "../../actions/videos";
 
-function CreateAnalysis() {
+function CreateFactCheck() {
   const history = useHistory();
 
   const dispatch = useDispatch();
@@ -13,7 +13,7 @@ function CreateAnalysis() {
       history.push(`/fact-checks/${res.video.id}/preview`);
     });
   };
-  return <AnalysisCreateForm onSubmit={onCreate} />;
+  return <FactCheckCreateForm onSubmit={onCreate} />;
 }
 
-export default CreateAnalysis;
+export default CreateFactCheck;

@@ -1,16 +1,16 @@
 import { Button, Form, Input, Select, Space, DatePicker } from "antd";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Editor from "../../../components/Editor";
+import Editor from "../../../../components/Editor";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
-import { getRatings } from "../../../actions/ratings";
-import { getClaimants } from "../../../actions/claimants";
+import { getRatings } from "../../../../actions/ratings";
+import { getClaimants } from "../../../../actions/claimants";
 import deepEqual from "deep-equal";
 import moment from "moment";
 import {
   convertSecondsToTimeString,
   convertTimeStringToSeconds,
-} from "../../../utils/analysis";
+} from "../../../../utils/analysis";
 
 
 function Claim({ onCreate, claim, setClaim }) {
