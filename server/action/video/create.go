@@ -125,6 +125,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result := videoResData{}
+	result.Video.Authors = make([]model.Author, 0)
 
 	tx := model.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
 	videoObj := model.Video{}
