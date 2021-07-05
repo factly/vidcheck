@@ -25,16 +25,11 @@ import Media from "../pages/media";
 import UploadMedium from "../pages/media/UploadMedium";
 import EditMedium from "../pages/media/EditMedium";
 
-//Videos
-// import CreateVideo from "../pages/videos/CreateVideo";
-// import EditVideo from "../pages/videos/EditVideo";
 
 import Preview from "../pages/preview";
 
 import CreateAnalysis from "../pages/analysis/CreateAnalysis";
 import EditAnalysis from "../pages/analysis/EditAnalysis";
-import Claim from "../pages/analysis/ClaimForm";
-import EditClaim from "../pages/analysis/EditClaim";
 
 //Policies
 import Policies from "../pages/policies";
@@ -107,33 +102,6 @@ const routes = {
     path: "/videos/:id/edit",
     Component: EditAnalysis,
     title: "Edit Analysis",
-    permission: {
-      resource: "fact-checks",
-      action: "create",
-    },
-  },
-  videosClaim: {
-    path: "/videos/claim",
-    Component: Claim,
-    title: "Claim",
-    permission: {
-      resource: "fact-checks",
-      action: "create",
-    },
-  },
-  videoClaimEdit: {
-    path: "/videos/:vid/claim/:index",
-    Component: EditClaim,
-    title: "Edit Claim",
-    permission: {
-      resource: "fact-checks",
-      action: "edit",
-    },
-  },
-  videoEditClaim: {
-    path: "/videos/claim/:index",
-    Component: EditClaim,
-    title: "Edit Claim",
     permission: {
       resource: "fact-checks",
       action: "create",
