@@ -51,7 +51,7 @@ func publishedDetails(w http.ResponseWriter, r *http.Request) {
 	claimBlocks := make([]model.Claim, 0)
 	err = model.DB.Model(&model.Video{}).Where(&model.Video{
 		SpaceID: uint(sID),
-		Status:  "published",
+		Status:  "publish",
 	}).Preload("Tags").Preload("Categories").First(&videoObj).Error
 	if err != nil {
 		loggerx.Error(err)
