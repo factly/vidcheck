@@ -29,7 +29,7 @@ import EditMedium from "../pages/media/EditMedium";
 import Preview from "../pages/preview";
 
 import CreateFactCheck from "../pages/fact-checks/CreateFactCheck";
-import EditAnalysis from "../pages/fact-checks/EditFactCheck";
+import EditFactCheck from "../pages/fact-checks/EditFactCheck";
 
 //Policies
 import Policies from "../pages/policies";
@@ -92,7 +92,7 @@ const routes = {
   createFactCheck: {
     path: "/fact-checks/create",
     Component: CreateFactCheck,
-    title: "Analysis",
+    title: "Fact Checks",
     permission: {
       resource: "fact-checks",
       action: "create",
@@ -100,8 +100,8 @@ const routes = {
   },
   editFactCheck: {
     path: "/fact-checks/:id/edit",
-    Component: EditAnalysis,
-    title: "Edit Analysis",
+    Component: EditFactCheck,
+    title: "Edit Fact Check",
     permission: {
       resource: "fact-checks",
       action: "create",
