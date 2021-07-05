@@ -73,6 +73,11 @@ function Claim({ onCreate, claim, setClaim }) {
     wrapperCol: { span: 24 },
   };
 
+  const disabledDate = (current) => {
+    let customDate = new Date();
+    return current > moment(customDate, "YYYY-MM-DDTHH:mm:ssZ");
+  }
+
 
   return (
     <>
@@ -192,10 +197,10 @@ function Claim({ onCreate, claim, setClaim }) {
           <Editor />
         </Form.Item>
         <Form.Item name="claim_date" label="Claim Date">
-          <DatePicker />
+          <DatePicker disabledDate={disabledDate} />
         </Form.Item>
         <Form.Item name="checked_date" label="Checked Date">
-          <DatePicker />
+          <DatePicker disabledDate={disabledDate} />
         </Form.Item>
         <Form.List name="review_sources" label="Review sources">
           {(fields, { add, remove }) => (
