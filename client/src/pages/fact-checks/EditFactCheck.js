@@ -26,8 +26,7 @@ function EditFactCheck() {
   if (loading || !video.url) return <Skeleton />;
 
   const onUpdate = (values) => {
-    dispatch(updateVideo(values)).then((res) =>
-      history.push(`/fact-checks/${res.video.id}/preview`)
+    dispatch(updateVideo(values)).then((res) => { if (res?.video?.id) history.push(`/fact-checks/${res.video.id}/preview`) }
     );
   };
 
