@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 
 import {
   Button, Input, Form, Card, Popconfirm, Tooltip, Drawer,
@@ -24,11 +24,14 @@ import moment from "moment";
 import Selector from "../../../../components/Selector";
 import Claim from "../Claim";
 
+import { setCollapse } from "../../../../actions/sidebar";
+
+
 
 function Analysis({ onSubmit }) {
   const [form] = Form.useForm();
   const [claimform] = Form.useForm();
-
+  const sidebar = useSelector((state) => state.sidebar);
   const [settingsDrawerVisible, setSettingsDrawerVisible] = useState(false);
   const [claim, setClaim] = useState({ index: -1, data: {}, drawerVisible: false });
 
@@ -47,6 +50,17 @@ function Analysis({ onSubmit }) {
   const dispatch = useDispatch();
 
   const player = useRef(null);
+
+  useEffect(() => {
+    const prev = sidebar.collapsed;
+    if (!sidebar.collapsed) {
+      dispatch(setCollapse(true));
+    }
+    return () => {
+      if (!prev) dispatch(setCollapse(false));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onTitleChange = (string) => {
     if (status !== 'publish') {
@@ -115,7 +129,11 @@ function Analysis({ onSubmit }) {
   };
 
 
-  const onSubmitClaim = (values) => dispatch(addClaim(values));
+  const onSubmitClaim = (values) => {
+    dispatch(addClaim(values))
+    form.resetFields()
+    setClaim({ data: {}, drawerVisible: false, index: -1 })
+  };
 
   const setReadyFlag = () => {
     status === 'ready' ? setStatus('draft') : setStatus('ready');
@@ -456,7 +474,13 @@ function Analysis({ onSubmit }) {
               <Form.Item name="tags" label="Tags">
                 <Selector mode="multiple" action="Tags" createEntity="Tag" />
               </Form.Item>
-              <Form.Item name="authors" label="Authors">
+              <Form.Item name="authors" label="Authors" rules={[
+                {
+                  required: true,
+                  message: 'Atleast one author is required!',
+                },
+
+              ]}>
                 <Selector mode="multiple" display={'email'} action="Authors" />
               </Form.Item>
             </Drawer>
@@ -474,7 +498,7 @@ function Analysis({ onSubmit }) {
       onClose={onClose}
       visible={claim.drawerVisible}
       getContainer={false}
-      width={"50%"}
+      width={"75%"}
       bodyStyle={{ paddingBottom: 40 }}
       headerStyle={{ fontWeight: 'bold' }}
       maskClosable={false}

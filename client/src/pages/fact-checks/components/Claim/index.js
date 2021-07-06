@@ -107,7 +107,6 @@ function Claim({ onCreate, claim, setClaim }) {
             end_time: convertTimeStringToSeconds(values["end_time"]),
           });
           form.resetFields();
-          setClaim({ drawerVisible: false, index: -1 });
         }}
         name="control-hooks"
         layout={"vertical"}
