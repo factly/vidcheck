@@ -29,11 +29,14 @@ const RatingForm = ({ onCreate, data = {} }) => {
     data.text_colour ? data.text_colour : null
   );
 
+  const [name, setName] = useState('')
+
   const onReset = () => {
     form.resetFields();
   };
 
   const onTitleChange = (string) => {
+    setName(string)
     form.setFieldsValue({
       slug: maker(string),
     });
@@ -111,7 +114,7 @@ const RatingForm = ({ onCreate, data = {} }) => {
         />
       </Form.Item>
 
-      <Row
+      {name ? <Row
         className="preview-container"
         gutter={16}
         style={{ marginBottom: "1rem" }}
@@ -131,10 +134,10 @@ const RatingForm = ({ onCreate, data = {} }) => {
               border: "1px solid black",
             }}
           >
-            Preview
+            {name}
           </div>
         </Col>
-      </Row>
+      </Row> : null}
 
       <Form.Item name="description" label="Description">
         <Editor style={{ width: "600px" }} basic={true} />

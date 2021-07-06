@@ -3,6 +3,7 @@ package video
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/factly/vidcheck/action/author"
 	"github.com/factly/vidcheck/action/rating"
@@ -57,17 +58,33 @@ func list(w http.ResponseWriter, r *http.Request) {
 	videos := make([]model.Video, 0)
 	offset, limit := paginationx.Parse(r.URL.Query())
 
+	// Filters
+	u, _ := url.Parse(r.URL.String())
+	queryMap := u.Query()
+
 	searchQuery := r.URL.Query().Get("q")
 	sort := r.URL.Query().Get("sort")
+	filters := generateFilters(queryMap["tag"], queryMap["category"], queryMap["author"], queryMap["status"], queryMap["rating"], queryMap["claimant"])
 
 	filteredVideoIDs := make([]uint, 0)
 
-	if searchQuery != "" {
+	if filters != "" {
+		filters = fmt.Sprint(filters, " AND space_id=", sID)
+	}
 
-		filters := fmt.Sprint("space_id=", sID)
+	if filters != "" || searchQuery != "" {
+
 		var hits []interface{}
+		var res map[string]interface{}
 
-		hits, err = meilisearchx.SearchWithQuery("vidcheck", searchQuery, filters, "video")
+		if searchQuery != "" {
+			hits, err = meilisearchx.SearchWithQuery("vidcheck", searchQuery, filters, "video")
+		} else {
+			res, err = meilisearchx.SearchWithoutQuery("vidcheck", filters, "video")
+			if _, found := res["hits"]; found {
+				hits = res["hits"].([]interface{})
+			}
+		}
 
 		if err != nil {
 			loggerx.Error(err)
@@ -163,4 +180,36 @@ func list(w http.ResponseWriter, r *http.Request) {
 	}
 
 	renderx.JSON(w, http.StatusOK, result)
+}
+
+func generateFilters(tagIDs, categoryIDs, authorIDs, status, ratingIDs, claimantIDs []string) string {
+	filters := ""
+	if len(tagIDs) > 0 {
+		filters = fmt.Sprint(filters, meilisearchx.GenerateFieldFilter(tagIDs, "tag_ids"), " AND ")
+	}
+
+	if len(categoryIDs) > 0 {
+		filters = fmt.Sprint(filters, meilisearchx.GenerateFieldFilter(categoryIDs, "category_ids"), " AND ")
+	}
+
+	if len(authorIDs) > 0 {
+		filters = fmt.Sprint(filters, meilisearchx.GenerateFieldFilter(authorIDs, "author_ids"), " AND ")
+	}
+
+	if len(status) > 0 {
+		filters = fmt.Sprint(filters, meilisearchx.GenerateFieldFilter(status, "status"), " AND ")
+	}
+
+	if len(ratingIDs) > 0 {
+		filters = fmt.Sprint(filters, meilisearchx.GenerateFieldFilter(ratingIDs, "rating_id"), " AND ")
+	}
+	if len(claimantIDs) > 0 {
+		filters = fmt.Sprint(filters, meilisearchx.GenerateFieldFilter(claimantIDs, "claimant_id"), " AND ")
+	}
+
+	if filters != "" && filters[len(filters)-5:] == " AND " {
+		filters = filters[:len(filters)-5]
+	}
+
+	return filters
 }

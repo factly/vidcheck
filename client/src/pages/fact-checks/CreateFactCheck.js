@@ -10,7 +10,8 @@ function CreateFactCheck() {
   const dispatch = useDispatch();
   const onCreate = (values) => {
     dispatch(addVideo(values)).then((res) => {
-      history.push(`/fact-checks/${res.video.id}/preview`);
+      if (res?.video?.id)
+        history.push(`/fact-checks/${res.video.id}/preview`);
     });
   };
   return <FactCheckCreateForm onSubmit={onCreate} />;

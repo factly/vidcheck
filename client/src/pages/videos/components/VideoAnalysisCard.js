@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button, Row, Col, Typography, Popconfirm } from "antd";
 import { Link, useHistory } from "react-router-dom";
 
@@ -22,6 +22,16 @@ function VideoAnalysisCard({ data }) {
       }
     });
   getRatingsCount();
+
+  const statuses = {
+    'ready': 'Ready to Publish',
+    'draft': 'Draft',
+    'publish': 'Published'
+  }
+
+  useEffect(() => {
+
+  }, [dispatch])
 
 
   return (
@@ -68,11 +78,12 @@ function VideoAnalysisCard({ data }) {
           <Typography.Paragraph ellipsis={true}>
             {data.video.summary}
           </Typography.Paragraph>
-          <div style={{ marginBottom: "auto" }}>
-            <Button onClick={() => history.push(`/fact-checks/${data.video.id}/preview`)}>
+          <div style={{ marginBottom: "auto", margin: 3 }}>
+            <Button onClick={() => history.push(`/fact-checks/${data.video.id}/preview`)} style={{ margin: 3 }}>
               Preview
             </Button>
             <Button
+              style={{ margin: 3 }}
               onClick={() => history.push(`/fact-checks/${data.video.id}/edit`)}
             >
               Edit
@@ -85,8 +96,9 @@ function VideoAnalysisCard({ data }) {
                 )
               }
             >
-              <Button>Delete</Button>
+              <Button style={{ margin: 3 }}>Delete</Button>
             </Popconfirm>
+            {statuses[data.video.status] ? <Button style={{ margin: 3, cursor: 'initial' }} type="primary">{statuses[data.video.status]} </Button> : null}
           </div>
         </Col>
       </Row>

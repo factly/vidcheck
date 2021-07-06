@@ -1,39 +1,8 @@
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React from "react";
 import { List, Space } from "antd";
-import deepEqual from "deep-equal";
 import VideoAnalysisCard from "./VideoAnalysisCard";
-import { getVideos } from "../../../actions/videos";
 
-function VideoList() {
-  const dispatch = useDispatch();
-  const [filters, setFilters] = useState({
-    page: 1,
-    limit: 5,
-  });
-  const { videos, loading, total } = useSelector(({ videos }) => {
-    const node = videos.req.find((item) => {
-      return deepEqual(item.query, filters);
-    });
-
-    if (node)
-      return {
-        videos: node.data.map((element) => videos.details[element]),
-        total: node.total,
-        loading: videos.loading,
-      };
-    return { videos: [], total: 0, loading: videos.loading };
-  });
-
-  React.useEffect(() => {
-    fetchVideos();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters]);
-
-  const fetchVideos = () => {
-    dispatch(getVideos(filters));
-  };
-
+function VideoList({ videos, loading, total, filters, setFilters }) {
   return (
     <Space direction="vertical">
       <List

@@ -12,12 +12,40 @@ import { addCategories } from './categories';
 import { addAuthors } from './authors';
 import { addTags } from './tags';
 
-export const getVideos = (query) => {
+export const getVideos = (query = {}) => {
   return (dispatch) => {
     dispatch(loadingVideos());
+
+    const params = new URLSearchParams();
+    if (query.category && query.category.length > 0) {
+      query.category.map((each) => params.append('category', each));
+    }
+    if (query.tag && query.tag.length > 0) {
+      query.tag.map((each) => params.append('tag', each));
+    }
+    if (query.format && query.format.length > 0) {
+      query.format.map((each) => params.append('format', each));
+    }
+    if (query.page) {
+      params.append('page', query.page);
+    }
+    if (query.limit) {
+      params.append('limit', query.limit);
+    }
+    if (query.sort) {
+      params.append('sort', query.sort);
+    }
+    if (query.q) {
+      params.append('q', query.q);
+    }
+    if (query.status) {
+      params.append('status', query.status);
+    }
+
+
     return axios
       .get(VIDEOS_API, {
-        params: query,
+        params: params,
       })
       .then((response) => {
         dispatch(
