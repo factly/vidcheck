@@ -64,13 +64,7 @@ Once the application is up and running you should be able to access it using the
 
 ### Env files to be added
 
-- Create a file `.env.development.local` in `/client` and add the following values
-  ```
-  REACT_APP_BASE_API_URL=http://127.0.0.1:4455/.factly/vid-check/server/
-  REACT_APP_PUBLIC_URL=http://127.0.0.1:4455/.factly/vid-check/web/
-  ```
-
-- Create config file with name config (and extension .env, .yml, .json) in `server/` and add cnofig variables (eg. below)
+- Create config file with name config (and extension .env, .yml, .json) in `server/` and add config variables (eg. below)
 ```
 DATABASE_HOST=postgres 
 DATABASE_USER=postgres
@@ -79,8 +73,40 @@ DATABASE_NAME=vidcheck
 DATABASE_PORT=5432 
 DATABASE_SSL_MODE=disable
 
+KETO_URL=http://keto:4466
 KAVACH_URL=http://kavach-server:8000
-
-DEGA_INTEGRATION=false
+OATHKEEPER_HOST=oathkeeper:4455
+KRATOS_PUBLIC_URL=http://kratos:4433
 DEGA_URL=http://dega-server:8000
+DEGA_INTEGRATION=false
+
+IFRAMELY_URL=http://iframely:8061
+MEILI_KEY=password
+MEILI_URL=http://meilisearch:7700
+IMAGEPROXY_URL=http://127.0.0.1:7001
+
+TEMPLATES_PATH=web/templates/*
+
+SUPER_ORGANISATION_TITLE=Organisation Title
+DEFAULT_NUMBER_OF_MEDIA=10
+DEFAULT_NUMBER_OF_SPACES=2
+DEFAULT_NUMBER_OF_VIDEOS=10
+CREATE_SUPER_ORGANISATION=true
+DEFAULT_USER_EMAIL=EMAIL
+DEFAULT_USER_PASSWORD=PASSWORD
+```
+
+- Create a folder companion in root `/` and create `.env` file inside companion and add config variables (eg. below)
+```
+COMPANION_GOOGLE_KEY=GOOGLE_KEY
+COMPANION_GOOGLE_SECRET=GOOGLE_SECRET
+COMPANION_AWS_ENDPOINT=http://localhost:9000
+COMPANION_AWS_BUCKET=vidcheck
+COMPANION_AWS_KEY=miniokey
+COMPANION_AWS_SECRET=miniosecret
+COMPANION_DOMAIN=localhost:3020
+COMPANION_PROTOCOL=http
+COMPANION_DATADIR=/
+COMPANION_SELF_ENDPOINT=localhost:3020
+NODE_ENV=dev
 ```
