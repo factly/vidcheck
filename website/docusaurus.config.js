@@ -47,32 +47,11 @@ module.exports = {
       style: 'light',
       links: [
         {
-          title: 'About',
+          title: 'Factly Media & Research',
           items: [
             {
-              label: 'Factly Media & Research',
-              to: 'https://factly.in',
-            },
-            {
-              label: 'About Us',
-              to: 'https://factly.in/about',
-            },
-            {
-              label: 'Contact',
-              to: 'mailto:admin@factly.in',
-            },
-            // {
-            //   label: 'Privacy Policy',
-            //   to: 'docs/privacy-policy',
-            // },
-          ],
-        },
-        {
-          title: 'Social',
-          items: [
-            {
-              label: 'Github',
-              to: 'https://github.com/factly',
+              label: 'About',
+              to: 'docs/ecosystem/philosophy#about-factly',
             },
             {
               label: 'Facebook',
@@ -85,6 +64,31 @@ module.exports = {
             {
               label: 'Instagram',
               to: 'https://www.instagram.com/factlyindia',
+            },            
+            // {
+            //   label: 'Privacy Policy',
+            //   to: 'docs/privacy-policy',
+            // },
+          ],
+        },
+        {
+          title: 'Factly Labs',
+          items: [
+            {
+              label: 'About',
+              to: 'docs/ecosystem/philosophy#about-factly-labs',
+            },            
+            {
+              label: 'Github',
+              to: 'https://github.com/factly',
+            },
+            {
+              label: 'Slack',
+              to: 'http://slack.factly.org/',
+            },
+            {
+              label: 'Twitter',
+              to: 'https://twitter.com/factlylabs',
             },
           ],
         },
@@ -96,17 +100,17 @@ module.exports = {
               to: 'http://slack.factly.org/',
             },
             {
-              label: 'Dega',
-              href: 'https://github.com/factly/dega',
+              label: 'Github',
+              to: 'https://github.com/factly',
             },
             {
-              label: 'Dega Server',
-              href: 'https://github.com/factly/dega-server',
+              label: 'Twitter',
+              to: 'https://twitter.com/factlylabs',
             },
             {
-              label: 'Dega Admin Portal',
-              href: 'https://github.com/factly/dega-admin-portal',
-            },
+              label: 'Contributors',
+              to: 'docs/contributors/introduction'
+            }
             // {
             //   label: 'Dega Themes',
             //   href: 'https://github.com/factly/dega-themes',
@@ -114,24 +118,24 @@ module.exports = {
           ],
         },
         {
-          title: 'Resources',
+          title: 'VidCheck',
           items: [
-            // {
-            //   label: 'Guides',
-            //   to: 'docs/what-is-dega',
-            // },
-            // {
-            //   label: 'FAQ',
-            //   to: 'docs/faq',
-            // },
             {
-              label: 'API',
-              to: 'https://degacms.com/docs/api/intro',
+              label: 'GitHub',
+              to: 'https://github.com/factly/vidcheck',
             },
             {
-              label: 'Blog',
-              to: 'blog',
+              label: 'Issues',
+              to: 'https://github.com/factly/vidcheck/issues',
             },
+            {
+              label: 'Discussions',
+              to: 'https://github.com/factly/vidcheck/discussions',
+            },
+            {
+              label: 'Managed Hosting',
+              to: 'https://vidcheck.factly.org',
+            },            
           ],
         },
       ],
