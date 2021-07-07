@@ -16,7 +16,7 @@ Your project announcements, feature proposals, support queries and sweet, sweet 
 
 Prefer the speed and fluidity of chat? Then join our [Slack community](https://slack.factly.org/). You can also join our community hangout, if you want to speak to the Factly team directly or ask some questions. 
 
-We have dedicated Slack channels for each of our projects at Factly Tech Labs, so please make sure to start the discussions in the relevant channel for a quick response.
+We have dedicated Slack channels for each of our projects at Factly Labs, so please make sure to start the discussions in the relevant channel for a quick response.
 
 ## Report Issues
 

@@ -4,20 +4,20 @@ sidebar_position: 2
 
 # Projects
 
-Factly Tech Labs works on developing and managing various applications that will increase access to public data and information by making it easy, interactive and intuitive. [Counting India](https://countingindia.com) is Factly’s first tool in its beta version that focuses on accessibility and data visualization of Census-2011 data. Factly is currently working on various applications that are in different stages of development.
+Factly Labs works on developing and managing various applications that will increase access to public data and information by making it easy, interactive and intuitive. [Counting India](https://countingindia.com) is Factly’s first tool in its beta version that focuses on accessibility and data visualization of Census-2011 data. Factly is currently working on various applications that are in different stages of development.
 
 ## Maturity Levels
 
 We use the following phases to define the projects maturity:
 
 - **Sandbox:** Applications that are in an experimental phases. Completed PoC, but haven't deployed a usable product yet. Expect breaking changes and not suitable for Production usage.
-- **Incubating:** Deployed in Production at Factly or one major organization for less than a year. Developed & maintained actively. High likelihood of breaking changes for backward compatability. Please reach out to the Factly Team on the [slack channel](https://slack.factly.org) before using the applications in a Production setting.
-- **Graduated:** Deployed in Production at Factly or multiple other organizations for over a year. Developed & maintained actively. Suitable for usage in Production.
+- **Incubating:** Deployed in Production at Factly or one major organisation for less than a year. Developed & maintained actively. High likelihood of breaking changes for backward compatability. Please reach out to the Factly Team on the [slack channel](https://slack.factly.org) before using the applications in a Production setting.
+- **Graduated:** Deployed in Production at Factly or multiple other organisations for over a year. Developed & maintained actively. Suitable for usage in Production.
 - **Retired:** Not actively developed and supported. Users will be provided enough notice before a service is ever retired.
 
 ## Dega
 
-Dega is a lightweight, scalable & high performant open-source publishing platform for small and medium scale news media organizations. The platform has various features built-in for fact-checking organizations. Dega supports managing multiple organizations and sites from the same portal. It is developed for modern web features with all the publishing best practices built-in. The tool is written in Go & React.
+Dega is a lightweight, scalable & high performant open-source publishing platform for small and medium scale news media organisations. The platform has various features built-in for fact-checking organisations. Dega supports managing multiple organisations and sites from the same portal. It is developed for modern web features with all the publishing best practices built-in. The tool is written in Go & React.
 
 **GitHub Repositories:**
 - https://github.com/factly/dega-server
@@ -38,7 +38,7 @@ VidCheck is a web application that makes video fact-checking more standardized f
 
 ## Kavach
 
-Kavach is an open-source identity and access management solution. It is a lightweight solution with features to manage organizations, users, permissions and can be configured easily to support applications required multitenancy. Kavach is written in Go, React and is built on ORY stack of services.
+Kavach is an open-source identity and access management solution. It is a lightweight solution with features to manage organisations, users, permissions and can be configured easily to support applications required multitenancy. Kavach is written in Go, React and is built on ORY stack of services.
 
 **GitHub Repository:** https://github.com/factly/kavach <br/>
 **License:** [MIT](https://github.com/factly/kavach/blob/develop/LICENSE) <br/>
@@ -67,7 +67,7 @@ Parlens is a tool for searching data that is indexed from Indian parliament data
 
 ## Counting India
 
-Counting India (CI) is the first major application developed as an initiative of Factly Tech Labs. CI makes data related to the States/Districts in India more accessible and understandable. The primary source of data for CI is the Census of India 2011 and other official sources. In CI, one can compare any two States/Districts side by side. One can also embed, access or download the data.
+Counting India (CI) is the first major application developed as an initiative of Factly Labs. CI makes data related to the States/Districts in India more accessible and understandable. The primary source of data for CI is the Census of India 2011 and other official sources. In CI, one can compare any two States/Districts side by side. One can also embed, access or download the data.
 
 We envision that every person who is interested in using data in their sphere of work will value CI’s platform. CI will also be a reliable resource for policy makers, journalists and researchers to explore and discover stories of public interest in India.
 

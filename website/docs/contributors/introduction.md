@@ -54,14 +54,14 @@ There are many other ways you can contribute without writing any code. Here are
 a few things you can do to help out:
 
 - **Give us a star.** It may not seem like much, but it really makes a difference. 
-  This is something that everyone can do to help with the projects developed at Factly Tech Labs.
+  This is something that everyone can do to help with the projects developed at Factly Labs.
   Github stars help our projects gain visibility and stand out.
 
 - **Join the community.** Sometimes helping people can be as easy as listening
   to their problems and offering a different perspective. Join our Slack, have a
   look at discussions in the forum. More info on this in [Communication](/docs/contact-us).
 
-- **Helping with open issues.** We have a lot of open issues for various projects at Factly Tech Labs
+- **Helping with open issues.** We have a lot of open issues for various projects at Factly Labs
   and some of them may lack necessary information, some are duplicates of older
   issues. You can help out by guiding people through the process of filling out
   the issue template, asking for clarifying information, or pointing them to

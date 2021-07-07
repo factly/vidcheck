@@ -4,25 +4,94 @@ sidebar_position: 2
 
 # Installation
 
-## What is offered as a part of managed service?
+## Using Docker Compose
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer volutpat ante eu condimentum pharetra. Nulla luctus tortor velit, in bibendum augue accumsan eget. Mauris porta in mi eget fermentum. Sed ultricies consectetur placerat. Aliquam tincidunt enim a neque elementum convallis. Nam eu hendrerit leo, in pellentesque nisl. Etiam eget fringilla diam. Aliquam maximus tristique enim quis maximus. Etiam sit amet placerat erat, eget cursus tellus. Mauris non cursus ex. Sed commodo nec enim ac rutrum.
+Docker Compose is the easiest way to install and get started with VidCheck on your system locally. 
 
-Nulla eu ullamcorper dui, eget tincidunt ligula. Aenean a vestibulum leo, sed efficitur erat. Ut sit amet turpis at risus ultricies lobortis eu at mi. Cras vitae interdum est. Suspendisse a porta urna. Nunc in quam quis justo lacinia pulvinar. Integer a ante in tellus facilisis luctus at quis turpis. Nullam tincidunt orci vulputate, sollicitudin nunc vel, condimentum velit. Morbi gravida, lectus vel lacinia blandit, ex ex aliquam velit, quis ornare nibh leo sed dui.
+### Pre-requisites
 
-## Should you choose our managed service?
+- Currently the setup is only tested for development on Mac OS and Linux
+- Install and run Docker and Docker Compose
 
-Our managed service might be a good option if you:
+### Clone the required repositories
 
-- Do not have the technical resources/capabilities to deploy and manage a highly available platform.
-- Do not want to worry about scaling the platform to your organization/audience. 
-- Do not want to perform upgrades manually risking downtime of the platform.
-- Are exploring VidCheck to see if it is a good fit for your organization or your personal project.
-- Want to focus on the core objectives of your organization and not have to deal with the IT services.
-- Want quick support for getting started and for any help going forward.
+- [kavach-server](https://github.com/factly/kavach-server)
+- [kavach-web](https://github.com/factly/kavach-web)
 
-## What other options do you have?
+```
+    git clone https://github.com/factly/kavach-server.git kavach/kavach-server
+    git clone https://github.com/factly/kavach-web.git kavach/kavach-web
+```
 
-VidCheck is an open source project with a very permissive [MIT License](https://github.com/factly/vidcheck/blob/develop/LICENSE) like most of our other projects. All the features available in the managed service are available for free in the open source version as well. You can read more about the open source version [here](/docs/introduction/self-hosted).
+The folder structure after cloning the above repositories should look like the following:
 
-If you are a WordPress user and would rather want to install VidCheck as a plugin instead of a stand-alone service, you could read about our WordPress plugin [here](/docs/introduction/wordpress-plugin).
+```
+    .
+    ├── README.md
+    ├── docker-compose.yml
+    ├── kavach
+    ├── kratos
+    ├── client
+    ├── server
+    ├── oathkeeper
+    └── pg-init-scripts
+```
+
+### Env file to be added
+
+- Create config file with name config (and extension .env, .yml, .json) in `server/` and add cnofig variables (eg. below)
+    ```
+    DATABASE_HOST=postgres 
+    DATABASE_USER=postgres
+    DATABASE_PASSWORD=postgres
+    DATABASE_NAME=vidcheck 
+    DATABASE_PORT=5432 
+    DATABASE_SSL_MODE=disable
+
+    KETO_URL=http://keto:4466
+    KAVACH_URL=http://kavach-server:8000
+    OATHKEEPER_HOST=oathkeeper:4455
+    KRATOS_PUBLIC_URL=http://kratos:4433
+    DEGA_URL=http://dega-server:8000
+    DEGA_INTEGRATION=false
+
+    IFRAMELY_URL=http://iframely:8061
+    MEILI_KEY=password
+    MEILI_URL=http://meilisearch:7700
+    IMAGEPROXY_URL=http://127.0.0.1:7001
+
+    TEMPLATES_PATH=web/templates/*
+
+    SUPER_ORGANISATION_TITLE='VidCheck Administration'
+    DEFAULT_NUMBER_OF_MEDIA=10
+    DEFAULT_NUMBER_OF_SPACES=2
+    DEFAULT_NUMBER_OF_VIDEOS=10
+    CREATE_SUPER_ORGANISATION=true
+    DEFAULT_USER_EMAIL=admin@vidcheck.com
+    DEFAULT_USER_PASSWORD=2ssad32sadADSd@!@4
+    ```
+
+### Starting the application
+
+- Execute the following command docker-compose command to start Vidcheck
+
+  ```
+    docker-compose up
+  ```
+
+- When the application is started using docker-compose, a directory with name `factly` will be created at the root level to perisit all the data
+
+### Access the application
+
+Once the application is up and running you should be able to access it using the following urls:
+
+- Vidcheck: [http://127.0.0.1:4455/.factly/vid-check/web/](http://127.0.0.1:4455/.factly/vid-check/web/)
+- Kavach: [http://127.0.0.1:4455/.factly/kavach/web/auth/login](http://127.0.0.1:4455/.factly/kavach/web/auth/login)
+
+### Stopping the application
+
+- Execute the following command docker-compose command to stop Vidcheck and all the components
+
+  ```
+    docker-compose down
+  ```

@@ -19,11 +19,11 @@ As mentioned in our [philosophy](/docs/ecosystem/philosophy), we strongly believ
 Self-hosted version of the platform might be a good option if you:
 
 - Have the technical resources/capabilities to deploy and manage a highly available platform.
-- Are not worried about deploying and maintaining a solution that can scale the platform to your organization/audience.
+- Are not worried about deploying and maintaining a solution that can scale the platform to your organisation/audience.
 - Are not worried about performing upgrades manually risking downtime of the platform.
 - Do not want your content to be hosted in a cloud service provider.
 - Want to install the platform in-house. There are no licensing costs involved to do so.
-- Want to extend/customize certain features of the platform to your organization's need that are not possible with the managed service. [Reach out to us](https://github.com/factly/vidcheck/discussions) for any such features, we would love to hear from you.
+- Want to extend/customize certain features of the platform to your organisation's need that are not possible with the managed service. [Reach out to us](https://github.com/factly/vidcheck/discussions) for any such features, we would love to hear from you.
 
 ## What other options do you have?
 

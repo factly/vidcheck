@@ -19,7 +19,7 @@ function HomepageHeader() {
           <p className={styles.button}>
           <Link
             className="button button--success button--lg"
-            to="/docs/introduction/vidcheck-cloud">
+            to="/docs/introduction/managed-hosting">
             Request Access
           </Link>
           </p>
