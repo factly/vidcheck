@@ -107,6 +107,8 @@ kavach/
 ### Vid check server ###
 server/config.*
 
+!server/config.env.example
+
 # End of https://www.toptal.com/developers/gitignore/api/code,intellij,go,react
 
 
