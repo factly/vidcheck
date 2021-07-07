@@ -34,7 +34,7 @@ The default ratings created would be:
 
 ## Step 3: Create Claimants 
 
-Every Fact Check will have a [claimant](/docs/core-concepts/claimaints). So, lets add a claimant from the `claimant` menu. The fields are self-explanatory but you can check [claimant](/docs/core-concepts/claimaints) section for more details.
+Every Fact Check will have a [claimant](/docs/core-concepts/claimants). So, lets add a claimant from the `claimant` menu. The fields are self-explanatory but you can check [claimant](/docs/core-concepts/claimants) section for more details.
 
 ## Step 4: Create Fact Checks
 

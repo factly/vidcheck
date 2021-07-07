@@ -27,6 +27,6 @@ Self-hosted version of the platform might be a good option if you:
 
 ## What other options do you have?
 
-VidCheck is an open source project with a very permissive [MIT License](https://github.com/factly/vidcheck/blob/develop/LICENSE) like most of our other projects. All the features available in the managed service are available for free in the open source version as well. You can read more about the open source version [here](/docs/introduction/open-source).
+Like most of our other projects, we have a [managed hosting](/docs/introduction/managed-hosting) service for VidCheck. It is the simplest way to get started with VidCheck and you don't have to worry about maintainence and upgrades going forward. You can read more about our managed hosting [here](/docs/introduction/managed-hosting).
 
 If you are a WordPress user and would rather want to install VidCheck as a plugin instead of a stand-alone service, you could read about our WordPress plugin [here](/docs/introduction/wordpress-plugin).
