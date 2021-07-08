@@ -2,6 +2,6 @@
 sidebar_position: 8
 ---
 
-# organisations
+# Organisations
 
 ## Coming Soon!
