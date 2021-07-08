@@ -2,6 +2,8 @@
 sidebar_position: 3
 ---
 
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # Quick Start
 
 If you are using the Managed Environment, you could skip the next paragraph about Super organisation.
@@ -40,4 +42,9 @@ Every Fact Check will have a [claimant](/docs/core-concepts/claimants). So, lets
 
 You can start creating your first Video Fact Check by clicking on `Create New` button from the Fact Checks menu.
 
+### Create New Fact Check
 
+- Navigate to the Fact Check Menu
+- Click on `Create New` button to getting started with creating a new video fact check
+
+<img alt="Create New Fact Check" src={useBaseUrl('/img/docs/getting-started/create-new-fact-check-1.png')} />
