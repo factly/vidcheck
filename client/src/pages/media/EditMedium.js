@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useParams, useLocation } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import {
   Row,
   Col,
@@ -15,6 +15,8 @@ import { getMedium, updateMedium, deleteMedium } from "../../actions/media";
 import RecordNotFound from "../../components/ErrorsAndImage/RecordNotFound";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { useHistory } from "react-router-dom";
+import MonacoEditor from "../../components/MonacoEditor";
+import getJsonValue from "../../utils/getJsonValue";
 
 function EditMedium() {
   const [form] = Form.useForm();
@@ -22,7 +24,6 @@ function EditMedium() {
 
   const { id } = useParams();
   const history = useHistory();
-  const spaces = useSelector(({ spaces }) => spaces);
 
   const dispatch = useDispatch();
   const { media, loading } = useSelector((state) => {
@@ -48,6 +49,12 @@ function EditMedium() {
 
   if (!media) {
     return <RecordNotFound />;
+  }
+
+  if (media && media.meta_fields) {
+    if (typeof media.meta_fields !== 'string') {
+      media.meta_fields = JSON.stringify(media.meta_fields);
+    }
   }
 
   return (
@@ -80,6 +87,9 @@ function EditMedium() {
           form={form}
           name="create-space"
           onFinish={(values) => {
+            if (values.meta_fields) {
+              values.meta_fields = getJsonValue(values.meta_fields);
+            }
             updateMedia(values);
           }}
           onValuesChange={() => {
@@ -98,6 +108,9 @@ function EditMedium() {
           </Form.Item>
           <Form.Item name="description" label="Description">
             <Input />
+          </Form.Item>
+          <Form.Item name="meta_fields" label="Metafields">
+            <MonacoEditor language="json" />
           </Form.Item>
           <Form.Item>
             <Space>

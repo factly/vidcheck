@@ -187,7 +187,6 @@ function Analysis({ onSubmit }) {
             {true ? (
               <Form.Item name="submit">
                 <Button type="secondary" htmlType="submit" onClick={() => {
-                  console.log("OnSubmit")
                   setStatus('publish')
                 }}>
                   {video.id && status === 'publish' ? 'Update' : 'Publish'}

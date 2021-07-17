@@ -7,7 +7,7 @@ import { deleteVideo, getVideos } from "../../../actions/videos";
 import HorizontalTimelineBar from "../components/AnalysisTimelineBar/HorizontalTimelineBar";
 import ImagePlaceholder from "../../../components/ImagePlaceholder";
 
-function VideoAnalysisCard({ data }) {
+function VideoAnalysisCard({ data, onDeleteVideo }) {
   const history = useHistory();
   const dispatch = useDispatch();
 
@@ -90,11 +90,7 @@ function VideoAnalysisCard({ data }) {
             </Button>
             <Popconfirm
               title="Sure to Delete?"
-              onConfirm={() =>
-                dispatch(deleteVideo(data.video.id)).then(() =>
-                  dispatch(getVideos())
-                )
-              }
+              onConfirm={() => onDeleteVideo(data.video.id)}
             >
               <Button style={{ margin: 3 }}>Delete</Button>
             </Popconfirm>

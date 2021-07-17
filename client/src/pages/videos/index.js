@@ -4,10 +4,11 @@ import { Link } from "react-router-dom";
 import VideoList from "./components/VideoList";
 import { useDispatch, useSelector } from "react-redux";
 import Selector from '../../components/Selector'
-import { getVideos } from "../../actions/videos";
+import { deleteVideo, getVideos } from "../../actions/videos";
 import deepEqual from 'deep-equal';
 
 function Videos({ permission }) {
+
   const dispatch = useDispatch();
   const { actions } = permission;
   const [filters, setFilters] = React.useState({
@@ -16,8 +17,6 @@ function Videos({ permission }) {
   });
   const [form] = Form.useForm();
   const { Option } = Select;
-
-
 
   React.useEffect(() => {
     fetchVideos();
@@ -41,6 +40,12 @@ function Videos({ permission }) {
       };
     return { videos: [], total: 0, loading: videos.loading };
   });
+
+  const onDeleteVideo = (id) => {
+    dispatch(deleteVideo(id)).then(() =>
+      dispatch(getVideos(filters))
+    )
+  }
 
   const onSave = (values) => {
     let filterValue = {
@@ -127,7 +132,7 @@ function Videos({ permission }) {
           </Col>
         </Row>
       </Form>
-      <VideoList videos={videos} loading={loading} total={total} filters={filters} setFilters={setFilters} />
+      <VideoList videos={videos} loading={loading} total={total} filters={filters} setFilters={setFilters} onDeleteVideo={onDeleteVideo} />
     </Space>
   );
 }

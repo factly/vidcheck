@@ -13,6 +13,8 @@ import { addAuthors } from './authors';
 import { addTags } from './tags';
 
 export const getVideos = (query = {}) => {
+
+
   return (dispatch) => {
     dispatch(loadingVideos());
 

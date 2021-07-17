@@ -4,6 +4,8 @@ import { maker, checker } from "../../../utils/sluger";
 import { ChromePicker } from "react-color";
 import Editor from "../../../components/Editor";
 import MediaSelector from "../../../components/MediaSelector";
+import MonacoEditor from '../../../components/MonacoEditor';
+import getJsonValue from "../../../utils/getJsonValue";
 
 const layout = {
   labelCol: {
@@ -21,6 +23,11 @@ const tailLayout = {
 };
 
 const RatingForm = ({ onCreate, data = {} }) => {
+  if (data && data.meta_fields) {
+    if (typeof data.meta_fields !== 'string') {
+      data.meta_fields = JSON.stringify(data.meta_fields);
+    }
+  }
   const [form] = Form.useForm();
   const [backgroundColour, setBackgroundColour] = useState(
     data.background_colour ? data.background_colour : null
@@ -49,6 +56,9 @@ const RatingForm = ({ onCreate, data = {} }) => {
       initialValues={{ ...data }}
       name="creat-rating"
       onFinish={(values) => {
+        if (values.meta_fields) {
+          values.meta_fields = getJsonValue(values.meta_fields);
+        }
         onCreate(values);
         onReset();
       }}
@@ -141,6 +151,9 @@ const RatingForm = ({ onCreate, data = {} }) => {
 
       <Form.Item name="description" label="Description">
         <Editor style={{ width: "600px" }} basic={true} />
+      </Form.Item>
+      <Form.Item name="meta_fields" label="Metafields">
+        <MonacoEditor language="json" />
       </Form.Item>
 
       <Form.Item {...tailLayout}>
