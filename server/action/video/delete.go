@@ -27,7 +27,6 @@ import (
 // @Failure 400 {array} string
 // @Router /videos/{video_id} [delete]
 func delete(w http.ResponseWriter, r *http.Request) {
-
 	sID, err := util.GetSpace(r.Context())
 	if err != nil {
 		loggerx.Error(err)
@@ -119,15 +118,3 @@ func delete(w http.ResponseWriter, r *http.Request) {
 	tx.Commit()
 	renderx.JSON(w, http.StatusOK, nil)
 }
-
-// func getUserAndOrganisation(r *http.Request) map[string]uint {
-//     userId, err := strconv.ParseUint(r.Header.Get("X-User-ID"))
-//     organisationId, err := strconv.ParseUint(r.Header.Get("X-Organisation-ID"))
-//
-// //     userId := r.Header.Get("X-User-ID")
-// //     organisationId := r.Header.Get("X-Organisation-ID")
-//     userAndOrgData := make(map[string]uint)
-//     userAndOrgData["user_id"] = userId
-//     userAndOrgData["organisation_id"] = organisationId
-//     return userAndOrgData
-// }

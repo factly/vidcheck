@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/factly/vidcheck/model"
+	"github.com/spf13/viper"
 )
 
 type ctxKeyOrganisationID int
@@ -18,6 +19,11 @@ const OrganisationIDKey ctxKeyOrganisationID = 0
 func GenerateOrganisation(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokens := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
+
+		if viper.GetBool("dega_integration") {
+			h.ServeHTTP(w, r)
+			return
+		}
 
 		if tokens[0] != "spaces" {
 

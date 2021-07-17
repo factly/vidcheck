@@ -17,8 +17,6 @@ function Videos({ permission }) {
   const [form] = Form.useForm();
   const { Option } = Select;
 
-
-
   React.useEffect(() => {
     fetchVideos();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -46,8 +44,6 @@ function Videos({ permission }) {
     let filterValue = {
       tag: values.tags,
       category: values.categories,
-      claimant: values.claimants,
-      rating: values.ratings,
       sort: values.sort,
       q: values.q,
       status: values.status !== 'all' ? values.status : null,
@@ -103,16 +99,6 @@ function Videos({ permission }) {
           <Col span={4} offset={1}>
             <Form.Item name="categories" label="Categories">
               <Selector mode="multiple" action="Categories" placeholder="Filter Categories" />
-            </Form.Item>
-          </Col>
-          <Col span={4} offset={1}>
-            <Form.Item name="claimants" label="Claimants">
-              <Selector mode="multiple" action="Claimants" />
-            </Form.Item>
-          </Col>
-          <Col span={4} offset={1}>
-            <Form.Item name="ratings" label="Ratings">
-              <Selector mode="multiple" action="Ratings" />
             </Form.Item>
           </Col>
           <Col span={4} key={4} offset={1}>

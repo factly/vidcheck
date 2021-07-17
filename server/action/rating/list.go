@@ -60,7 +60,7 @@ func list(w http.ResponseWriter, r *http.Request) {
 }
 
 //GetDegaRatings fetches all the ratings from dega-server
-func GetDegaRatings(uID, sID int) (map[uint]model.Rating, error) {
+func GetDegaRatings(uID, sID int, ids []uint) (map[uint]model.Rating, error) {
 	url := fmt.Sprint(viper.GetString("dega_url"), "/fact-check/ratings?all=true")
 	req, _ := http.NewRequest("GET", url, nil)
 
@@ -84,7 +84,9 @@ func GetDegaRatings(uID, sID int) (map[uint]model.Rating, error) {
 
 	ratmap := make(map[uint]model.Rating)
 	for _, rating := range pagingRes.Nodes {
-		ratmap[rating.ID] = rating
+		if util.Contains(ids, rating.ID) {
+			ratmap[rating.ID] = rating
+		}
 	}
 	return ratmap, nil
 }

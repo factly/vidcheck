@@ -120,6 +120,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		Description:     claimant.Description,
 		MediumID:        mediumID,
 		HTMLDescription: description,
+		MetaFields:      claimant.MetaFields,
 	}).Preload("Medium").First(&result).Error
 
 	if err != nil {
@@ -139,6 +140,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		"tag_line":    result.TagLine,
 		"medium_id":   result.MediumID,
 		"space_id":    result.SpaceID,
+		"meta_fields": result.MetaFields,
 	}
 
 	err = meilisearchx.UpdateDocument("vidcheck", meiliObj)

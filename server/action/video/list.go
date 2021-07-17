@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/factly/vidcheck/action/author"
+	"github.com/factly/vidcheck/action/claimant"
 	"github.com/factly/vidcheck/action/rating"
 	"github.com/factly/vidcheck/config"
 
@@ -114,15 +115,7 @@ func list(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var ratingMap map[uint]model.Rating
-
-	if config.DegaIntegrated() {
-		ratingMap, err = rating.GetDegaRatings(uID, sID)
-		if err != nil {
-			loggerx.Error(err)
-			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-			return
-		}
-	}
+	var claimantMap map[uint]model.Claimant
 
 	var videoIDs []uint
 	for _, p := range videos {
@@ -148,6 +141,9 @@ func list(w http.ResponseWriter, r *http.Request) {
 		}
 		videoAuthorMap[videoAuthor.VideoID] = append(videoAuthorMap[videoAuthor.VideoID], videoAuthor.AuthorID)
 	}
+	claimsList := make([]model.Claim, 0)
+
+	videoClaimList := make(map[uint][]model.Claim, 0)
 
 	for _, video := range videos {
 		var claimData videoResData
@@ -155,6 +151,8 @@ func list(w http.ResponseWriter, r *http.Request) {
 		claimData.Video.Authors = make([]model.Author, 0)
 
 		videoAuthors, hasEle := videoAuthorMap[video.ID]
+
+		claims := make([]model.Claim, 0)
 
 		if hasEle {
 			for _, videoAuthor := range videoAuthors {
@@ -164,19 +162,59 @@ func list(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		}
-		stmt := model.DB.Model(&model.Claim{}).Order("start_time").Where("video_id = ?", video.ID).Preload("Claimant")
+		model.DB.Model(&model.Claim{}).Order("start_time").Where("video_id = ?", video.ID).Find(&claims)
 
-		if !config.DegaIntegrated() {
-			stmt.Preload("Rating")
-		}
+		claimsList = append(claimsList, claims...)
 
-		stmt.Find(&claimData.Claims)
+		videoClaimList[video.ID] = claims
 
 		if config.DegaIntegrated() {
-			claimData.Claims = AddDegaRatings(uID, sID, claimData.Claims, ratingMap)
+			claimData.Claims = AddEntities(uID, sID, claimsList, ratingMap, claimantMap)
 		}
 
 		result.Nodes = append(result.Nodes, claimData)
+	}
+
+	ratingIDs, claimantIDs := getRatingAndClaimantIDs(claimsList)
+
+	if config.DegaIntegrated() {
+		ratingMap, err = rating.GetDegaRatings(uID, sID, ratingIDs)
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+			return
+		}
+		claimantMap, err = claimant.GetDegaClaimants(uID, sID, claimantIDs)
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+			return
+		}
+	} else {
+
+		ratings := make([]model.Rating, 0)
+		claimants := make([]model.Claimant, 0)
+
+		model.DB.Model(model.Rating{}).Where(ratingIDs).Find(&ratings)
+
+		model.DB.Model(model.Claimant{}).Where(claimantIDs).Find(&claimants)
+
+		for _, rating := range ratings {
+			ratingMap[rating.ID] = rating
+		}
+		for _, claimant := range claimants {
+			claimantMap[claimant.ID] = claimant
+		}
+	}
+
+	for index, video := range result.Nodes {
+		videoData := video
+		if config.DegaIntegrated() {
+			videoData.Claims = AddEntities(uID, sID, videoClaimList[video.Video.ID], ratingMap, claimantMap)
+		}
+		result.Nodes[index] = videoData
 	}
 
 	renderx.JSON(w, http.StatusOK, result)

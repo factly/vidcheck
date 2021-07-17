@@ -94,6 +94,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 			URL:         medium.URL,
 			Dimensions:  medium.Dimensions,
 			SpaceID:     uint(sID),
+			MetaFields:  medium.MetaFields,
 		}
 
 		result.Nodes = append(result.Nodes, med)
@@ -121,6 +122,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 			"type":        result.Nodes[i].Type,
 			"description": result.Nodes[i].Description,
 			"space_id":    result.Nodes[i].SpaceID,
+			"meta_fields": result.Nodes[i].MetaFields,
 		}
 
 		err = meilisearchx.AddDocument("vidcheck", meiliObj)

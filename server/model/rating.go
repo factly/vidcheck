@@ -20,6 +20,7 @@ type Rating struct {
 	BackgroundColour postgres.Jsonb `gorm:"column:background_colour" json:"background_colour" swaggertype:"primitive,string"`
 	TextColour       postgres.Jsonb `gorm:"column:text_colour" json:"text_colour" swaggertype:"primitive,string"`
 	SpaceID          uint           `gorm:"column:space_id" json:"space_id"`
+	MetaFields       postgres.Jsonb `gorm:"column:meta_fields" json:"meta_fields" swaggertype:"primitive,string"`
 }
 
 var ratingUser ContextKey = "rating_user"

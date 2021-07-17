@@ -20,7 +20,7 @@ function VideoList({ videos, loading, total, filters, setFilters }) {
         }}
         renderItem={(item) => (
           <List.Item>
-            <VideoAnalysisCard data={item} />
+            <VideoAnalysisCard data={item} filters={filters} />
           </List.Item>
         )}
       ></List>

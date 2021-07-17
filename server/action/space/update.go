@@ -168,6 +168,9 @@ func update(w http.ResponseWriter, r *http.Request) {
 		VerificationCodes: space.VerificationCodes,
 		SocialMediaURLs:   space.SocialMediaURLs,
 		ContactInfo:       space.ContactInfo,
+		HeaderCode:        space.HeaderCode,
+		FooterCode:        space.FooterCode,
+		MetaFields:        space.MetaFields,
 	}).Preload("Logo").Preload("LogoMobile").Preload("FavIcon").Preload("MobileIcon").First(&result).Error
 
 	if err != nil {
@@ -189,6 +192,9 @@ func update(w http.ResponseWriter, r *http.Request) {
 		"tag_line":        result.TagLine,
 		"organisation_id": result.OrganisationID,
 		"analytics":       result.Analytics,
+		"header_code":     result.HeaderCode,
+		"footer_code":     result.FooterCode,
+		"meta_fields":     result.MetaFields,
 	}
 
 	err = meilisearchx.UpdateDocument("vidcheck", meiliObj)

@@ -9,17 +9,9 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/factly/vidcheck/model"
+	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/loggerx"
 )
-
-func contains(s []string, e string) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
-}
 
 // Composer create keto policy
 func Composer(oID int, sID int, inputPolicy policyReq) model.KetoPolicy {
@@ -35,11 +27,11 @@ func Composer(oID int, sID int, inputPolicy policyReq) model.KetoPolicy {
 	result.Actions = make([]string, 0)
 
 	for _, each := range inputPolicy.Permissions {
-		if contains(allowedResources, each.Resource) {
+		if util.ContainString(allowedResources, each.Resource) {
 			result.Resources = append(result.Resources, "resources"+commanPolicyString+each.Resource)
 			var eachActions []string
 			for _, action := range each.Actions {
-				if contains(allowedActions, action) {
+				if util.ContainString(allowedActions, action) {
 					eachActions = append(eachActions, "actions"+commanPolicyString+each.Resource+":"+action)
 				}
 			}

@@ -23,6 +23,7 @@ type Medium struct {
 	URL         postgres.Jsonb `gorm:"column:url" json:"url" swaggertype:"primitive,string"`
 	Dimensions  string         `gorm:"column:dimensions" json:"dimensions"`
 	SpaceID     uint           `gorm:"column:space_id" json:"space_id"`
+	MetaFields  postgres.Jsonb `gorm:"column:meta_fields" json:"meta_fields" swaggertype:"primitive,string"`
 }
 
 func (Medium) TableName() string {

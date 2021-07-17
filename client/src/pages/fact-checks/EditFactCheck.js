@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
-import { addClaims } from "../../actions/claims";
+import { addClaims, resetClaim } from "../../actions/claims";
 import { getVideo, updateVideo } from "../../actions/videos";
 import { Skeleton } from "antd";
 import EditFactCheckForm from "./components/Form/index";
@@ -26,7 +26,12 @@ function EditFactCheck() {
   if (loading || !video.url) return <Skeleton />;
 
   const onUpdate = (values) => {
-    dispatch(updateVideo(values)).then((res) => { if (res?.video?.id) history.push(`/fact-checks/${res.video.id}/preview`) }
+    dispatch(updateVideo(values)).then((res) => {
+      if (res?.video?.id) {
+        dispatch(resetClaim())
+        history.push(`/fact-checks/${res.video.id}/preview`)
+      }
+    }
     );
   };
 

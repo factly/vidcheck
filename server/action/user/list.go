@@ -9,9 +9,9 @@ import (
 
 	"github.com/factly/vidcheck/action/author"
 	"github.com/factly/vidcheck/action/policy"
+	"github.com/factly/vidcheck/util"
 
 	"github.com/factly/vidcheck/model"
-	"github.com/factly/vidcheck/util"
 
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"

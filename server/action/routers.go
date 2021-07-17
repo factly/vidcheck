@@ -18,8 +18,6 @@ import (
 
 	"github.com/factly/vidcheck/model"
 
-	"github.com/factly/vidcheck/config"
-
 	"github.com/factly/vidcheck/action/rating"
 	"github.com/factly/vidcheck/action/space"
 	"github.com/spf13/viper"
@@ -58,7 +56,7 @@ func RegisterRoutes() http.Handler {
 		"kavach":   util.KavachChecker,
 	})
 
-	r.With(middlewarex.CheckUser, util.CheckSpace, util.GenerateOrganisation).Group(func(r chi.Router) {
+	r.With(middlewarex.CheckUser, util.CheckSpace, util.GenerateOrganisation, util.CheckDegaEnable).Group(func(r chi.Router) {
 		r.Mount("/videos", video.Router())
 		r.Mount("/categories", category.Router())
 		r.Mount("/claimants", claimant.Router())
@@ -69,16 +67,15 @@ func RegisterRoutes() http.Handler {
 		r.Mount("/users", user.Router())
 		r.Mount("/policies", policy.Router())
 		r.Mount("/tags", tag.Router())
-		if !config.DegaIntegrated() {
-			r.Mount("/spaces", space.Router())
-			r.Mount("/ratings", rating.Router())
-		}
+		r.Mount("/spaces", space.Router())
+		r.Mount("/ratings", rating.Router())
+
 	})
 
 	r.Mount("/videos/embed", embed.Router())
 	r.Mount("/ratings/embed", ratingEmbed.Router())
 
-	r.With(middlewarex.CheckUser).Group(func(r chi.Router) {
+	r.With(middlewarex.CheckUser, util.CheckDegaEnable).Group(func(r chi.Router) {
 		r.Post("/requests/organisations", organisation.Create)
 		r.With(middlewarex.CheckSpace(1)).Post("/requests/spaces", spaceRequest.Create)
 	})
