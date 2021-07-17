@@ -10,6 +10,7 @@ import (
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/renderx"
+	"github.com/factly/x/requestx"
 	"github.com/spf13/viper"
 )
 
@@ -53,19 +54,18 @@ func CheckDegaEnable(h http.Handler) http.Handler {
 
 			url := fmt.Sprint(viper.GetString("dega_url"), "/", service, r.URL.Path)
 
-			req, _ := http.NewRequest(r.Method, url, nil)
+			header := r.Header
 
-			req.Header = r.Header
-			req.Body = r.Body
+			resp, err := requestx.Request(r.Method, url, nil, map[string]string{
+				"Content-Type": "application/json",
+				"X-User":       header.Get("X-User"),
+				"X-Space":      header.Get("X-Space"),
+			})
 
-			client := &http.Client{}
-			resp, err := client.Do(req)
 			if err != nil {
-
 				errorx.Render(w, errorx.Parser(errorx.Unauthorized()))
 				return
 			}
-
 			defer resp.Body.Close()
 
 			var res interface{}
