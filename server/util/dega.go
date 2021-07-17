@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
@@ -29,8 +28,6 @@ func CheckDegaEnable(h http.Handler) http.Handler {
 			ctx := r.Context()
 
 			space, err := GetDegaSpace(r.Header)
-
-			log.Println("space, err", space, err)
 
 			if err != nil {
 				loggerx.Error(err)

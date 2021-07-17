@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -329,11 +328,6 @@ func update(w http.ResponseWriter, r *http.Request) {
 			claimantMap[claimant.ID] = claimant
 		}
 	}
-
-	log.Println(ratingIds)
-	log.Println(ratingMap)
-	log.Println(claimantIds)
-	log.Println(claimantMap)
 
 	if !(len(ratingIds) == len(ratingMap) && len(claimantIds) == len(claimantMap)) {
 		tx.Rollback()
