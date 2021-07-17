@@ -1,6 +1,7 @@
 package claimant
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/factly/x/meilisearchx"
 	"github.com/factly/x/paginationx"
 	"github.com/factly/x/renderx"
+	"github.com/spf13/viper"
 )
 
 // list response
@@ -88,4 +90,36 @@ func list(w http.ResponseWriter, r *http.Request) {
 	}
 
 	renderx.JSON(w, http.StatusOK, result)
+}
+
+//GetDegaClaimants fetches all the claimants from dega-server
+func GetDegaClaimants(uID, sID int, ids []uint) (map[uint]model.Claimant, error) {
+	url := fmt.Sprint(viper.GetString("dega_url"), "/fact-check/claimants?all=true")
+	req, _ := http.NewRequest("GET", url, nil)
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-User", fmt.Sprint(uID))
+	req.Header.Set("X-Space", fmt.Sprint(sID))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	var pagingRes paging
+	err = json.NewDecoder(resp.Body).Decode(&pagingRes)
+	if err != nil {
+		return nil, err
+	}
+
+	claimantMap := make(map[uint]model.Claimant)
+	for _, claimant := range pagingRes.Nodes {
+		if util.Contains(ids, claimant.ID) {
+			claimantMap[claimant.ID] = claimant
+		}
+	}
+	return claimantMap, nil
 }
