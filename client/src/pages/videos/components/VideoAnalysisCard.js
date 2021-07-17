@@ -7,7 +7,7 @@ import { deleteVideo, getVideos } from "../../../actions/videos";
 import HorizontalTimelineBar from "../components/AnalysisTimelineBar/HorizontalTimelineBar";
 import ImagePlaceholder from "../../../components/ImagePlaceholder";
 
-function VideoAnalysisCard({ data }) {
+function VideoAnalysisCard({ data, filters }) {
   const history = useHistory();
   const dispatch = useDispatch();
 
@@ -92,7 +92,7 @@ function VideoAnalysisCard({ data }) {
               title="Sure to Delete?"
               onConfirm={() =>
                 dispatch(deleteVideo(data.video.id)).then(() =>
-                  dispatch(getVideos())
+                  dispatch(getVideos(filters))
                 )
               }
             >
