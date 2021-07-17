@@ -121,6 +121,9 @@ func create(w http.ResponseWriter, r *http.Request) {
 		SocialMediaURLs:   space.SocialMediaURLs,
 		OrganisationID:    space.OrganisationID,
 		ContactInfo:       space.ContactInfo,
+		HeaderCode:        space.HeaderCode,
+		FooterCode:        space.FooterCode,
+		MetaFields:        space.MetaFields,
 	}
 
 	tx := model.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
@@ -171,6 +174,9 @@ func create(w http.ResponseWriter, r *http.Request) {
 		"tag_line":        result.TagLine,
 		"organisation_id": result.OrganisationID,
 		"analytics":       result.Analytics,
+		"header_code":     result.HeaderCode,
+		"footer_code":     result.FooterCode,
+		"meta_fields":     result.MetaFields,
 	}
 
 	err = meilisearchx.AddDocument("vidcheck", meiliObj)

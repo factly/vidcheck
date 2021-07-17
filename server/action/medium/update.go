@@ -115,6 +115,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		FileSize:    medium.FileSize,
 		URL:         medium.URL,
 		Dimensions:  medium.Dimensions,
+		MetaFields:  medium.MetaFields,
 	}).First(&result).Error
 
 	if err != nil {
@@ -134,6 +135,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		"type":        result.Type,
 		"description": result.Description,
 		"space_id":    result.SpaceID,
+		"meta_fields": result.MetaFields,
 	}
 
 	err = meilisearchx.UpdateDocument("vidcheck", meiliObj)
