@@ -48,8 +48,8 @@ type videoReqData struct {
 }
 
 type videoResData struct {
-	Video  VideoData     `json:"video"`
-	Claims []model.Claim `json:"claims"`
+	Video  VideoData         `json:"video"`
+	Claims []model.ClaimData `json:"claims"`
 }
 
 type iFramelyRes struct {

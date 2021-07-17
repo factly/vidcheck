@@ -9,6 +9,7 @@ import (
 	"github.com/factly/vidcheck/config"
 
 	"github.com/factly/vidcheck/action/author"
+	"github.com/factly/vidcheck/action/claimant"
 	"github.com/factly/vidcheck/action/rating"
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
@@ -61,7 +62,8 @@ func details(w http.ResponseWriter, r *http.Request) {
 	videoObj.Tags = make([]model.Tag, 0)
 	videoObj.Categories = make([]model.Category, 0)
 	videoObj.ID = uint(id)
-	claimBlocks := []model.Claim{}
+	claimBlocks := make([]model.ClaimData, 0)
+	claimList := make([]model.Claim, 0)
 	videoAuthors := []model.VideoAuthor{}
 
 	err = model.DB.Model(&model.Video{}).Where(&model.Video{
@@ -75,6 +77,9 @@ func details(w http.ResponseWriter, r *http.Request) {
 
 	result.Video.Video = *videoObj
 	result.Video.Authors = make([]model.Author, 0)
+
+	var ratingMap map[uint]model.Rating
+	var claimantMap map[uint]model.Claimant
 
 	// fetch all authors
 	model.DB.Model(&model.VideoAuthor{}).Where(&model.VideoAuthor{
@@ -95,23 +100,42 @@ func details(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	stmt := model.DB.Model(&model.Claim{}).Order("start_time").Where("video_id = ?", uint(id)).Preload("Claimant")
+	model.DB.Model(&model.Claim{}).Order("start_time").Where("video_id = ?", uint(id)).Find(&claimList)
 
-	if !config.DegaIntegrated() {
-		stmt.Preload("Rating")
-	}
-
-	stmt.Find(&claimBlocks)
+	ratingIDs, claimantIDs := getRatingAndClaimantIDs(claimList)
 
 	if config.DegaIntegrated() {
-		ratingMap, err := rating.GetDegaRatings(uID, sID)
+		ratingMap, err := rating.GetDegaRatings(uID, sID, ratingIDs)
 		if err != nil {
 			loggerx.Error(err)
 			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
 			return
 		}
 
-		claimBlocks = AddDegaRatings(uID, sID, claimBlocks, ratingMap)
+		claimantMap, err := claimant.GetDegaClaimants(uID, sID, claimantIDs)
+		if err != nil {
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+			return
+		}
+
+		claimBlocks = AddEntities(uID, sID, claimList, ratingMap, claimantMap)
+	} else {
+
+		ratings := make([]model.Rating, 0)
+		claimants := make([]model.Claimant, 0)
+
+		model.DB.Model(model.Rating{}).Where(ratingIDs).Find(&ratings)
+
+		model.DB.Model(model.Claimant{}).Where(claimantIDs).Find(&claimants)
+
+		for _, rating := range ratings {
+			ratingMap[rating.ID] = rating
+		}
+		for _, claimant := range claimants {
+			claimantMap[claimant.ID] = claimant
+		}
+
 	}
 
 	for index, each := range claimBlocks {
@@ -133,12 +157,17 @@ func details(w http.ResponseWriter, r *http.Request) {
 	renderx.JSON(w, http.StatusOK, result)
 }
 
-// AddDegaRatings added ratings from dega server in claim list
-func AddDegaRatings(uID, sID int, claimList []model.Claim, ratingMap map[uint]model.Rating) []model.Claim {
-	for i := range claimList {
-		if rat, found := ratingMap[claimList[i].RatingID]; found {
-			claimList[i].Rating = &rat
+// AddEntities added ratings and claimants from dega server in claim list
+func AddEntities(uID, sID int, claimList []model.Claim, ratingMap map[uint]model.Rating, claimantMap map[uint]model.Claimant) []model.ClaimData {
+	claimBlocks := make([]model.ClaimData, 0)
+	for _, claim := range claimList {
+		claimObj := model.ClaimData{
+			Claim:    claim,
+			Rating:   ratingMap[claim.RatingID],
+			Claimant: claimantMap[claim.ClaimantID],
 		}
+		claimBlocks = append(claimBlocks, claimObj)
+
 	}
-	return claimList
+	return claimBlocks
 }

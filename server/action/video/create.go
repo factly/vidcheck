@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/factly/vidcheck/action/author"
+	"github.com/factly/vidcheck/action/claimant"
 	"github.com/factly/vidcheck/action/rating"
 	"github.com/spf13/viper"
 
@@ -194,50 +195,12 @@ func create(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	err = insertVideoIntoMeili(videoObj)
-	if err != nil {
-		tx.Rollback()
-		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-		return
-	}
-
-	claimBlocks := []model.Claim{}
-	ratingMap := make(map[int]*model.Rating)
-	var degaRatingMap map[uint]model.Rating
-
-	if config.DegaIntegrated() {
-		degaRatingMap, err = rating.GetDegaRatings(uID, sID)
-		if err != nil {
-			tx.Rollback()
-			loggerx.Error(err)
-			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-			return
-		}
-	}
+	claimBlocks := make([]model.ClaimData, 0)
+	claimList := []model.Claim{}
+	var ratingMap map[uint]model.Rating
+	var claimantMap map[uint]model.Claimant
 
 	for _, claimBlock := range videoData.Claims {
-
-		// check if associated rating exist
-		if config.DegaIntegrated() {
-			if rat, found := degaRatingMap[claimBlock.RatingID]; found {
-				ratingMap[claimBlock.EndTime] = &rat
-			} else {
-				err = errors.New(`rating does not exist in dega`)
-			}
-		} else {
-			rat := model.Rating{}
-			rat.ID = claimBlock.RatingID
-			err = tx.First(&rat).Error
-		}
-
-		if err != nil {
-			tx.Rollback()
-			loggerx.Error(err)
-			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-			return
-		}
-
 		// Store HTML description
 		var description string
 		if len(claimBlock.Description.RawMessage) > 0 && !reflect.DeepEqual(claimBlock.Description, util.NilJsonb()) {
@@ -249,7 +212,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		claimBlockObj := model.Claim{
+		claimBlockObj := &model.Claim{
 			VideoID:         videoObj.ID,
 			RatingID:        claimBlock.RatingID,
 			Claim:           claimBlock.Claim,
@@ -265,10 +228,61 @@ func create(w http.ResponseWriter, r *http.Request) {
 			HTMLDescription: description,
 			SpaceID:         uint(sID),
 		}
-		claimBlocks = append(claimBlocks, claimBlockObj)
+
+		claimList = append(claimList, *claimBlockObj)
 	}
 
-	err = tx.Create(&claimBlocks).Error
+	ratingIDs, claimantIDs := getRatingAndClaimantIDs(claimList)
+
+	if config.DegaIntegrated() {
+		ratingMap, err = rating.GetDegaRatings(uID, sID, ratingIDs)
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+			return
+		}
+		claimantMap, err = claimant.GetDegaClaimants(uID, sID, claimantIDs)
+
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+			return
+		}
+	} else {
+
+		ratings := make([]model.Rating, 0)
+		claimants := make([]model.Claimant, 0)
+
+		model.DB.Model(model.Rating{}).Where(ratingIDs).Find(&ratings)
+
+		model.DB.Model(model.Claimant{}).Where(claimantIDs).Find(&claimants)
+
+		for _, rating := range ratings {
+			ratingMap[rating.ID] = rating
+		}
+		for _, claimant := range claimants {
+			claimantMap[claimant.ID] = claimant
+		}
+	}
+
+	if !(len(ratingIDs) == len(ratingMap) && len(claimantIDs) == len(claimantMap)) {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.GetMessage("Invalid rating or claimant id", http.StatusUnprocessableEntity)))
+		return
+	}
+
+	err = insertVideoIntoMeili(videoObj, ratingIDs, claimantIDs, videoData.Video.TagIDs, videoData.Video.CategoryIDs)
+	if err != nil {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	err = tx.Create(&claimList).Error
 	if err != nil {
 		tx.Rollback()
 		loggerx.Error(err)
@@ -276,7 +290,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, claim := range claimBlocks {
+	for _, claim := range claimList {
 		var claimMeiliDate int64 = 0
 		if claim.ClaimDate != nil {
 			claimMeiliDate = claim.ClaimDate.Unix()
@@ -294,20 +308,17 @@ func create(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	stmt := tx.Model(&model.Claim{}).Order("start_time").Where("video_id = ?", videoObj.ID).Preload("Claimant")
-
-	if !config.DegaIntegrated() {
-		stmt.Preload("Rating")
-	}
-
-	stmt.Find(&claimBlocks)
-
 	tx.Commit()
 
-	if config.DegaIntegrated() {
-		for i := range claimBlocks {
-			claimBlocks[i].Rating = ratingMap[claimBlocks[i].EndTime]
+	for _, claim := range claimList {
+		claimData := model.ClaimData{
+			Claim: claim,
 		}
+		claimData.Rating = ratingMap[claim.RatingID]
+		claimData.Claimant = claimantMap[claim.ClaimantID]
+
+		claimBlocks = append(claimBlocks, claimData)
+
 	}
 
 	result.Claims = claimBlocks
@@ -315,7 +326,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 	renderx.JSON(w, http.StatusCreated, result)
 }
 
-func insertVideoIntoMeili(video model.Video) error {
+func insertVideoIntoMeili(video model.Video, ratingIDs []uint, claimantIDs []uint, tagIds []uint, categoryIds []uint) error {
 	meiliObj := map[string]interface{}{
 		"id":             video.ID,
 		"kind":           "video",
@@ -327,6 +338,10 @@ func insertVideoIntoMeili(video model.Video) error {
 		"status":         video.Status,
 		"total_duration": video.TotalDuration,
 		"space_id":       video.SpaceID,
+		"rating_ids":     ratingIDs,
+		"claimant_ids":   claimantIDs,
+		"tag_ids":        tagIds,
+		"category_ids":   categoryIds,
 	}
 
 	return meilisearchx.AddDocument("vidcheck", meiliObj)
@@ -371,4 +386,27 @@ func getPublishPermissions(oID, sID, uID int) (int, error) {
 	}
 
 	return resStatus, nil
+}
+
+func getRatingAndClaimantIDs(claims []model.Claim) ([]uint, []uint) {
+
+	ratingIDs := make([]uint, 0)
+	claimantIDs := make([]uint, 0)
+
+	rMap := make(map[uint]uint)
+	cMap := make(map[uint]uint)
+
+	for _, each := range claims {
+		rMap[each.RatingID] = each.RatingID
+		cMap[each.ClaimantID] = each.ClaimantID
+	}
+
+	for _, rid := range rMap {
+		ratingIDs = append(ratingIDs, rid)
+	}
+	for _, cid := range cMap {
+		claimantIDs = append(claimantIDs, cid)
+	}
+
+	return ratingIDs, claimantIDs
 }
