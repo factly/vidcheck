@@ -18,6 +18,7 @@ type Claimant struct {
 	HTMLDescription string         `gorm:"column:html_description" json:"html_description,omitempty"`
 	TagLine         string         `gorm:"column:tag_line" json:"tag_line"`
 	SpaceID         uint           `gorm:"column:space_id" json:"space_id"`
+	MetaFields      postgres.Jsonb `gorm:"column:meta_fields" json:"meta_fields" swaggertype:"primitive,string"`
 }
 
 var claimantUser ContextKey = "claimant_user"

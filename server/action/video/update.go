@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/factly/vidcheck/action/author"
+	"github.com/factly/vidcheck/action/claimant"
 	"github.com/factly/vidcheck/action/rating"
 	"github.com/factly/vidcheck/config"
 	"github.com/factly/vidcheck/model"
@@ -108,18 +109,8 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var degaRatingMap map[uint]model.Rating
-
-	if config.DegaIntegrated() {
-		degaRatingMap, err = rating.GetDegaRatings(uID, sID)
-		if err != nil {
-			loggerx.Error(err)
-			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-			return
-		}
-	}
-
-	ratingMap := make(map[int]*model.Rating)
+	ratingMap := make(map[uint]model.Rating)
+	claimantMap := make(map[uint]model.Claimant)
 
 	tx := model.DB.Begin()
 
@@ -286,6 +277,65 @@ func update(w http.ResponseWriter, r *http.Request) {
 		meiliPublishDate = videoObj.PublishedDate.Unix()
 	}
 
+	var updatedOrCreatedVideoBlock []uint
+
+	ratingIds := make([]uint, 0)
+	claimantIds := make([]uint, 0)
+	rMap := make(map[uint]uint)
+	cMap := make(map[uint]uint)
+
+	for _, each := range videoData.Claims {
+
+		rMap[each.RatingID] = each.RatingID
+		cMap[each.ClaimantID] = each.ClaimantID
+
+	}
+	for _, rid := range rMap {
+		ratingIds = append(ratingIds, rid)
+	}
+	for _, cid := range cMap {
+		claimantIds = append(claimantIds, cid)
+	}
+
+	if config.DegaIntegrated() {
+		ratingMap, err = rating.GetDegaRatings(uID, sID, ratingIds)
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+			return
+		}
+		claimantMap, err = claimant.GetDegaClaimants(uID, sID, claimantIds)
+		if err != nil {
+			tx.Rollback()
+			loggerx.Error(err)
+			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+			return
+		}
+	} else {
+
+		ratings := make([]model.Rating, 0)
+		claimants := make([]model.Claimant, 0)
+
+		model.DB.Model(model.Rating{}).Where(ratingIds).Find(&ratings)
+
+		model.DB.Model(model.Claimant{}).Where(claimantIds).Find(&claimants)
+
+		for _, rating := range ratings {
+			ratingMap[rating.ID] = rating
+		}
+		for _, claimant := range claimants {
+			claimantMap[claimant.ID] = claimant
+		}
+	}
+
+	if !(len(ratingIds) == len(ratingMap) && len(claimantIds) == len(claimantMap)) {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.GetMessage("Invalid rating or claimant id", http.StatusUnprocessableEntity)))
+		return
+	}
+
 	meiliVideoObj := map[string]interface{}{
 		"id":                 videoObj.ID,
 		"kind":               "video",
@@ -301,6 +351,8 @@ func update(w http.ResponseWriter, r *http.Request) {
 		"tag_ids":            videoData.Video.TagIDs,
 		"category_ids":       videoData.Video.CategoryIDs,
 		"author_ids":         videoData.Video.AuthorIDs,
+		"rating_ids":         ratingIds,
+		"claimant_ids":       claimantIds,
 	}
 
 	err = meilisearchx.UpdateDocument("vidcheck", meiliVideoObj)
@@ -311,28 +363,8 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var updatedOrCreatedVideoBlock []uint
 	for _, claimBlock := range videoData.Claims {
 		if claimBlock.ID != uint(0) {
-			// check if new rating exist
-			if config.DegaIntegrated() {
-				if rat, found := degaRatingMap[claimBlock.RatingID]; found {
-					ratingMap[claimBlock.EndTime] = &rat
-				} else {
-					err = errors.New(`rating does not exist in dega`)
-				}
-			} else {
-				rat := model.Rating{}
-				rat.ID = claimBlock.RatingID
-				err = tx.First(&rat).Error
-			}
-
-			if err != nil {
-				tx.Rollback()
-				loggerx.Error(err)
-				errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-				return
-			}
 
 			claimBlockObj := &model.Claim{}
 			claimBlockObj.ID = uint(claimBlock.ID)
@@ -372,25 +404,6 @@ func update(w http.ResponseWriter, r *http.Request) {
 			}
 			updatedOrCreatedVideoBlock = append(updatedOrCreatedVideoBlock, claimBlockObj.ID)
 		} else {
-			// check if new rating exist
-			if config.DegaIntegrated() {
-				if rat, found := degaRatingMap[claimBlock.RatingID]; found {
-					ratingMap[claimBlock.EndTime] = &rat
-				} else {
-					err = errors.New(`rating does not exist in dega`)
-				}
-			} else {
-				rat := model.Rating{}
-				rat.ID = claimBlock.RatingID
-				err = tx.First(&rat).Error
-			}
-
-			if err != nil {
-				tx.Rollback()
-				loggerx.Error(err)
-				errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-				return
-			}
 
 			claimBlockObj := model.Claim{}
 
@@ -436,10 +449,10 @@ func update(w http.ResponseWriter, r *http.Request) {
 	}
 	// delete all the videoAnalysisBlocks which is neither updated/created.
 	if len(updatedOrCreatedVideoBlock) > 0 {
-		claimBlocks := []model.Claim{}
-		tx.Model(&model.Claim{}).Not(updatedOrCreatedVideoBlock).Where("video_id = ?", uint(id)).Delete(&claimBlocks)
+		claims := []model.Claim{}
+		tx.Model(&model.Claim{}).Not(updatedOrCreatedVideoBlock).Where("video_id = ?", uint(id)).Delete(&claims)
 
-		for _, claim := range claimBlocks {
+		for _, claim := range claims {
 			err = meilisearchx.DeleteDocument("vidcheck", claim.ID, "claim")
 			if err != nil {
 				tx.Rollback()
@@ -453,18 +466,10 @@ func update(w http.ResponseWriter, r *http.Request) {
 	tx.Commit()
 
 	// Get all video claimBlocks.
-	claimBlocks := []model.Claim{}
-	stmt := model.DB.Model(&model.Claim{}).Order("start_time").Where("video_id = ?", uint(id)).Preload("Claimant")
+	claimList := []model.Claim{}
+	model.DB.Model(&model.Claim{}).Order("start_time").Where("video_id = ?", uint(id)).Find(&claimList)
 
-	if !config.DegaIntegrated() {
-		stmt.Preload("Rating")
-	}
-
-	stmt.Find(&claimBlocks)
-
-	if config.DegaIntegrated() {
-		claimBlocks = AddDegaRatings(uID, sID, claimBlocks, degaRatingMap)
-	}
+	claimBlocks := AddEntities(uID, sID, claimList, ratingMap, claimantMap)
 
 	result.Claims = claimBlocks
 

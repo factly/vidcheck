@@ -115,6 +115,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		SpaceID:          uint(sID),
 		MediumID:         mediumID,
 		HTMLDescription:  description,
+		MetaFields:       rating.MetaFields,
 	}
 
 	tx := model.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
@@ -154,6 +155,7 @@ func insertIntoMeili(rating model.Rating) error {
 		"numeric_value":     rating.NumericValue,
 		"medium_id":         rating.MediumID,
 		"space_id":          rating.SpaceID,
+		"meta_fields":       rating.MetaFields,
 	}
 
 	return meilisearchx.AddDocument("vidcheck", meiliObj)

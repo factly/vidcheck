@@ -2,6 +2,7 @@ package rating
 
 import (
 	"github.com/factly/vidcheck/model"
+	"github.com/factly/vidcheck/util"
 	"github.com/go-chi/chi"
 	"github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -15,6 +16,7 @@ type rating struct {
 	BackgroundColour postgres.Jsonb `json:"background_colour" validate:"required" swaggertype:"primitive,string"`
 	TextColour       postgres.Jsonb `json:"text_colour" validate:"required" swaggertype:"primitive,string"`
 	MediumID         uint           `json:"medium_id"`
+	MetaFields       postgres.Jsonb `json:"meta_fields" swaggertype:"primitive,string"`
 }
 
 var userContext model.ContextKey = "rating_user"
@@ -23,14 +25,16 @@ var userContext model.ContextKey = "rating_user"
 func Router() chi.Router {
 	r := chi.NewRouter()
 
-	r.Get("/", list)
-	r.Post("/", create)
-	r.Post("/default", createDefaults)
+	entity := "ratings"
+
+	r.With(util.CheckKetoPolicy(entity, "get")).Get("/", list)
+	r.With(util.CheckKetoPolicy(entity, "create")).Post("/", create)
+	r.With(util.CheckKetoPolicy(entity, "create")).Post("/default", createDefaults)
 
 	r.Route("/{rating_id}", func(r chi.Router) {
-		r.Get("/", details)
-		r.Put("/", update)
-		r.Delete("/", delete)
+		r.With(util.CheckKetoPolicy(entity, "get")).Get("/", details)
+		r.With(util.CheckKetoPolicy(entity, "update")).Put("/", update)
+		r.With(util.CheckKetoPolicy(entity, "delete")).Delete("/", delete)
 	})
 
 	return r

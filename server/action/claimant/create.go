@@ -88,6 +88,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		TagLine:         claimant.TagLine,
 		MediumID:        mediumID,
 		HTMLDescription: description,
+		MetaFields:      claimant.MetaFields,
 	}
 
 	tx := model.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
@@ -113,6 +114,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		"tag_line":    result.TagLine,
 		"space_id":    result.SpaceID,
 		"medium_id":   mediumID,
+		"meta_fields": result.MetaFields,
 	}
 
 	err = meilisearchx.AddDocument("vidcheck", meiliObj)

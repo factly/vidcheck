@@ -2,7 +2,7 @@ import React from "react";
 import { List, Space } from "antd";
 import VideoAnalysisCard from "./VideoAnalysisCard";
 
-function VideoList({ videos, loading, total, filters, setFilters, onDeleteVideo }) {
+function VideoList({ videos, loading, total, filters, setFilters }) {
   return (
     <Space direction="vertical">
       <List
@@ -18,9 +18,9 @@ function VideoList({ videos, loading, total, filters, setFilters, onDeleteVideo 
           onChange: (pageNumber, pageSize) =>
             setFilters({ ...filters, page: pageNumber, limit: pageSize }),
         }}
-        renderItem={(item, index) => (
-          <List.Item key={index}>
-            <VideoAnalysisCard data={item} onDeleteVideo={onDeleteVideo} key={index} />
+        renderItem={(item) => (
+          <List.Item>
+            <VideoAnalysisCard data={item} filters={filters} />
           </List.Item>
         )}
       ></List>
