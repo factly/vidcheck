@@ -9,8 +9,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/factly/vidcheck/config"
-
 	"github.com/factly/vidcheck/model"
 	"github.com/spf13/viper"
 )
@@ -37,7 +35,14 @@ const SpaceIDKey ctxKeySpaceID = 0
 func CheckSpace(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		if strings.Split(strings.Trim(r.URL.Path, "/"), "/")[0] != "spaces" {
+		action := strings.Split(strings.Trim(r.URL.Path, "/"), "/")[0]
+
+		if viper.GetBool("dega_integration") {
+			h.ServeHTTP(w, r)
+			return
+		}
+
+		if action != "spaces" {
 			space := r.Header.Get("X-Space")
 			if space == "" {
 				w.WriteHeader(http.StatusUnauthorized)
@@ -54,21 +59,13 @@ func CheckSpace(h http.Handler) http.Handler {
 			ctx = context.WithValue(ctx, SpaceIDKey, sid)
 
 			var spaceObj *model.Space
-			if !config.DegaIntegrated() {
-				spaceObj = &model.Space{}
-				spaceObj.ID = uint(sid)
 
-				err = model.DB.First(&spaceObj).Error
-				if err != nil {
-					w.WriteHeader(http.StatusUnauthorized)
-					return
-				}
-			} else {
-				_, err := GetDegaSpace(ctx)
-				if err != nil {
-					w.WriteHeader(http.StatusUnauthorized)
-					return
-				}
+			spaceObj.ID = uint(sid)
+
+			err = model.DB.First(&spaceObj).Error
+			if err != nil {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
 			}
 
 			h.ServeHTTP(w, r.WithContext(ctx))
@@ -90,23 +87,16 @@ func GetSpace(ctx context.Context) (int, error) {
 	return 0, errors.New("something went wrong")
 }
 
-// GetDegaSpace returns space ID from dega
-func GetDegaSpace(ctx context.Context) (*model.Space, error) {
-	if ctx == nil {
-		return nil, errors.New("context not found")
-	}
-	spaceID := ctx.Value(SpaceIDKey)
-	uID, err := GetUser(ctx)
-	if err != nil {
-		return nil, err
-	}
+// GetDegaSpace returns space from dega
+func GetDegaSpace(headers map[string][]string) (*model.Space, error) {
 
-	if spaceID != nil {
-		url := fmt.Sprint(viper.GetString("dega_url"), "/core/spaces")
+	sID := headers["X-Space"]
+
+	if len(sID) > 0 {
+		url := fmt.Sprint(viper.GetString("dega_url"), "/core/spaces/", sID[0])
 		req, _ := http.NewRequest("GET", url, nil)
 
-		req.Header.Set("Content-Type", "application/json")
-		req.Header.Set("X-User", fmt.Sprint(uID))
+		req.Header = headers
 
 		client := &http.Client{}
 		resp, err := client.Do(req)
@@ -116,19 +106,15 @@ func GetDegaSpace(ctx context.Context) (*model.Space, error) {
 
 		defer resp.Body.Close()
 
-		var orgWithSpaceList []orgWithSpace
-		err = json.NewDecoder(resp.Body).Decode(&orgWithSpaceList)
+		var space model.Space
+		err = json.NewDecoder(resp.Body).Decode(&space)
 		if err != nil {
 			return nil, err
 		}
 
-		for _, org := range orgWithSpaceList {
-			for _, space := range org.Spaces {
-				if int(space.ID) == spaceID.(int) {
-					return &space, nil
-				}
-			}
-		}
+		return &space, nil
 	}
-	return nil, errors.New("something went wrong")
+
+	return nil, errors.New("Invalid space id")
+
 }
