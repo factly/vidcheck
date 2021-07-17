@@ -1,17 +1,17 @@
-import React from 'react';
-import { Popconfirm, Button, Table, Space } from 'antd';
-import { useDispatch } from 'react-redux';
-import { deleteTag } from '../../../actions/tags';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Popconfirm, Button, Table, Space } from "antd";
+import { useDispatch } from "react-redux";
+import { deleteTag } from "../../../actions/tags";
+import { Link } from "react-router-dom";
 
 function TagList({ actions, filters, setFilters, fetchTags, data }) {
   const dispatch = useDispatch();
   const columns = [
-    { title: 'Name', dataIndex: 'name', key: 'name', width: '15%' },
-    { title: 'Slug', dataIndex: 'slug', key: 'slug', width: '15%' },
+    { title: "Name", dataIndex: "name", key: "name", width: "15%" },
+    { title: "Slug", dataIndex: "slug", key: "slug", width: "15%" },
     {
-      title: 'Action',
-      dataIndex: 'operation',
+      title: "Action",
+      dataIndex: "operation",
       render: (_, record) => {
         return (
           <span>
@@ -22,16 +22,26 @@ function TagList({ actions, filters, setFilters, fetchTags, data }) {
               }}
               to={`/tags/${record.id}/edit`}
             >
-              <Button disabled={!(actions.includes('admin') || actions.includes('update'))}>
+              <Button
+                disabled={
+                  !(actions.includes("admin") || actions.includes("update"))
+                }
+              >
                 Edit
               </Button>
             </Link>
             <Popconfirm
               title="Sure to Delete?"
-              onConfirm={() => dispatch(deleteTag(record.id)).then(() => fetchTags())}
+              onConfirm={() =>
+                dispatch(deleteTag(record.id)).then(() => fetchTags())
+              }
             >
               <Link to="" className="ant-dropdown-link">
-                <Button disabled={!(actions.includes('admin') || actions.includes('delete'))}>
+                <Button
+                  disabled={
+                    !(actions.includes("admin") || actions.includes("delete"))
+                  }
+                >
                   Delete
                 </Button>
               </Link>
@@ -39,18 +49,18 @@ function TagList({ actions, filters, setFilters, fetchTags, data }) {
           </span>
         );
       },
-      width: '20%',
+      width: "20%",
     },
   ];
 
   return (
-    <Space direction={'vertical'}>
+    <Space direction={"vertical"}>
       <Table
         bordered
         columns={columns}
         dataSource={data.tags}
         loading={data.loading}
-        rowKey={'id'}
+        rowKey={"id"}
         pagination={{
           total: data.total,
           current: filters.page,

@@ -103,7 +103,7 @@ function RatingList() {
             );
           }}
         >
-          <PlusOutlined /> Create Ratings
+          <PlusOutlined /> Create Default Ratings
         </Button>
       ) : null}
       <Table

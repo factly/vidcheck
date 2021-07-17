@@ -1,11 +1,11 @@
 import React from "react";
-import { Space, Button, Row, Col, Form, Input, Select } from 'antd';
+import { Space, Button, Row, Col, Form, Input, Select } from "antd";
 import { Link } from "react-router-dom";
 import VideoList from "./components/VideoList";
 import { useDispatch, useSelector } from "react-redux";
-import Selector from '../../components/Selector'
-import { getVideos } from "../../actions/videos";
-import deepEqual from 'deep-equal';
+import Selector from "../../components/Selector";
+import { deleteVideo, getVideos } from "../../actions/videos";
+import deepEqual from "deep-equal";
 
 function Videos({ permission }) {
   const dispatch = useDispatch();
@@ -40,13 +40,17 @@ function Videos({ permission }) {
     return { videos: [], total: 0, loading: videos.loading };
   });
 
+  const onDeleteVideo = (id) => {
+    dispatch(deleteVideo(id)).then(() => dispatch(getVideos(filters)));
+  };
+
   const onSave = (values) => {
     let filterValue = {
       tag: values.tags,
       category: values.categories,
       sort: values.sort,
       q: values.q,
-      status: values.status !== 'all' ? values.status : null,
+      status: values.status !== "all" ? values.status : null,
     };
 
     setFilters({ ...filters, ...filterValue });
@@ -58,7 +62,7 @@ function Videos({ permission }) {
         form={form}
         name="filters"
         onFinish={(values) => onSave(values)}
-        style={{ maxWidth: '100%' }}
+        style={{ maxWidth: "100%" }}
         onValuesChange={(changedValues, allValues) => {
           if (!changedValues.q) {
             onSave(allValues);
@@ -68,7 +72,11 @@ function Videos({ permission }) {
         <Row gutter={24}>
           <Col key={1} span={5}>
             <Link to="/fact-checks/create">
-              <Button disabled={!(actions.includes('admin') || actions.includes('create'))}>
+              <Button
+                disabled={
+                  !(actions.includes("admin") || actions.includes("create"))
+                }
+              >
                 Create New
               </Button>
             </Link>
@@ -81,7 +89,7 @@ function Videos({ permission }) {
               <Form.Item>
                 <Button htmlType="submit">Search</Button>
               </Form.Item>
-              <Form.Item name="sort" label="Sort" style={{ width: '100%' }}>
+              <Form.Item name="sort" label="Sort" style={{ width: "100%" }}>
                 <Select defaultValue="desc">
                   <Option value="desc">Latest</Option>
                   <Option value="asc">Old</Option>
@@ -91,14 +99,22 @@ function Videos({ permission }) {
           </Col>
         </Row>
         <Row gutter={24}>
-          <Col span={4} >
+          <Col span={4}>
             <Form.Item name="tags" label="Tags">
-              <Selector mode="multiple" action="Tags" placeholder="Filter Tags" />
+              <Selector
+                mode="multiple"
+                action="Tags"
+                placeholder="Filter Tags"
+              />
             </Form.Item>
           </Col>
           <Col span={4} offset={1}>
             <Form.Item name="categories" label="Categories">
-              <Selector mode="multiple" action="Categories" placeholder="Filter Categories" />
+              <Selector
+                mode="multiple"
+                action="Categories"
+                placeholder="Filter Categories"
+              />
             </Form.Item>
           </Col>
           <Col span={4} key={4} offset={1}>
@@ -113,7 +129,14 @@ function Videos({ permission }) {
           </Col>
         </Row>
       </Form>
-      <VideoList videos={videos} loading={loading} total={total} filters={filters} setFilters={setFilters} />
+      <VideoList
+        videos={videos}
+        loading={loading}
+        total={total}
+        filters={filters}
+        setFilters={setFilters}
+        onDeleteVideo={onDeleteVideo}
+      />
     </Space>
   );
 }

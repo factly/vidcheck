@@ -1,7 +1,7 @@
-import React from 'react';
-import SpaceRequestList from './components/RequestList';
-import { Space, Button } from 'antd';
-import { Link } from 'react-router-dom';
+import React from "react";
+import SpaceRequestList from "./components/RequestList";
+import { Space, Button } from "antd";
+import { Link } from "react-router-dom";
 
 function SpaceRequests() {
   return (

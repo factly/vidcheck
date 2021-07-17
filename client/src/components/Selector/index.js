@@ -1,7 +1,7 @@
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Select, Empty, Button } from 'antd';
-import deepEqual from 'deep-equal';
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Select, Empty, Button } from "antd";
+import deepEqual from "deep-equal";
 
 function Selector({
   mode,
@@ -9,7 +9,7 @@ function Selector({
   value,
   onChange,
   action,
-  display = 'name',
+  display = "name",
   placeholder,
   style,
 }) {
@@ -49,7 +49,9 @@ function Selector({
     let total = 0;
 
     for (var i = 1; i <= query.page; i++) {
-      let j = state[entity].req.findIndex((item) => deepEqual(item.query, { ...query, page: i }));
+      let j = state[entity].req.findIndex((item) =>
+        deepEqual(item.query, { ...query, page: i })
+      );
       if (j > -1) {
         total = state[entity].req[j].total;
         ids = ids.concat(state[entity].req[j].data);
@@ -61,16 +63,20 @@ function Selector({
       .map((id) => state[entity].details[id]);
 
     details = details.concat(
-      ids.filter((id) => !value.includes(id)).map((id) => state[entity].details[id]),
+      ids
+        .filter((id) => !value.includes(id))
+        .map((id) => state[entity].details[id])
     );
 
-    if (action === 'Organisations') {
+    if (action === "Organisations") {
       const req = state[entity].req;
 
       if (req.length > 0 && req[0].total > 0) {
         const details = Object.keys(state[entity].details)
           .map((key, index) => {
-            return !state[entity].details[key].permission ? state[entity].details[key] : undefined;
+            return !state[entity].details[key].permission
+              ? state[entity].details[key]
+              : undefined;
           })
           .filter((each) => each);
         return {
@@ -94,12 +100,12 @@ function Selector({
   }, [query]);
 
   const fetchEntities = () => {
-    dispatch(selectorType['get' + action](query));
+    dispatch(selectorType["get" + action](query));
   };
 
   return (
     <Select
-      allowClear={mode === 'mutliple' ? false : true}
+      allowClear={mode === "mutliple" ? false : true}
       bordered
       listHeight={128}
       loading={loading}
@@ -113,7 +119,10 @@ function Selector({
         option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
       onPopupScroll={(e) => {
-        if (e.target.scrollTop + e.target.offsetHeight === e.target.scrollHeight) {
+        if (
+          e.target.scrollTop + e.target.offsetHeight ===
+          e.target.scrollHeight
+        ) {
           if (details.length < total) {
             setQuery({ ...query, page: query.page + 1 });
           }
@@ -125,15 +134,15 @@ function Selector({
             block
             type="dashed"
             style={{
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
             }}
             onClick={() =>
               dispatch(
-                selectorType['add' + createEntity]({
+                selectorType["add" + createEntity]({
                   name: query.q.trim(),
-                }),
+                })
               ).then(() => setQuery({ page: 1 }), setEntityCreatedFlag(true))
             }
           >

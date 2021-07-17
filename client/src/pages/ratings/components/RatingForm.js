@@ -4,6 +4,8 @@ import { maker, checker } from "../../../utils/sluger";
 import { ChromePicker } from "react-color";
 import Editor from "../../../components/Editor";
 import MediaSelector from "../../../components/MediaSelector";
+import MonacoEditor from "../../../components/MonacoEditor";
+import getJsonValue from "../../../utils/getJsonValue";
 
 const layout = {
   labelCol: {
@@ -21,6 +23,11 @@ const tailLayout = {
 };
 
 const RatingForm = ({ onCreate, data = {} }) => {
+  if (data && data.meta_fields) {
+    if (typeof data.meta_fields !== "string") {
+      data.meta_fields = JSON.stringify(data.meta_fields);
+    }
+  }
   const [form] = Form.useForm();
   const [backgroundColour, setBackgroundColour] = useState(
     data.background_colour ? data.background_colour : null
@@ -29,14 +36,14 @@ const RatingForm = ({ onCreate, data = {} }) => {
     data.text_colour ? data.text_colour : null
   );
 
-  const [name, setName] = useState('')
+  const [name, setName] = useState("");
 
   const onReset = () => {
     form.resetFields();
   };
 
   const onTitleChange = (string) => {
-    setName(string)
+    setName(string);
     form.setFieldsValue({
       slug: maker(string),
     });
@@ -49,6 +56,9 @@ const RatingForm = ({ onCreate, data = {} }) => {
       initialValues={{ ...data }}
       name="creat-rating"
       onFinish={(values) => {
+        if (values.meta_fields) {
+          values.meta_fields = getJsonValue(values.meta_fields);
+        }
         onCreate(values);
         onReset();
       }}
@@ -114,33 +124,38 @@ const RatingForm = ({ onCreate, data = {} }) => {
         />
       </Form.Item>
 
-      {name ? <Row
-        className="preview-container"
-        gutter={16}
-        style={{ marginBottom: "1rem" }}
-      >
-        <Col span={10} style={{ textAlign: "right" }}>
-          Preview:
-        </Col>
-        <Col span={8}>
-          <div
-            className="preview"
-            style={{
-              textAlign: "center",
-              color: textColour?.hex,
-              background: backgroundColour?.hex,
-              width: "100px",
-              padding: "0.5rem 1rem",
-              border: "1px solid black",
-            }}
-          >
-            {name}
-          </div>
-        </Col>
-      </Row> : null}
+      {name ? (
+        <Row
+          className="preview-container"
+          gutter={16}
+          style={{ marginBottom: "1rem" }}
+        >
+          <Col span={10} style={{ textAlign: "right" }}>
+            Preview:
+          </Col>
+          <Col span={8}>
+            <div
+              className="preview"
+              style={{
+                textAlign: "center",
+                color: textColour?.hex,
+                background: backgroundColour?.hex,
+                width: "100px",
+                padding: "0.5rem 1rem",
+                border: "1px solid black",
+              }}
+            >
+              {name}
+            </div>
+          </Col>
+        </Row>
+      ) : null}
 
       <Form.Item name="description" label="Description">
         <Editor style={{ width: "600px" }} basic={true} />
+      </Form.Item>
+      <Form.Item name="meta_fields" label="Metafields">
+        <MonacoEditor language="json" />
       </Form.Item>
 
       <Form.Item {...tailLayout}>

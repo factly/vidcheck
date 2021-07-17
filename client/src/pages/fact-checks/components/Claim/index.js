@@ -12,7 +12,6 @@ import {
   convertTimeStringToSeconds,
 } from "../../../../utils/analysis";
 
-
 function Claim({ onCreate, claim, setClaim }) {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
@@ -76,8 +75,7 @@ function Claim({ onCreate, claim, setClaim }) {
   const disabledDate = (current) => {
     let customDate = new Date();
     return current > moment(customDate, "YYYY-MM-DDTHH:mm:ssZ");
-  }
-
+  };
 
   return (
     <>
@@ -87,16 +85,34 @@ function Claim({ onCreate, claim, setClaim }) {
           ...claim.data,
           end_time: convertSecondsToTimeString(claim.data.end_time),
           start_time: convertSecondsToTimeString(claim.data.start_time),
-          claim_date: claim.data.claim_date ? moment(claim.data.claim_date) : null,
-          checked_date: claim.data.checked_date ? moment(claim.data.checked_date) : null,
+          claim_date: claim.data.claim_date
+            ? moment(claim.data.claim_date)
+            : null,
+          checked_date: claim.data.checked_date
+            ? moment(claim.data.checked_date)
+            : null,
         }}
         form={form}
-        onValuesChange={() => setClaim({
-          ...claim, data: {
-            ...form.getFieldsValue(), end_time: convertTimeStringToSeconds(form.getFieldValue("end_time")), start_time: convertTimeStringToSeconds(form.getFieldValue("start_time")), claim_date: form.getFieldValue("claim_date") ? moment(form.getFieldValue("claim_date")) : null,
-            checked_date: form.getFieldValue("checked_date") ? moment(form.getFieldValue("checked_date")) : null,
-          }
-        })}
+        onValuesChange={() =>
+          setClaim({
+            ...claim,
+            data: {
+              ...form.getFieldsValue(),
+              end_time: convertTimeStringToSeconds(
+                form.getFieldValue("end_time")
+              ),
+              start_time: convertTimeStringToSeconds(
+                form.getFieldValue("start_time")
+              ),
+              claim_date: form.getFieldValue("claim_date")
+                ? moment(form.getFieldValue("claim_date"))
+                : null,
+              checked_date: form.getFieldValue("checked_date")
+                ? moment(form.getFieldValue("checked_date"))
+                : null,
+            },
+          })
+        }
         onFinish={(values) => {
           const rating = ratings.find((each) => each.id === values.rating_id);
           onCreate({
@@ -111,7 +127,6 @@ function Claim({ onCreate, claim, setClaim }) {
         name="control-hooks"
         layout={"vertical"}
       >
-
         <Form.Item
           style={{
             marginBottom: 0,
@@ -185,10 +200,7 @@ function Claim({ onCreate, claim, setClaim }) {
         <Form.Item name="claim" label="Claim">
           <Input.TextArea autoSize={{ minRows: 4, maxRows: 7 }} />
         </Form.Item>
-        <Form.Item
-          name="fact"
-          label="Fact"
-        >
+        <Form.Item name="fact" label="Fact">
           <Input.TextArea autoSize={{ minRows: 4, maxRows: 7 }} />
         </Form.Item>
         <Form.Item name={"description"} label={"Description"}>
@@ -257,7 +269,6 @@ function Claim({ onCreate, claim, setClaim }) {
             <Button onClick={onReset}>Reset Claim</Button>
           </div>
         </Form.Item>
-
       </Form>
     </>
   );

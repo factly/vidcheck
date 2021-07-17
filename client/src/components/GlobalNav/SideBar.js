@@ -31,7 +31,14 @@ function Sidebar({ superOrg, permission, orgs, loading }) {
     "organisations",
   ];
 
-  let protectedResouces = ["media", "categories", "claimants", "ratings", "fact-checks", "tags"];
+  let protectedResouces = [
+    "media",
+    "categories",
+    "claimants",
+    "ratings",
+    "fact-checks",
+    "tags",
+  ];
 
   permission.forEach((each) => {
     if (each.resource === "admin" || orgs[0]?.permission.role === "owner") {
@@ -99,7 +106,7 @@ function Sidebar({ superOrg, permission, orgs, loading }) {
               {menu.submenu && menu.submenu.length > 0 ? (
                 <>
                   {menu.submenu[0].isAdmin === superOrg.is_admin &&
-                    orgs[0]?.permission.role === "owner" ? (
+                  orgs[0]?.permission.role === "owner" ? (
                     <SubMenu
                       key={menu.submenu[0].title + index}
                       title={menu.submenu[0].title}

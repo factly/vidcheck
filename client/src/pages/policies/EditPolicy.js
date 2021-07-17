@@ -1,11 +1,11 @@
-import React from 'react';
-import PolicyEditForm from './components/PolicyForm';
-import { useDispatch, useSelector } from 'react-redux';
-import { Skeleton } from 'antd';
-import { getPolicy, updatePolicy } from '../../actions/policies';
-import { useHistory } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
-import RecordNotFound from '../../components/ErrorsAndImage/RecordNotFound';
+import React from "react";
+import PolicyEditForm from "./components/PolicyForm";
+import { useDispatch, useSelector } from "react-redux";
+import { Skeleton } from "antd";
+import { getPolicy, updatePolicy } from "../../actions/policies";
+import { useHistory } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import RecordNotFound from "../../components/ErrorsAndImage/RecordNotFound";
 
 function EditPolicy() {
   const history = useHistory();
@@ -25,7 +25,7 @@ function EditPolicy() {
         ...state.policies.details[id],
         permissions: state.policies.details[id].permissions.reduce(
           (obj, item) => Object.assign(obj, { [item.resource]: item.actions }),
-          {},
+          {}
         ),
         users: state.policies.details[id].users
           ? state.policies.details[id].users.map((item) => parseInt(item.id))
@@ -47,7 +47,7 @@ function EditPolicy() {
 
   const onUpdate = (values) => {
     dispatch(updatePolicy({ ...policy, ...values })).then(() =>
-      history.push(`/policies/${id}/edit`),
+      history.push(`/policies/${id}/edit`)
     );
   };
 

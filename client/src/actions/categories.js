@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 import {
   ADD_CATEGORY,
   ADD_CATEGORIES,
@@ -6,10 +6,10 @@ import {
   SET_CATEGORIES_LOADING,
   RESET_CATEGORIES,
   CATEGORIES_API,
-} from '../constants/categories';
-import { addErrorNotification, addSuccessNotification } from './notifications';
-import { addMediaList } from './media';
-import getError from '../utils/getError';
+} from "../constants/categories";
+import { addErrorNotification, addSuccessNotification } from "./notifications";
+import { addMediaList } from "./media";
+import getError from "../utils/getError";
 
 export const getCategories = (query) => {
   return (dispatch) => {
@@ -23,22 +23,22 @@ export const getCategories = (query) => {
           addMediaList(
             response.data.nodes
               .filter((category) => category.medium)
-              .map((category) => category.medium),
-          ),
+              .map((category) => category.medium)
+          )
         );
         dispatch(
           addCategoriesList(
             response.data.nodes.map((category) => {
               return { ...category, medium: category.medium?.id };
-            }),
-          ),
+            })
+          )
         );
         dispatch(
           addCategoriesRequest({
             data: response.data.nodes.map((item) => item.id),
             query: query,
             total: response.data.total,
-          }),
+          })
         );
       })
       .catch((error) => {
@@ -52,11 +52,17 @@ export const getCategory = (id) => {
   return (dispatch) => {
     dispatch(loadingCategories());
     return axios
-      .get(CATEGORIES_API + '/' + id)
+      .get(CATEGORIES_API + "/" + id)
       .then((response) => {
-        if (response.data.medium) dispatch(addMediaList([response.data.medium]));
+        if (response.data.medium)
+          dispatch(addMediaList([response.data.medium]));
 
-        dispatch(getCategoryByID({ ...response.data, medium: response.data.medium?.id }));
+        dispatch(
+          getCategoryByID({
+            ...response.data,
+            medium: response.data.medium?.id,
+          })
+        );
       })
       .catch((error) => {
         dispatch(addErrorNotification(getError(error)));
@@ -72,7 +78,7 @@ export const addCategory = (data) => {
       .post(CATEGORIES_API, data)
       .then(() => {
         dispatch(resetCategories());
-        dispatch(addSuccessNotification('Category added'));
+        dispatch(addSuccessNotification("Category added"));
       })
       .catch((error) => {
         dispatch(addErrorNotification(getError(error)));
@@ -84,12 +90,18 @@ export const updateCategory = (data) => {
   return (dispatch) => {
     dispatch(loadingCategories());
     return axios
-      .put(CATEGORIES_API + '/' + data.id, data)
+      .put(CATEGORIES_API + "/" + data.id, data)
       .then((response) => {
-        if (response.data.medium) dispatch(addMediaList([response.data.medium]));
+        if (response.data.medium)
+          dispatch(addMediaList([response.data.medium]));
 
-        dispatch(getCategoryByID({ ...response.data, medium: response.data.medium?.id }));
-        dispatch(addSuccessNotification('Category updated'));
+        dispatch(
+          getCategoryByID({
+            ...response.data,
+            medium: response.data.medium?.id,
+          })
+        );
+        dispatch(addSuccessNotification("Category updated"));
       })
       .catch((error) => {
         dispatch(addErrorNotification(getError(error)));
@@ -102,10 +114,10 @@ export const deleteCategory = (id) => {
   return (dispatch) => {
     dispatch(loadingCategories());
     return axios
-      .delete(CATEGORIES_API + '/' + id)
+      .delete(CATEGORIES_API + "/" + id)
       .then(() => {
         dispatch(resetCategories());
-        dispatch(addSuccessNotification('Category deleted'));
+        dispatch(addSuccessNotification("Category deleted"));
       })
       .catch((error) => {
         dispatch(addErrorNotification(getError(error)));
@@ -117,15 +129,17 @@ export const addCategories = (categories) => {
   return (dispatch) => {
     dispatch(
       addMediaList(
-        categories.filter((category) => category.medium).map((category) => category.medium),
-      ),
+        categories
+          .filter((category) => category.medium)
+          .map((category) => category.medium)
+      )
     );
     dispatch(
       addCategoriesList(
         categories.map((category) => {
           return { ...category, medium: category.medium?.id };
-        }),
-      ),
+        })
+      )
     );
   };
 };

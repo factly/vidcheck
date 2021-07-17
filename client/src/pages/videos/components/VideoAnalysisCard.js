@@ -18,21 +18,24 @@ function VideoAnalysisCard({ data, filters }) {
       if (ratingsCount[each.rating.name]) {
         ratingsCount[each.rating.name].count += 1;
       } else {
-        ratingsCount = { ...ratingsCount, [each.rating.name]: { count: 1, colour: each.rating.background_colour.hex } };
+        ratingsCount = {
+          ...ratingsCount,
+          [each.rating.name]: {
+            count: 1,
+            colour: each.rating.background_colour.hex,
+          },
+        };
       }
     });
   getRatingsCount();
 
   const statuses = {
-    'ready': 'Ready to Publish',
-    'draft': 'Draft',
-    'publish': 'Published'
-  }
+    ready: "Ready to Publish",
+    draft: "Draft",
+    publish: "Published",
+  };
 
-  useEffect(() => {
-
-  }, [dispatch])
-
+  useEffect(() => {}, [dispatch]);
 
   return (
     <React.Fragment key={data.video.id}>
@@ -79,7 +82,12 @@ function VideoAnalysisCard({ data, filters }) {
             {data.video.summary}
           </Typography.Paragraph>
           <div style={{ marginBottom: "auto", margin: 3 }}>
-            <Button onClick={() => history.push(`/fact-checks/${data.video.id}/preview`)} style={{ margin: 3 }}>
+            <Button
+              onClick={() =>
+                history.push(`/fact-checks/${data.video.id}/preview`)
+              }
+              style={{ margin: 3 }}
+            >
               Preview
             </Button>
             <Button
@@ -98,7 +106,11 @@ function VideoAnalysisCard({ data, filters }) {
             >
               <Button style={{ margin: 3 }}>Delete</Button>
             </Popconfirm>
-            {statuses[data.video.status] ? <Button style={{ margin: 3, cursor: 'initial' }} type="primary">{statuses[data.video.status]} </Button> : null}
+            {statuses[data.video.status] ? (
+              <Button style={{ margin: 3, cursor: "initial" }} type="primary">
+                {statuses[data.video.status]}{" "}
+              </Button>
+            ) : null}
           </div>
         </Col>
       </Row>

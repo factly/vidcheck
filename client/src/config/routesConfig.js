@@ -1,9 +1,9 @@
 import Videos from "../pages/videos";
 
 //Categories
-import Categories from '../pages/categories';
-import CreateCategory from '../pages/categories/CreateCategory';
-import EditCategory from '../pages/categories/EditCategory';
+import Categories from "../pages/categories";
+import CreateCategory from "../pages/categories/CreateCategory";
+import EditCategory from "../pages/categories/EditCategory";
 
 //Ratings
 import Ratings from "../pages/ratings";
@@ -24,7 +24,6 @@ import EditSpace from "../pages/spaces/EditSpace";
 import Media from "../pages/media";
 import UploadMedium from "../pages/media/UploadMedium";
 import EditMedium from "../pages/media/EditMedium";
-
 
 import Preview from "../pages/preview";
 
@@ -59,9 +58,9 @@ import Dashboard from "../pages/dashboard";
 import Analytics from "../pages/analytics";
 
 //Tags
-import Tags from '../pages/tags';
-import CreateTag from '../pages/tags/CreateTag';
-import EditTag from '../pages/tags/EditTag';
+import Tags from "../pages/tags";
+import CreateTag from "../pages/tags/CreateTag";
+import EditTag from "../pages/tags/EditTag";
 
 // Users & Permissions
 import Users from "../pages/users";
@@ -117,30 +116,30 @@ const routes = {
     },
   },
   categories: {
-    path: '/categories',
+    path: "/categories",
     Component: Categories,
-    title: 'Categories',
+    title: "Categories",
     permission: {
-      resource: 'categories',
-      action: 'get',
+      resource: "categories",
+      action: "get",
     },
   },
   createCategory: {
-    path: '/categories/create',
+    path: "/categories/create",
     Component: CreateCategory,
-    title: 'Create',
+    title: "Create",
     permission: {
-      resource: 'categories',
-      action: 'create',
+      resource: "categories",
+      action: "create",
     },
   },
   editCategory: {
-    path: '/categories/:id/edit',
+    path: "/categories/:id/edit",
     Component: EditCategory,
-    title: 'Edit',
+    title: "Edit",
     permission: {
-      resource: 'categories',
-      action: 'update',
+      resource: "categories",
+      action: "update",
     },
   },
   ratings: {
@@ -355,30 +354,30 @@ const routes = {
     isOwner: true,
   },
   tags: {
-    path: '/tags',
+    path: "/tags",
     Component: Tags,
-    title: 'Tags',
+    title: "Tags",
     permission: {
-      resource: 'tags',
-      action: 'get',
+      resource: "tags",
+      action: "get",
     },
   },
   createTag: {
-    path: '/tags/create',
+    path: "/tags/create",
     Component: CreateTag,
-    title: 'Create',
+    title: "Create",
     permission: {
-      resource: 'tags',
-      action: 'create',
+      resource: "tags",
+      action: "create",
     },
   },
   editTag: {
-    path: '/tags/:id/edit',
+    path: "/tags/:id/edit",
     Component: EditTag,
-    title: 'Edit',
+    title: "Edit",
     permission: {
-      resource: 'tags',
-      action: 'update',
+      resource: "tags",
+      action: "update",
     },
   },
 };
@@ -392,7 +391,13 @@ export const sidebarMenu = [
   {
     title: "FACT CHECKING",
     Icon: CheckCircleOutlined,
-    children: [routes.factCheck, routes.claimants, routes.ratings, routes.categories, routes.tags],
+    children: [
+      routes.factCheck,
+      routes.claimants,
+      routes.ratings,
+      routes.categories,
+      routes.tags,
+    ],
   },
   {
     title: "ADMINSTRATION",
