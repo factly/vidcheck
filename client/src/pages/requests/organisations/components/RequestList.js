@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { Popconfirm, Button, Table } from 'antd';
+import React, { useState } from "react";
+import { Popconfirm, Button, Table } from "antd";
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from "react-redux";
 import {
   getOrganisations,
   approveOrganisationRequest,
-} from '../../../../actions/organisationRequests';
-import { Link } from 'react-router-dom';
-import deepEqual from 'deep-equal';
+} from "../../../../actions/organisationRequests";
+import { Link } from "react-router-dom";
+import deepEqual from "deep-equal";
 
 function RequestList() {
   const dispatch = useDispatch();
@@ -24,17 +24,22 @@ function RequestList() {
     if (node)
       return {
         organisationRequests: node.data.map(
-          (element) => state.organisationRequests.details[element],
+          (element) => state.organisationRequests.details[element]
         ),
         total: node.total,
         loading: state.organisationRequests.loading,
       };
-    return { organisationRequests: [], total: 0, loading: state.organisationRequests.loading };
+    return {
+      organisationRequests: [],
+      total: 0,
+      loading: state.organisationRequests.loading,
+    };
   });
 
   const orgPermissions = useSelector(({ admin }) => admin);
 
-  let is_admin = !orgPermissions.loading && orgPermissions.organisation.is_admin;
+  let is_admin =
+    !orgPermissions.loading && orgPermissions.organisation.is_admin;
 
   React.useEffect(() => {
     fetchOrganisationRequests();
@@ -46,29 +51,33 @@ function RequestList() {
   };
 
   const columns = [
-    { title: 'Description', dataIndex: 'description', key: 'description' },
+    { title: "Description", dataIndex: "description", key: "description" },
     {
-      title: 'Spaces',
-      dataIndex: ['spaces'],
+      title: "Spaces",
+      dataIndex: ["spaces"],
       render: (_, record) => {
-        return record.spaces > 0 ? <p>{record.spaces ? record.spaces : 0}</p> : <p>Unlimited</p>;
+        return record.spaces > 0 ? (
+          <p>{record.spaces ? record.spaces : 0}</p>
+        ) : (
+          <p>Unlimited</p>
+        );
       },
     },
-    { title: 'Status', dataIndex: 'status', key: 'status' },
+    { title: "Status", dataIndex: "status", key: "status" },
   ];
 
   if (is_admin) {
     columns.push({
-      title: 'Action',
-      dataIndex: 'operation',
+      title: "Action",
+      dataIndex: "operation",
       render: (_, record) => {
         return (
           <span>
             <Popconfirm
               title="Sure to Approve?"
               onConfirm={() =>
-                dispatch(approveOrganisationRequest(record.id, 'approve')).then(() =>
-                  fetchOrganisationRequests(),
+                dispatch(approveOrganisationRequest(record.id, "approve")).then(
+                  () => fetchOrganisationRequests()
                 )
               }
             >
@@ -77,8 +86,8 @@ function RequestList() {
             <Popconfirm
               title="Sure to Reject?"
               onConfirm={() =>
-                dispatch(approveOrganisationRequest(record.id, 'reject')).then(() =>
-                  fetchOrganisationRequests(),
+                dispatch(approveOrganisationRequest(record.id, "reject")).then(
+                  () => fetchOrganisationRequests()
                 )
               }
             >
@@ -98,7 +107,7 @@ function RequestList() {
       columns={columns}
       dataSource={organisationRequests}
       loading={loading}
-      rowKey={'id'}
+      rowKey={"id"}
       pagination={{
         total: total,
         current: filters.page,

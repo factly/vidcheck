@@ -1,15 +1,15 @@
-import React from 'react';
-import { Modal, Button, Radio, Space } from 'antd';
-import { useDispatch, useSelector } from 'react-redux';
-import MediaUploader from './UploadMedium';
-import MediaList from './MediaList';
-import { getMedium, getMedia } from '../../actions/media';
-import ImagePlaceholder from '../ErrorsAndImage/PlaceholderImage';
+import React from "react";
+import { Modal, Button, Radio, Space } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import MediaUploader from "./UploadMedium";
+import MediaList from "./MediaList";
+import { getMedium, getMedia } from "../../actions/media";
+import ImagePlaceholder from "../ErrorsAndImage/PlaceholderImage";
 
 function MediaSelector({ value = null, onChange }) {
   const [show, setShow] = React.useState(false);
   const [selected, setSelected] = React.useState(null);
-  const [tab, setTab] = React.useState('list');
+  const [tab, setTab] = React.useState("list");
   const dispatch = useDispatch();
 
   const [mediumFetch, setMediumFetch] = React.useState(false);
@@ -62,7 +62,7 @@ function MediaSelector({ value = null, onChange }) {
         visible={show}
         onCancel={() => setShow(false)}
         closable={false}
-        width={'800px'}
+        width={"800px"}
         footer={[
           <Button key="back" onClick={() => setShow(false)}>
             Return
@@ -80,13 +80,21 @@ function MediaSelector({ value = null, onChange }) {
         ]}
       >
         <Space direction="vertical">
-          <Radio.Group buttonStyle="solid" value={tab} onChange={(e) => setTab(e.target.value)}>
+          <Radio.Group
+            buttonStyle="solid"
+            value={tab}
+            onChange={(e) => setTab(e.target.value)}
+          >
             <Radio.Button value="list">List</Radio.Button>
             <Radio.Button value="upload">Upload</Radio.Button>
           </Radio.Group>
-          {tab === 'list' ? (
-            <MediaList onSelect={setSelected} selected={selected} onUnselect={setValue} />
-          ) : tab === 'upload' ? (
+          {tab === "list" ? (
+            <MediaList
+              onSelect={setSelected}
+              selected={selected}
+              onUnselect={setValue}
+            />
+          ) : tab === "upload" ? (
             <MediaUploader onMediaUpload={onUpload} />
           ) : null}
         </Space>

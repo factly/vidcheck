@@ -1,22 +1,24 @@
-import React from 'react';
-import Uppy from '@uppy/core';
-import AwsS3 from '@uppy/aws-s3';
-import GoogleDrive from '@uppy/google-drive';
-import ImageEditor from '@uppy/image-editor';
-import Url from '@uppy/url';
-import { Dashboard } from '@uppy/react';
-import { useSelector } from 'react-redux';
-import '@uppy/core/dist/style.css';
-import '@uppy/dashboard/dist/style.css';
-import '@uppy/url/dist/style.css';
-import '@uppy/image-editor/dist/style.css';
-import { checker, maker } from '../../utils/sluger';
+import React from "react";
+import Uppy from "@uppy/core";
+import AwsS3 from "@uppy/aws-s3";
+import GoogleDrive from "@uppy/google-drive";
+import ImageEditor from "@uppy/image-editor";
+import Url from "@uppy/url";
+import { Dashboard } from "@uppy/react";
+import { useSelector } from "react-redux";
+import "@uppy/core/dist/style.css";
+import "@uppy/dashboard/dist/style.css";
+import "@uppy/url/dist/style.css";
+import "@uppy/image-editor/dist/style.css";
+import { checker, maker } from "../../utils/sluger";
 
-function UppyUploader({ onUpload, allowedFileTypes = ['image/*'] }) {
-  const space_slug = useSelector((state) => state.spaces.details[state.spaces.selected].slug);
+function UppyUploader({ onUpload, allowedFileTypes = ["image/*"] }) {
+  const space_slug = useSelector(
+    (state) => state.spaces.details[state.spaces.selected].slug
+  );
   const uppy = Uppy({
-    id: 'uppy-media',
-    meta: { type: 'avatar' },
+    id: "uppy-media",
+    meta: { type: "avatar" },
     restrictions: {
       allowedFileTypes: allowedFileTypes,
     },
@@ -25,8 +27,10 @@ function UppyUploader({ onUpload, allowedFileTypes = ['image/*'] }) {
       const updatedFiles = {};
 
       Object.keys(files).forEach((fileID) => {
-        const fileName = files[fileID].meta.name.replace(/\.[^/.]+$/, '');
-        const name = checker.test(fileName) ? files[fileID].meta.name : maker(fileName);
+        const fileName = files[fileID].meta.name.replace(/\.[^/.]+$/, "");
+        const name = checker.test(fileName)
+          ? files[fileID].meta.name
+          : maker(fileName);
         updatedFiles[fileID] = {
           ...files[fileID],
           file_name: name,
@@ -34,13 +38,13 @@ function UppyUploader({ onUpload, allowedFileTypes = ['image/*'] }) {
             ...files[fileID].meta,
             name:
               space_slug +
-              '/' +
+              "/" +
               new Date().getFullYear() +
-              '/' +
+              "/" +
               new Date().getMonth() +
-              '/' +
+              "/" +
               Date.now().toString() +
-              '_' +
+              "_" +
               name,
           },
         };
@@ -52,7 +56,7 @@ function UppyUploader({ onUpload, allowedFileTypes = ['image/*'] }) {
     .use(Url, { companionUrl: window.REACT_APP_COMPANION_URL })
     .use(GoogleDrive, { companionUrl: window.REACT_APP_COMPANION_URL })
     .use(ImageEditor, {
-      id: 'ImageEditor',
+      id: "ImageEditor",
 
       cropperOptions: {
         viewMode: 1,
@@ -62,7 +66,7 @@ function UppyUploader({ onUpload, allowedFileTypes = ['image/*'] }) {
       },
       companionUrl: window.REACT_APP_COMPANION_URL,
     });
-  uppy.on('file-added', (file) => {
+  uppy.on("file-added", (file) => {
     const data = file.data;
     const url = data.thumbnail ? data.thumbnail : URL.createObjectURL(data);
     const image = new Image();
@@ -75,21 +79,21 @@ function UppyUploader({ onUpload, allowedFileTypes = ['image/*'] }) {
       URL.revokeObjectURL(url);
     };
   });
-  uppy.on('complete', (result) => {
+  uppy.on("complete", (result) => {
     const uploadList = result.successful.map((successful) => {
       const upload = {};
       const { meta } = successful;
-      upload['alt_text'] = meta.alt_text ? meta.alt_text : successful.file_name;
-      upload['caption'] = meta.caption;
-      upload['description'] = meta.caption;
-      upload['dimensions'] = `${meta.width}x${meta.height}`;
-      upload['file_size'] = successful.size;
-      upload['name'] = successful.file_name;
-      upload['slug'] = successful.file_name;
-      upload['title'] = meta.caption ? meta.caption : '';
-      upload['type'] = meta.type;
-      upload['url'] = {};
-      upload['url']['raw'] = successful.uploadURL;
+      upload["alt_text"] = meta.alt_text ? meta.alt_text : successful.file_name;
+      upload["caption"] = meta.caption;
+      upload["description"] = meta.caption;
+      upload["dimensions"] = `${meta.width}x${meta.height}`;
+      upload["file_size"] = successful.size;
+      upload["name"] = successful.file_name;
+      upload["slug"] = successful.file_name;
+      upload["title"] = meta.caption ? meta.caption : "";
+      upload["type"] = meta.type;
+      upload["url"] = {};
+      upload["url"]["raw"] = successful.uploadURL;
       return upload;
     });
     onUpload(uploadList);
@@ -97,11 +101,19 @@ function UppyUploader({ onUpload, allowedFileTypes = ['image/*'] }) {
   return (
     <Dashboard
       uppy={uppy}
-      plugins={['GoogleDrive', 'Url', 'ImageEditor']}
+      plugins={["GoogleDrive", "Url", "ImageEditor"]}
       metaFields={[
-        { id: 'name', name: 'Name', placeholder: 'file name' },
-        { id: 'caption', name: 'Caption', placeholder: 'describe what the image is about' },
-        { id: 'alt_text', name: 'Alt Text', placeholder: 'describe what the image is content' },
+        { id: "name", name: "Name", placeholder: "file name" },
+        {
+          id: "caption",
+          name: "Caption",
+          placeholder: "describe what the image is about",
+        },
+        {
+          id: "alt_text",
+          name: "Alt Text",
+          placeholder: "describe what the image is content",
+        },
       ]}
     />
   );

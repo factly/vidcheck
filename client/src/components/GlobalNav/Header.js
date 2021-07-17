@@ -1,8 +1,6 @@
 import React from "react";
 import { Layout, Divider, Popover, List, Avatar } from "antd";
-import {
-  AppstoreOutlined,
-} from "@ant-design/icons";
+import { AppstoreOutlined } from "@ant-design/icons";
 import AccountMenu from "./AccountMenu";
 import SpaceSelector from "./SpaceSelector";
 

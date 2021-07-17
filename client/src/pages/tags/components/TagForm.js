@@ -1,9 +1,9 @@
-import React from 'react';
-import { Button, Form, Input, Space, Switch } from 'antd';
-import { maker, checker } from '../../../utils/sluger';
-import Editor from '../../../components/Editor';
-import MonacoEditor from '../../../components/MonacoEditor';
-import getJsonValue from '../../../utils/getJsonValue';
+import React from "react";
+import { Button, Form, Input, Space, Switch } from "antd";
+import { maker, checker } from "../../../utils/sluger";
+import Editor from "../../../components/Editor";
+import MonacoEditor from "../../../components/MonacoEditor";
+import getJsonValue from "../../../utils/getJsonValue";
 
 const layout = {
   labelCol: {
@@ -22,7 +22,7 @@ const tailLayout = {
 
 const TagForm = ({ onCreate, data = {} }) => {
   if (data && data.meta_fields) {
-    if (typeof data.meta_fields !== 'string') {
+    if (typeof data.meta_fields !== "string") {
       data.meta_fields = JSON.stringify(data.meta_fields);
     }
   }
@@ -62,10 +62,10 @@ const TagForm = ({ onCreate, data = {} }) => {
         rules={[
           {
             required: true,
-            message: 'Please enter tag name!',
+            message: "Please enter tag name!",
           },
-          { min: 3, message: 'Name must be minimum 3 characters.' },
-          { max: 50, message: 'Name must be maximum 50 characters.' },
+          { min: 3, message: "Name must be minimum 3 characters." },
+          { max: 50, message: "Name must be maximum 50 characters." },
         ]}
       >
         <Input onChange={(e) => onTitleChange(e.target.value)} />
@@ -76,11 +76,11 @@ const TagForm = ({ onCreate, data = {} }) => {
         rules={[
           {
             required: true,
-            message: 'Please input the slug!',
+            message: "Please input the slug!",
           },
           {
             pattern: checker,
-            message: 'Please enter valid slug!',
+            message: "Please enter valid slug!",
           },
         ]}
       >
@@ -90,7 +90,11 @@ const TagForm = ({ onCreate, data = {} }) => {
         <Switch />
       </Form.Item>
       <Form.Item name="description" label="Description">
-        <Editor style={{ width: '600px' }} placeholder="Enter Description..." basic={true} />
+        <Editor
+          style={{ width: "600px" }}
+          placeholder="Enter Description..."
+          basic={true}
+        />
       </Form.Item>
       <Form.Item name="meta_fields" label="Metafields">
         <MonacoEditor language="json" />
@@ -98,7 +102,7 @@ const TagForm = ({ onCreate, data = {} }) => {
       <Form.Item {...tailLayout}>
         <Space>
           <Button disabled={!valueChange} type="primary" htmlType="submit">
-            {data && data.id ? 'Update' : 'Submit'}
+            {data && data.id ? "Update" : "Submit"}
           </Button>
           <Button htmlType="button" onClick={onReset}>
             Reset

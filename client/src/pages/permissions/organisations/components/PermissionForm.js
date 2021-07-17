@@ -1,6 +1,6 @@
-import React from 'react';
-import { Button, Form, InputNumber, Space, Switch } from 'antd';
-import Selector from '../../../../components/Selector';
+import React from "react";
+import { Button, Form, InputNumber, Space, Switch } from "antd";
+import Selector from "../../../../components/Selector";
 
 const layout = {
   labelCol: {
@@ -36,7 +36,11 @@ const PermissionForm = ({ onCreate, data = {} }) => {
       }}
     >
       <Form.Item name="organisation_id" label="Organisation">
-        <Selector action="Organisations" display="title" placeholder="Select organisation" />
+        <Selector
+          action="Organisations"
+          display="title"
+          placeholder="Select organisation"
+        />
       </Form.Item>
       <Form.Item
         name="spaces"
@@ -44,7 +48,7 @@ const PermissionForm = ({ onCreate, data = {} }) => {
         rules={[
           {
             required: true,
-            message: 'Please enter the numeric value!',
+            message: "Please enter the numeric value!",
           },
         ]}
       >
@@ -56,7 +60,7 @@ const PermissionForm = ({ onCreate, data = {} }) => {
         rules={[
           {
             required: true,
-            message: 'Please enter the numeric value!',
+            message: "Please enter the numeric value!",
           },
         ]}
       >
@@ -68,7 +72,7 @@ const PermissionForm = ({ onCreate, data = {} }) => {
         rules={[
           {
             required: true,
-            message: 'Please enter the numeric value!',
+            message: "Please enter the numeric value!",
           },
         ]}
       >

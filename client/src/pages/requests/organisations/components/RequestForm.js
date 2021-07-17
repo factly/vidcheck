@@ -1,6 +1,6 @@
-import React from 'react';
-import { Button, Form, InputNumber, Space, Select, Input } from 'antd';
-import { useSelector } from 'react-redux';
+import React from "react";
+import { Button, Form, InputNumber, Space, Select, Input } from "antd";
+import { useSelector } from "react-redux";
 
 const layout = {
   labelCol: {
@@ -43,10 +43,10 @@ const RequestForm = ({ onCreate, data = {} }) => {
         rules={[
           {
             required: true,
-            message: 'Please enter title!',
+            message: "Please enter title!",
           },
-          { min: 3, message: 'Name must be minimum 3 characters.' },
-          { max: 50, message: 'Name must be maximum 50 characters.' },
+          { min: 3, message: "Name must be minimum 3 characters." },
+          { max: 50, message: "Name must be maximum 50 characters." },
         ]}
       >
         <Input />
@@ -58,7 +58,8 @@ const RequestForm = ({ onCreate, data = {} }) => {
           listHeight={128}
           defaultValue={[]}
           filterOption={(input, option) =>
-            option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+            option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
+            0
           }
         >
           {orgs.map((item) => (
@@ -74,7 +75,7 @@ const RequestForm = ({ onCreate, data = {} }) => {
         rules={[
           {
             required: true,
-            message: 'Please enter the numeric value!',
+            message: "Please enter the numeric value!",
           },
         ]}
       >

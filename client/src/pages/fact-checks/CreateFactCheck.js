@@ -12,8 +12,8 @@ function CreateFactCheck() {
   const onCreate = (values) => {
     dispatch(addVideo(values)).then((res) => {
       if (res?.video?.id) {
-        dispatch(resetClaim())
-        history.push(`/fact-checks/${res.video.id}/preview`)
+        dispatch(resetClaim());
+        history.push(`/fact-checks/${res.video.id}/preview`);
       }
     });
   };

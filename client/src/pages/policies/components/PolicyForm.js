@@ -26,13 +26,13 @@ const entities = [
     options: options,
   },
   {
-    name: 'categories',
-    label: 'Categories',
+    name: "categories",
+    label: "Categories",
     options: options,
   },
   {
-    name: 'tags',
-    label: 'Tags',
+    name: "tags",
+    label: "Tags",
     options: options,
   },
   {

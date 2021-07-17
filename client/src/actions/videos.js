@@ -8,39 +8,36 @@ import {
   VIDEOS_API,
 } from "../constants/videos";
 import { addErrorNotification, addSuccessNotification } from "./notifications";
-import { addCategories } from './categories';
-import { addAuthors } from './authors';
-import { addTags } from './tags';
+import { addCategories } from "./categories";
+import { addAuthors } from "./authors";
+import { addTags } from "./tags";
 
 export const getVideos = (query = {}) => {
-
-
   return (dispatch) => {
     dispatch(loadingVideos());
 
     const params = new URLSearchParams();
     if (query.category && query.category.length > 0) {
-      query.category.map((each) => params.append('category', each));
+      query.category.map((each) => params.append("category", each));
     }
     if (query.tag && query.tag.length > 0) {
-      query.tag.map((each) => params.append('tag', each));
+      query.tag.map((each) => params.append("tag", each));
     }
     if (query.page) {
-      params.append('page', query.page);
+      params.append("page", query.page);
     }
     if (query.limit) {
-      params.append('limit', query.limit);
+      params.append("limit", query.limit);
     }
     if (query.sort) {
-      params.append('sort', query.sort);
+      params.append("sort", query.sort);
     }
     if (query.q) {
-      params.append('q', query.q);
+      params.append("q", query.q);
     }
     if (query.status) {
-      params.append('status', query.status);
+      params.append("status", query.status);
     }
-
 
     return axios
       .get(VIDEOS_API, {
@@ -54,8 +51,8 @@ export const getVideos = (query = {}) => {
               .map((data) => {
                 return data.video.authors;
               })
-              .flat(1),
-          ),
+              .flat(1)
+          )
         );
         dispatch(
           addTags(
@@ -64,8 +61,8 @@ export const getVideos = (query = {}) => {
               .map((data) => {
                 return data.video.tags;
               })
-              .flat(1),
-          ),
+              .flat(1)
+          )
         );
         dispatch(
           addCategories(
@@ -74,8 +71,8 @@ export const getVideos = (query = {}) => {
               .map((data) => {
                 return data.video.categories;
               })
-              .flat(1),
-          ),
+              .flat(1)
+          )
         );
         dispatch(
           addVideosList(
@@ -83,14 +80,16 @@ export const getVideos = (query = {}) => {
               return {
                 video: {
                   ...each.video,
-                  categories: each.video.categories.map((category) => category.id),
+                  categories: each.video.categories.map(
+                    (category) => category.id
+                  ),
                   tags: each.video.tags.map((tag) => tag.id),
                   authors: each.video.authors.map((author) => author.id),
                 },
-                claims: each.claims
+                claims: each.claims,
               };
-            }),
-          ),
+            })
+          )
         );
 
         dispatch(
@@ -125,8 +124,8 @@ export const getVideo = (id) => {
             tags: data.video.tags.map((tag) => tag.id),
             authors: data.video.authors.map((author) => author.id),
           },
-          claims: data.claims
-        }
+          claims: data.claims,
+        };
         dispatch(getVideoByID(videoObj));
         dispatch(stopVideosLoading());
 
@@ -164,15 +163,17 @@ export const updateVideo = (data) => {
         dispatch(addTags(data.video.tags));
         dispatch(addAuthors(data.video.authors));
         dispatch(addCategories(data.video.categories));
-        dispatch(getVideoByID({
-          video: {
-            ...data.video,
-            categories: data.video.categories.map((category) => category.id),
-            tags: data.video.tags.map((tag) => tag.id),
-            authors: data.video.authors.map((author) => author.id),
-          },
-          claims: data.claims
-        }));
+        dispatch(
+          getVideoByID({
+            video: {
+              ...data.video,
+              categories: data.video.categories.map((category) => category.id),
+              tags: data.video.tags.map((tag) => tag.id),
+              authors: data.video.authors.map((author) => author.id),
+            },
+            claims: data.claims,
+          })
+        );
         dispatch(stopVideosLoading());
         dispatch(addSuccessNotification("Video updated"));
         return response.data;

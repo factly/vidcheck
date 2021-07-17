@@ -52,7 +52,7 @@ function EditMedium() {
   }
 
   if (media && media.meta_fields) {
-    if (typeof media.meta_fields !== 'string') {
+    if (typeof media.meta_fields !== "string") {
       media.meta_fields = JSON.stringify(media.meta_fields);
     }
   }

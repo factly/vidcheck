@@ -1,7 +1,7 @@
-import React from 'react';
-import OrganisationPermissionList from './components/PermissionList';
-import { Space, Button } from 'antd';
-import { Link } from 'react-router-dom';
+import React from "react";
+import OrganisationPermissionList from "./components/PermissionList";
+import { Space, Button } from "antd";
+import { Link } from "react-router-dom";
 
 function OrganisationPermissions() {
   return (

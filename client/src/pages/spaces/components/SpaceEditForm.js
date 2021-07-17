@@ -1,10 +1,10 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
-import { Button, Form, Input, Select, Collapse } from 'antd';
-import MediaSelector from '../../../components/MediaSelector';
-import { checker } from '../../../utils/sluger';
-import MonacoEditor from '../../../components/MonacoEditor';
-import getJsonValue from '../../../utils/getJsonValue';
+import React from "react";
+import { useSelector } from "react-redux";
+import { Button, Form, Input, Select, Collapse } from "antd";
+import MediaSelector from "../../../components/MediaSelector";
+import { checker } from "../../../utils/sluger";
+import MonacoEditor from "../../../components/MonacoEditor";
+import getJsonValue from "../../../utils/getJsonValue";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -20,7 +20,7 @@ const layout = {
 
 const SpaceEditForm = ({ onCreate, data = {} }) => {
   if (data && data.meta_fields) {
-    if (typeof data.meta_fields !== 'string') {
+    if (typeof data.meta_fields !== "string") {
       data.meta_fields = JSON.stringify(data.meta_fields);
     }
   }
@@ -36,7 +36,7 @@ const SpaceEditForm = ({ onCreate, data = {} }) => {
   const [basicPanel, setBasicPanel] = React.useState(null);
 
   const handleBasicCollapse = () => {
-    basicPanel === null ? setBasicPanel('1') : setBasicPanel(null);
+    basicPanel === null ? setBasicPanel("1") : setBasicPanel(null);
   };
 
   return (
@@ -56,19 +56,19 @@ const SpaceEditForm = ({ onCreate, data = {} }) => {
         scrollToFirstError={true}
         onFinishFailed={(errors) => {
           let name = errors.errorFields[0].name[0];
-          if (['name', 'slug'].includes(name)) {
-            setBasicPanel('1');
+          if (["name", "slug"].includes(name)) {
+            setBasicPanel("1");
           }
         }}
         onValuesChange={() => {
           setValueChange(true);
         }}
         style={{
-          paddingTop: '24px',
+          paddingTop: "24px",
         }}
       >
         <Collapse
-          style={{ width: '95%', marginBottom: '15px' }}
+          style={{ width: "95%", marginBottom: "15px" }}
           activeKey={basicPanel}
           onChange={handleBasicCollapse}
         >
@@ -78,9 +78,14 @@ const SpaceEditForm = ({ onCreate, data = {} }) => {
                 <Form.Item
                   name="organisation_id"
                   noStyle
-                  rules={[{ required: true, message: 'Organisation is required' }]}
+                  rules={[
+                    { required: true, message: "Organisation is required" },
+                  ]}
                 >
-                  <Select style={{ width: '40%' }} placeholder="Select organisation">
+                  <Select
+                    style={{ width: "40%" }}
+                    placeholder="Select organisation"
+                  >
                     {orgs.map((org) => (
                       <Option key={org.id} value={org.id}>
                         {org.title}
@@ -92,12 +97,12 @@ const SpaceEditForm = ({ onCreate, data = {} }) => {
                   name="name"
                   noStyle
                   rules={[
-                    { required: true, message: 'Name is required' },
-                    { min: 3, message: 'Name must be minimum 3 characters.' },
-                    { max: 50, message: 'Name must be maximum 50 characters.' },
+                    { required: true, message: "Name is required" },
+                    { min: 3, message: "Name must be minimum 3 characters." },
+                    { max: 50, message: "Name must be maximum 50 characters." },
                   ]}
                 >
-                  <Input style={{ width: '60%' }} placeholder="Input name" />
+                  <Input style={{ width: "60%" }} placeholder="Input name" />
                 </Form.Item>
               </Input.Group>
             </Form.Item>
@@ -107,11 +112,11 @@ const SpaceEditForm = ({ onCreate, data = {} }) => {
               rules={[
                 {
                   required: true,
-                  message: 'Please input the slug!',
+                  message: "Please input the slug!",
                 },
                 {
                   required: checker,
-                  message: 'Please enter valid slug!',
+                  message: "Please enter valid slug!",
                 },
               ]}
             >
@@ -134,7 +139,7 @@ const SpaceEditForm = ({ onCreate, data = {} }) => {
             </Form.Item>
           </Panel>
         </Collapse>
-        <Collapse style={{ width: '95%', marginBottom: '15px' }}>
+        <Collapse style={{ width: "95%", marginBottom: "15px" }}>
           <Panel header="Media" key="2">
             <Form.Item label="Logo" name="logo_id">
               <MediaSelector />
@@ -150,36 +155,54 @@ const SpaceEditForm = ({ onCreate, data = {} }) => {
             </Form.Item>
           </Panel>
         </Collapse>
-        <Collapse style={{ width: '95%', marginBottom: '15px' }}>
+        <Collapse style={{ width: "95%", marginBottom: "15px" }}>
           <Panel header="Contact" key="3">
-            <Form.Item name={['social_media_urls', 'facebook']} label="Facebook">
-              <Input style={{ width: '100%' }} />
+            <Form.Item
+              name={["social_media_urls", "facebook"]}
+              label="Facebook"
+            >
+              <Input style={{ width: "100%" }} />
             </Form.Item>
-            <Form.Item name={['social_media_urls', 'twitter']} label="Twitter">
-              <Input style={{ width: '100%' }} />
+            <Form.Item name={["social_media_urls", "twitter"]} label="Twitter">
+              <Input style={{ width: "100%" }} />
             </Form.Item>
-            <Form.Item name={['social_media_urls', 'pintrest']} label="Pintrest">
-              <Input style={{ width: '100%' }} />
+            <Form.Item
+              name={["social_media_urls", "pintrest"]}
+              label="Pintrest"
+            >
+              <Input style={{ width: "100%" }} />
             </Form.Item>
-            <Form.Item name={['social_media_urls', 'instagram']} label="Instagram">
-              <Input style={{ width: '100%' }} />
+            <Form.Item
+              name={["social_media_urls", "instagram"]}
+              label="Instagram"
+            >
+              <Input style={{ width: "100%" }} />
             </Form.Item>
           </Panel>
         </Collapse>
-        <Collapse style={{ width: '95%', marginBottom: '15px' }}>
+        <Collapse style={{ width: "95%", marginBottom: "15px" }}>
           <Panel header="Analytics" key="4">
-            <Form.Item name={['analytics', 'plausible', 'server_url']} label="Server URL">
-              <Input style={{ width: '100%' }} />
+            <Form.Item
+              name={["analytics", "plausible", "server_url"]}
+              label="Server URL"
+            >
+              <Input style={{ width: "100%" }} />
             </Form.Item>
-            <Form.Item name={['analytics', 'plausible', 'domain']} label="Domain">
-              <Input style={{ width: '100%' }} />
+            <Form.Item
+              name={["analytics", "plausible", "domain"]}
+              label="Domain"
+            >
+              <Input style={{ width: "100%" }} />
             </Form.Item>
-            <Form.Item name={['analytics', 'plausible', 'embed_code']} label="Embed Code">
-              <Input.TextArea style={{ width: '100%' }} />
+            <Form.Item
+              name={["analytics", "plausible", "embed_code"]}
+              label="Embed Code"
+            >
+              <Input.TextArea style={{ width: "100%" }} />
             </Form.Item>
           </Panel>
         </Collapse>
-        <Collapse style={{ width: '95%', marginBottom: '15px' }}>
+        <Collapse style={{ width: "95%", marginBottom: "15px" }}>
           <Panel header="Code Injection" key="5">
             <Form.Item name="header_code" label="Header Code">
               <MonacoEditor language="html" width={650} />

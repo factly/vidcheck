@@ -1,8 +1,8 @@
-import React from 'react';
-import { Space, Typography, Table, Tag } from 'antd';
-import { getUsers } from '../../actions/users';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Space, Typography, Table, Tag } from "antd";
+import { getUsers } from "../../actions/users";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 function Users() {
   const dispatch = useDispatch();
@@ -20,36 +20,36 @@ function Users() {
 
   const columns = [
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
       render: (_, record) => {
         return (
           <Typography key={record.id}>
-            {record.policies[0].id !== 'admin' ? (
+            {record.policies[0].id !== "admin" ? (
               <Link to={`/users/${record.id}/permissions`}>
-                {record.first_name + ' ' + record.last_name}
+                {record.first_name + " " + record.last_name}
               </Link>
             ) : (
-              record.first_name + ' ' + record.last_name
+              record.first_name + " " + record.last_name
             )}
           </Typography>
         );
       },
     },
     {
-      title: 'E-mail',
-      dataIndex: 'email',
-      key: 'email',
+      title: "E-mail",
+      dataIndex: "email",
+      key: "email",
     },
     {
-      title: 'Policies',
-      dataIndex: 'policies',
-      key: 'policies',
+      title: "Policies",
+      dataIndex: "policies",
+      key: "policies",
       render: (_, record) => {
         return record.policies.map((policy, index) => (
           <Tag key={record.id + policy.id}>
-            {policy.id !== 'admin' ? (
+            {policy.id !== "admin" ? (
               <Link to={`/policies/${policy.id}/edit`}> {policy.name}</Link>
             ) : (
               policy.name
@@ -61,13 +61,13 @@ function Users() {
   ];
 
   return (
-    <Space direction={'vertical'}>
+    <Space direction={"vertical"}>
       <Table
         bordered
         columns={columns}
         dataSource={details}
         loading={loading}
-        rowKey={['record', 'user', 'id']}
+        rowKey={["record", "user", "id"]}
       />
     </Space>
   );

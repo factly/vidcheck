@@ -1,19 +1,19 @@
-import React from 'react';
-import { Popconfirm, Button, Table, Space } from 'antd';
+import React from "react";
+import { Popconfirm, Button, Table, Space } from "antd";
 
-import { useDispatch } from 'react-redux';
-import { deleteCategory } from '../../../actions/categories';
-import { Link } from 'react-router-dom';
+import { useDispatch } from "react-redux";
+import { deleteCategory } from "../../../actions/categories";
+import { Link } from "react-router-dom";
 
 function CategoryList({ actions, data, filters, setFilters, fetchCategories }) {
   const dispatch = useDispatch();
   const columns = [
-    { title: 'Name', dataIndex: 'name', key: 'name' },
-    { title: 'Slug', dataIndex: 'slug', key: 'slug' },
-    { title: 'Parent Category', dataIndex: 'parent_id', key: 'parent_id' },
+    { title: "Name", dataIndex: "name", key: "name" },
+    { title: "Slug", dataIndex: "slug", key: "slug" },
+    { title: "Parent Category", dataIndex: "parent_id", key: "parent_id" },
     {
-      title: 'Action',
-      dataIndex: 'operation',
+      title: "Action",
+      dataIndex: "operation",
       render: (_, record) => {
         return (
           <span>
@@ -24,16 +24,28 @@ function CategoryList({ actions, data, filters, setFilters, fetchCategories }) {
               }}
               to={`/categories/${record.id}/edit`}
             >
-              <Button disabled={!(actions.includes('admin') || actions.includes('update'))}>
+              <Button
+                disabled={
+                  !(actions.includes("admin") || actions.includes("update"))
+                }
+              >
                 Edit
               </Button>
             </Link>
             <Popconfirm
               title="Sure to Delete?"
-              onConfirm={() => dispatch(deleteCategory(record.id)).then(() => fetchCategories())}
+              onConfirm={() =>
+                dispatch(deleteCategory(record.id)).then(() =>
+                  fetchCategories()
+                )
+              }
             >
               <Link to="" className="ant-dropdown-link">
-                <Button disabled={!(actions.includes('admin') || actions.includes('delete'))}>
+                <Button
+                  disabled={
+                    !(actions.includes("admin") || actions.includes("delete"))
+                  }
+                >
                   Delete
                 </Button>
               </Link>
@@ -45,13 +57,13 @@ function CategoryList({ actions, data, filters, setFilters, fetchCategories }) {
   ];
 
   return (
-    <Space direction={'vertical'}>
+    <Space direction={"vertical"}>
       <Table
         bordered
         columns={columns}
         dataSource={data.categories}
         loading={data.loading}
-        rowKey={'id'}
+        rowKey={"id"}
         pagination={{
           total: data.total,
           current: filters.page,

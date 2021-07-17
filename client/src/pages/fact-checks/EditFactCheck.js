@@ -16,11 +16,9 @@ function EditFactCheck() {
   const { video } = useSelector(({ videoClaims }) => videoClaims);
 
   React.useEffect(() => {
-
     dispatch(getVideo(id)).then((data) =>
       dispatch(addClaims({ video: data.video, claims: data.claims }))
     );
-
   }, [dispatch]);
 
   if (loading || !video.url) return <Skeleton />;
@@ -28,11 +26,10 @@ function EditFactCheck() {
   const onUpdate = (values) => {
     dispatch(updateVideo(values)).then((res) => {
       if (res?.video?.id) {
-        dispatch(resetClaim())
-        history.push(`/fact-checks/${res.video.id}/preview`)
+        dispatch(resetClaim());
+        history.push(`/fact-checks/${res.video.id}/preview`);
       }
-    }
-    );
+    });
   };
 
   return <EditFactCheckForm onSubmit={onUpdate} />;

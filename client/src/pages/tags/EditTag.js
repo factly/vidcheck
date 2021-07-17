@@ -1,11 +1,11 @@
-import React from 'react';
-import TagEditForm from './components/TagForm';
-import { useDispatch, useSelector } from 'react-redux';
-import { Skeleton } from 'antd';
-import { updateTag, getTag } from '../../actions/tags';
-import { useHistory } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
-import RecordNotFound from '../../components/ErrorsAndImage/RecordNotFound';
+import React from "react";
+import TagEditForm from "./components/TagForm";
+import { useDispatch, useSelector } from "react-redux";
+import { Skeleton } from "antd";
+import { updateTag, getTag } from "../../actions/tags";
+import { useHistory } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import RecordNotFound from "../../components/ErrorsAndImage/RecordNotFound";
 
 function EditTag() {
   const history = useHistory();

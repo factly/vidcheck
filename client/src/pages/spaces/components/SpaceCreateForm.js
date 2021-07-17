@@ -1,7 +1,7 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
-import { Button, Form, Input, Select } from 'antd';
-import { maker, checker } from './../../../utils/sluger';
+import React from "react";
+import { useSelector } from "react-redux";
+import { Button, Form, Input, Select } from "antd";
+import { maker, checker } from "./../../../utils/sluger";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -46,7 +46,7 @@ const SpaceCreateForm = ({ onCreate }) => {
           onReset();
         }}
         style={{
-          paddingTop: '24px',
+          paddingTop: "24px",
         }}
       >
         <Form.Item label="Name">
@@ -54,9 +54,12 @@ const SpaceCreateForm = ({ onCreate }) => {
             <Form.Item
               name="organisation_id"
               noStyle
-              rules={[{ required: true, message: 'organisation is required' }]}
+              rules={[{ required: true, message: "organisation is required" }]}
             >
-              <Select style={{ width: '40%' }} placeholder="Select organisation">
+              <Select
+                style={{ width: "40%" }}
+                placeholder="Select organisation"
+              >
                 {orgs.map((org) => (
                   <Option key={org.id} value={org.id}>
                     {org.title}
@@ -68,13 +71,13 @@ const SpaceCreateForm = ({ onCreate }) => {
               name="name"
               noStyle
               rules={[
-                { required: true, message: 'Name is required' },
-                { min: 3, message: 'Name must be minimum 3 characters.' },
-                { max: 50, message: 'Name must be maximum 50 characters.' },
+                { required: true, message: "Name is required" },
+                { min: 3, message: "Name must be minimum 3 characters." },
+                { max: 50, message: "Name must be maximum 50 characters." },
               ]}
             >
               <Input
-                style={{ width: '60%' }}
+                style={{ width: "60%" }}
                 placeholder="Input name"
                 onChange={(e) => onTitleChange(e.target.value)}
               />
@@ -87,11 +90,11 @@ const SpaceCreateForm = ({ onCreate }) => {
           rules={[
             {
               required: true,
-              message: 'Please input the slug!',
+              message: "Please input the slug!",
             },
             {
               pattern: checker,
-              message: 'Please enter valid slug!',
+              message: "Please enter valid slug!",
             },
           ]}
         >

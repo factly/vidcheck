@@ -1,10 +1,10 @@
-import React from 'react';
-import CategoryList from './components/CategoryList';
-import { Space, Button, Form, Input, Select, Row, Col } from 'antd';
-import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { getCategories } from '../../actions/categories';
-import deepEqual from 'deep-equal';
+import React from "react";
+import CategoryList from "./components/CategoryList";
+import { Space, Button, Form, Input, Select, Row, Col } from "antd";
+import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getCategories } from "../../actions/categories";
+import deepEqual from "deep-equal";
 
 function Categories({ permission }) {
   const { actions } = permission;
@@ -22,7 +22,9 @@ function Categories({ permission }) {
 
     if (node)
       return {
-        categories: node.data.map((element) => state.categories.details[element]),
+        categories: node.data.map(
+          (element) => state.categories.details[element]
+        ),
         total: node.total,
         loading: state.categories.loading,
       };
@@ -42,7 +44,11 @@ function Categories({ permission }) {
       <Row>
         <Col span={8}>
           <Link key="1" to="/categories/create">
-            <Button disabled={!(actions.includes('admin') || actions.includes('create'))}>
+            <Button
+              disabled={
+                !(actions.includes("admin") || actions.includes("create"))
+              }
+            >
               Create New
             </Button>
           </Link>
@@ -54,7 +60,7 @@ function Categories({ permission }) {
             name="filters"
             layout="inline"
             onFinish={(values) => setFilters({ ...filters, ...values })}
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
             onValuesChange={(changedValues, allValues) => {
               if (!changedValues.q) {
                 setFilters({ ...filters, ...changedValues });
@@ -67,7 +73,7 @@ function Categories({ permission }) {
             <Form.Item>
               <Button htmlType="submit">Search</Button>
             </Form.Item>
-            <Form.Item name="sort" label="Sort" style={{ width: '30%' }}>
+            <Form.Item name="sort" label="Sort" style={{ width: "30%" }}>
               <Select>
                 <Option value="desc">Latest</Option>
                 <Option value="asc">Old</Option>

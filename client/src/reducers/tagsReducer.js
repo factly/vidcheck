@@ -4,8 +4,8 @@ import {
   ADD_TAGS_REQUEST,
   SET_TAGS_LOADING,
   RESET_TAGS,
-} from '../constants/tags';
-import deepEqual from 'deep-equal';
+} from "../constants/tags";
+import deepEqual from "deep-equal";
 
 const initialState = {
   req: [],
@@ -41,7 +41,10 @@ export default function tagsReducer(state = initialState, action = {}) {
         ...state,
         details: {
           ...state.details,
-          ...action.payload.reduce((obj, item) => Object.assign(obj, { [item.id]: item }), {}),
+          ...action.payload.reduce(
+            (obj, item) => Object.assign(obj, { [item.id]: item }),
+            {}
+          ),
         },
       };
     case ADD_TAG:

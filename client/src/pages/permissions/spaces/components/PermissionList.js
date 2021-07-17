@@ -1,9 +1,12 @@
-import React from 'react';
-import { Popconfirm, Button, Table } from 'antd';
+import React from "react";
+import { Popconfirm, Button, Table } from "antd";
 
-import { useDispatch, useSelector } from 'react-redux';
-import { getSpaces, deleteSpacePermission } from '../../../../actions/spacePermissions';
-import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getSpaces,
+  deleteSpacePermission,
+} from "../../../../actions/spacePermissions";
+import { Link } from "react-router-dom";
 
 function PermissionList() {
   const dispatch = useDispatch();
@@ -26,7 +29,7 @@ function PermissionList() {
       return {
         space_permissions: details.slice(
           filters.page - 1,
-          filters.limit + (filters.page - 1) * filters.limit,
+          filters.limit + (filters.page - 1) * filters.limit
         ),
         total: details.total,
         loading: state.spacePermissions.loading,
@@ -50,16 +53,16 @@ function PermissionList() {
   };
 
   const columns = [
-    { title: 'Space', dataIndex: 'name', key: 'name' },
+    { title: "Space", dataIndex: "name", key: "name" },
     {
-      title: 'Organisation ID',
-      dataIndex: 'organisation_id',
-      key: 'organisation_id',
-      width: '10%',
+      title: "Organisation ID",
+      dataIndex: "organisation_id",
+      key: "organisation_id",
+      width: "10%",
     },
     {
-      title: 'Media',
-      dataIndex: ['permission', 'media'],
+      title: "Media",
+      dataIndex: ["permission", "media"],
       render: (_, record) => {
         return record.permission.media > 0 ? (
           <p>{record.permission.media ? record.permission.media : 0}</p>
@@ -69,8 +72,8 @@ function PermissionList() {
       },
     },
     {
-      title: 'Posts',
-      dataIndex: ['permission', 'posts'],
+      title: "Posts",
+      dataIndex: ["permission", "posts"],
       render: (_, record) => {
         return record.permission.posts > 0 ? (
           <p>{record.permission.posts ? record.permission.posts : 0}</p>
@@ -80,8 +83,8 @@ function PermissionList() {
       },
     },
     {
-      title: 'Episodes',
-      dataIndex: ['permission', 'episodes'],
+      title: "Episodes",
+      dataIndex: ["permission", "episodes"],
       render: (_, record) => {
         return record.permission.episodes > 0 ? (
           <p>{record.permission.episodes ? record.permission.episodes : 0}</p>
@@ -91,17 +94,17 @@ function PermissionList() {
       },
     },
     {
-      title: 'Fact Check',
-      dataIndex: ['permission', 'fact_check'],
+      title: "Fact Check",
+      dataIndex: ["permission", "fact_check"],
       render: (_, record) => {
-        return <p>{record.permission.fact_check ? 'Enabled' : 'Disabled'}</p>;
+        return <p>{record.permission.fact_check ? "Enabled" : "Disabled"}</p>;
       },
     },
     {
-      title: 'Podcast',
-      dataIndex: ['permission', 'podcast'],
+      title: "Podcast",
+      dataIndex: ["permission", "podcast"],
       render: (_, record) => {
-        return <p>{record.permission.podcast ? 'Enabled' : 'Disabled'}</p>;
+        return <p>{record.permission.podcast ? "Enabled" : "Disabled"}</p>;
       },
     },
     // {
@@ -144,7 +147,7 @@ function PermissionList() {
       columns={columns}
       dataSource={space_permissions}
       loading={loading}
-      rowKey={'id'}
+      rowKey={"id"}
       pagination={{
         total: total,
         current: filters.page,

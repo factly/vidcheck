@@ -1,15 +1,15 @@
-import * as Monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import * as Monaco from "monaco-editor/esm/vs/editor/editor.api";
 const schemas = [
   {
     schema: {
-      type: 'object',
+      type: "object",
       properties: {
         q1: {
-          enum: ['x1', 'x2'],
+          enum: ["x1", "x2"],
         },
       },
     },
-    uri: 'JsonSchema',
+    uri: "JsonSchema",
   },
 ];
 
@@ -17,12 +17,12 @@ export default function setupMonaco() {
   var fileCounter = 0;
   var editorArray = [];
   // define editor theme
-  Monaco.editor.defineTheme('myTheme', {
-    base: 'vs-dark',
+  Monaco.editor.defineTheme("myTheme", {
+    base: "vs-dark",
     inherit: true,
-    rules: [{ background: 'EDF9FA' }],
+    rules: [{ background: "EDF9FA" }],
   });
-  Monaco.editor.setTheme('myTheme');
+  Monaco.editor.setTheme("myTheme");
 
   // Create a new editor
   function newEditor(container_id, code, language) {
@@ -36,15 +36,15 @@ export default function setupMonaco() {
 
   // Create a new div
   function addNewEditor(code, language) {
-    var new_container = document.createElement('DIV');
-    new_container.id = 'container-' + fileCounter.toString(10);
-    new_container.className = 'container';
-    document.getElementById('root').appendChild(new_container);
+    var new_container = document.createElement("DIV");
+    new_container.id = "container-" + fileCounter.toString(10);
+    new_container.className = "container";
+    document.getElementById("root").appendChild(new_container);
     newEditor(new_container.id, code, language);
     fileCounter += 1;
   }
 
-  addNewEditor(null, 'html');
+  addNewEditor(null, "html");
 
   Monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
     allowComments: false,
@@ -65,7 +65,7 @@ export default function setupMonaco() {
     diagnostics: true,
   });
 
-  Monaco.languages.registerDocumentFormattingEditProvider('json', {
+  Monaco.languages.registerDocumentFormattingEditProvider("json", {
     provideDocumentFormattingEdits: function (model, options, token) {
       return [
         {

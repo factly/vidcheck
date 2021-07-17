@@ -1,7 +1,7 @@
-import React from 'react';
-import UppyUploader from '../Uppy';
-import { useDispatch } from 'react-redux';
-import { addMedium } from '../../actions/media';
+import React from "react";
+import UppyUploader from "../Uppy";
+import { useDispatch } from "react-redux";
+import { addMedium } from "../../actions/media";
 
 function UploadMedium({ onMediaUpload }) {
   const dispatch = useDispatch();

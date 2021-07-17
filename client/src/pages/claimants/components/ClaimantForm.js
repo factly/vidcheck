@@ -1,10 +1,10 @@
-import React from 'react';
-import { Button, Form, Input, Space } from 'antd';
-import { maker, checker } from '../../../utils/sluger';
-import MediaSelector from '../../../components/MediaSelector';
-import Editor from '../../../components/Editor';
-import MonacoEditor from '../../../components/MonacoEditor';
-import getJsonValue from '../../../utils/getJsonValue';
+import React from "react";
+import { Button, Form, Input, Space } from "antd";
+import { maker, checker } from "../../../utils/sluger";
+import MediaSelector from "../../../components/MediaSelector";
+import Editor from "../../../components/Editor";
+import MonacoEditor from "../../../components/MonacoEditor";
+import getJsonValue from "../../../utils/getJsonValue";
 
 const { TextArea } = Input;
 
@@ -25,7 +25,7 @@ const tailLayout = {
 
 const ClaimantForm = ({ onCreate, data = {} }) => {
   if (data && data.meta_fields) {
-    if (typeof data.meta_fields !== 'string') {
+    if (typeof data.meta_fields !== "string") {
       data.meta_fields = JSON.stringify(data.meta_fields);
     }
   }
@@ -65,10 +65,10 @@ const ClaimantForm = ({ onCreate, data = {} }) => {
         rules={[
           {
             required: true,
-            message: 'Please enter the name!',
+            message: "Please enter the name!",
           },
-          { min: 3, message: 'Name must be minimum 3 characters.' },
-          { max: 50, message: 'Name must be maximum 50 characters.' },
+          { min: 3, message: "Name must be minimum 3 characters." },
+          { max: 50, message: "Name must be maximum 50 characters." },
         ]}
       >
         <Input onChange={(e) => onTitleChange(e.target.value)} />
@@ -79,11 +79,11 @@ const ClaimantForm = ({ onCreate, data = {} }) => {
         rules={[
           {
             required: true,
-            message: 'Please input the slug!',
+            message: "Please input the slug!",
           },
           {
             pattern: checker,
-            message: 'Please enter valid slug!',
+            message: "Please enter valid slug!",
           },
         ]}
       >
@@ -97,7 +97,7 @@ const ClaimantForm = ({ onCreate, data = {} }) => {
         <MediaSelector />
       </Form.Item>
       <Form.Item name="description" label="Description">
-        <Editor style={{ width: '600px' }} placeholder="Enter Description..." />
+        <Editor style={{ width: "600px" }} placeholder="Enter Description..." />
       </Form.Item>
       <Form.Item name="meta_fields" label="Metafields">
         <MonacoEditor language="json" />
@@ -105,7 +105,7 @@ const ClaimantForm = ({ onCreate, data = {} }) => {
       <Form.Item {...tailLayout}>
         <Space>
           <Button disabled={!valueChange} type="primary" htmlType="submit">
-            {data && data.id ? 'Update' : 'Submit'}
+            {data && data.id ? "Update" : "Submit"}
           </Button>
           <Button htmlType="button" onClick={onReset}>
             Reset
