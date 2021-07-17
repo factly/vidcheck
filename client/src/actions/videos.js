@@ -23,9 +23,6 @@ export const getVideos = (query = {}) => {
     if (query.tag && query.tag.length > 0) {
       query.tag.map((each) => params.append('tag', each));
     }
-    if (query.format && query.format.length > 0) {
-      query.format.map((each) => params.append('format', each));
-    }
     if (query.page) {
       params.append('page', query.page);
     }
