@@ -22,7 +22,7 @@ func CheckDegaEnable(h http.Handler) http.Handler {
 
 		factCheck := []string{"ratings", "claimants"}
 
-		isContains := contains(factCheck, action)
+		isContains := ContainString(factCheck, action)
 
 		if viper.GetBool("dega_integration") && action == "videos" {
 
@@ -82,13 +82,4 @@ func CheckDegaEnable(h http.Handler) http.Handler {
 
 		h.ServeHTTP(w, r)
 	})
-}
-
-func contains(s []string, e string) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
 }
