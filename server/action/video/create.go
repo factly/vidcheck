@@ -11,6 +11,7 @@ import (
 
 	"github.com/factly/vidcheck/action/author"
 	"github.com/factly/vidcheck/config"
+	"github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/spf13/viper"
 
 	"github.com/factly/vidcheck/model"
@@ -193,7 +194,17 @@ func create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	claimBlocks := make([]model.Claim, 0)
-	claimList := []model.Claim{}
+
+	claimByte, err := util.ClaimSource(videoData.Video.URL, videoData.Video.Title)
+
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot parse claim sources", http.StatusUnprocessableEntity)))
+		return
+	}
+
+	claimSources := postgres.Jsonb{}
+	claimSources.RawMessage = claimByte
 
 	for _, claimBlock := range videoData.Claims {
 		// Store HTML description
@@ -217,14 +228,14 @@ func create(w http.ResponseWriter, r *http.Request) {
 			Description:     claimBlock.Description,
 			ClaimantID:      claimBlock.ClaimantID,
 			ReviewSources:   claimBlock.ReviewSources,
-			ClaimSources:    claimBlock.ClaimSources,
+			ClaimSources:    claimSources,
 			StartTime:       claimBlock.StartTime,
 			EndTime:         claimBlock.EndTime,
 			HTMLDescription: description,
 			SpaceID:         uint(sID),
 		}
 
-		claimList = append(claimList, *claimBlockObj)
+		claimBlocks = append(claimBlocks, *claimBlockObj)
 	}
 
 	err = insertVideoIntoMeili(videoObj, videoData.Video.TagIDs, videoData.Video.CategoryIDs)
@@ -235,7 +246,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = tx.Preload("Rating").Preload("Claimant").Create(&claimList).Error
+	err = tx.Preload("Rating").Preload("Claimant").Create(&claimBlocks).Error
 	if err != nil {
 		tx.Rollback()
 		loggerx.Error(err)
@@ -243,7 +254,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, claim := range claimList {
+	for _, claim := range claimBlocks {
 		var claimMeiliDate int64 = 0
 		if claim.ClaimDate != nil {
 			claimMeiliDate = claim.ClaimDate.Unix()

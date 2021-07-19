@@ -21,6 +21,7 @@ import (
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/validationx"
 	"github.com/go-chi/chi"
+	"github.com/jinzhu/gorm/dialects/postgres"
 )
 
 // update - Update video by id
@@ -299,6 +300,17 @@ func update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	claimByte, err := util.ClaimSource(videoData.Video.URL, videoData.Video.Title)
+
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot parse claim sources", http.StatusUnprocessableEntity)))
+		return
+	}
+
+	claimSources := postgres.Jsonb{}
+	claimSources.RawMessage = claimByte
+
 	for _, claimBlock := range videoData.Claims {
 		if claimBlock.ID != uint(0) {
 
@@ -325,7 +337,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 				Description:     claimBlock.Description,
 				ReviewSources:   claimBlock.ReviewSources,
 				ClaimantID:      claimBlock.ClaimantID,
-				ClaimSources:    claimBlock.ClaimSources,
+				ClaimSources:    claimSources,
 				StartTime:       claimBlock.StartTime,
 				EndTime:         claimBlock.EndTime,
 				HTMLDescription: description,
@@ -362,6 +374,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 				Fact:            claimBlock.Fact,
 				Description:     claimBlock.Description,
 				ReviewSources:   claimBlock.ReviewSources,
+				ClaimSources:    claimSources,
 				StartTime:       claimBlock.StartTime,
 				EndTime:         claimBlock.EndTime,
 				HTMLDescription: description,
