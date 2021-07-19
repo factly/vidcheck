@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/factly/vidcheck/config"
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
@@ -67,7 +68,7 @@ func delete(w http.ResponseWriter, r *http.Request) {
 	defer resp.Body.Close()
 
 	objectID := fmt.Sprint("policy_", policyId)
-	_, err = meilisearchx.Client.Documents("vidcheck").Delete(objectID)
+	_, err = meilisearchx.Client.Documents(config.AppName).Delete(objectID)
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))

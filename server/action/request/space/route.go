@@ -3,6 +3,7 @@ package space
 import (
 	"net/http"
 
+	"github.com/factly/vidcheck/config"
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/middlewarex"
@@ -24,11 +25,9 @@ type spacePermissionRequest struct {
 func Router() http.Handler {
 	r := chi.NewRouter()
 
-	app := "vidcheck"
-
-	r.With(middlewarex.CheckSuperOrganisation(app, util.GetOrganisation)).Get("/", list)
+	r.With(middlewarex.CheckSuperOrganisation(config.AppName, util.GetOrganisation)).Get("/", list)
 	r.Get("/my", my)
-	r.With(middlewarex.CheckSuperOrganisation(app, util.GetOrganisation)).Route("/{request_id}", func(r chi.Router) {
+	r.With(middlewarex.CheckSuperOrganisation(config.AppName, util.GetOrganisation)).Route("/{request_id}", func(r chi.Router) {
 		r.Get("/", details)
 		r.Delete("/", delete)
 		r.Post("/approve", approve)

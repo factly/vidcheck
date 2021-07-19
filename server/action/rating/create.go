@@ -9,6 +9,7 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/factly/vidcheck/config"
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
@@ -158,5 +159,5 @@ func insertIntoMeili(rating model.Rating) error {
 		"meta_fields":       rating.MetaFields,
 	}
 
-	return meilisearchx.AddDocument("vidcheck", meiliObj)
+	return meilisearchx.AddDocument(config.AppName, meiliObj)
 }
