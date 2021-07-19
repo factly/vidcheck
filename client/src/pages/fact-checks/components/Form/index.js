@@ -164,7 +164,11 @@ function Analysis({ onSubmit }) {
     <>
       <Form
         form={claimform}
-        initialValues={{ ...video }}
+        initialValues={{
+          ...video, published_date: video.published_date
+            ? moment(video.published_date).format("YYYY-MM-DDTHH:mm:ssZ")
+            : null
+        }}
         style={{ maxWidth: "100%", width: "100%" }}
         onFinish={(values) => {
           values.category_ids = values.categories || [];
@@ -173,8 +177,8 @@ function Analysis({ onSubmit }) {
           values.status = status;
           values.status === "publish"
             ? (values.published_date = values.published_date
-                ? moment(values.published_date).format("YYYY-MM-DDTHH:mm:ssZ")
-                : moment(Date.now()).format("YYYY-MM-DDTHH:mm:ssZ"))
+              ? moment(values.published_date).format("YYYY-MM-DDTHH:mm:ssZ")
+              : moment(Date.now()).format("YYYY-MM-DDTHH:mm:ssZ"))
             : (values.published_date = null);
           onSubmit({
             video: {
@@ -539,9 +543,9 @@ function Analysis({ onSubmit }) {
                 >
                   <Input />
                 </Form.Item>
-                <Form.Item name="published_date" label="Published Date">
+                {/* <Form.Item name="published_date" label="Published Date">
                   <DatePicker />
-                </Form.Item>
+                </Form.Item> */}
                 <Form.Item name="categories" label="Categories">
                   <Selector
                     mode="multiple"
