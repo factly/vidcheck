@@ -3,7 +3,6 @@ package util
 import (
 	"context"
 	"errors"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -52,8 +51,6 @@ func CheckSpace(h http.Handler) http.Handler {
 			ctx = context.WithValue(ctx, SpaceIDKey, sid)
 
 			var spaceObj model.Space
-
-			log.Println("sid", sid)
 
 			spaceObj.ID = uint(sid)
 
