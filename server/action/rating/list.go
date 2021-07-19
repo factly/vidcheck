@@ -1,8 +1,6 @@
 package rating
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/factly/vidcheck/model"
@@ -11,7 +9,6 @@ import (
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/paginationx"
 	"github.com/factly/x/renderx"
-	"github.com/spf13/viper"
 )
 
 // list response
@@ -57,36 +54,4 @@ func list(w http.ResponseWriter, r *http.Request) {
 	}
 
 	renderx.JSON(w, http.StatusOK, result)
-}
-
-//GetDegaRatings fetches all the ratings from dega-server
-func GetDegaRatings(uID, sID int, ids []uint) (map[uint]model.Rating, error) {
-	url := fmt.Sprint(viper.GetString("dega_url"), "/fact-check/ratings?all=true")
-	req, _ := http.NewRequest("GET", url, nil)
-
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-User", fmt.Sprint(uID))
-	req.Header.Set("X-Space", fmt.Sprint(sID))
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	defer resp.Body.Close()
-
-	var pagingRes paging
-	err = json.NewDecoder(resp.Body).Decode(&pagingRes)
-	if err != nil {
-		return nil, err
-	}
-
-	ratmap := make(map[uint]model.Rating)
-	for _, rating := range pagingRes.Nodes {
-		if util.Contains(ids, rating.ID) {
-			ratmap[rating.ID] = rating
-		}
-	}
-	return ratmap, nil
 }

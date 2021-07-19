@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/factly/vidcheck/action/author"
+	"github.com/factly/vidcheck/config"
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
@@ -98,7 +99,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		"description": result.Description,
 	}
 
-	err = meilisearchx.UpdateDocument("vidcheck", meiliObj)
+	err = meilisearchx.UpdateDocument(config.AppName, meiliObj)
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))

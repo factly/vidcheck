@@ -48,7 +48,7 @@ func publishedDetails(w http.ResponseWriter, r *http.Request) {
 
 	videoObj := &model.Video{}
 	videoObj.ID = uint(id)
-	claimBlocks := make([]model.ClaimData, 0)
+	claimBlocks := make([]model.Claim, 0)
 	err = model.DB.Model(&model.Video{}).Where(&model.Video{
 		SpaceID: uint(sID),
 		Status:  "publish",
@@ -80,7 +80,7 @@ func publishedDetails(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	model.DB.Model(&model.Claim{}).Preload("Rating").Order("start_time").Where("video_id = ?", uint(id)).Find(&claimBlocks)
+	model.DB.Model(&model.Claim{}).Preload("Rating").Order("start_time").Where("video_id = ?", uint(id)).Preload("Rating").Preload("Claimant").Find(&claimBlocks)
 
 	for index, each := range claimBlocks {
 

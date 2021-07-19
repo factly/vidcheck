@@ -14,10 +14,14 @@ type OrganisationPermission struct {
 // SpacePermission model
 type SpacePermission struct {
 	Base
-	SpaceID uint   `gorm:"column:space_id" json:"space_id"`
-	Space   *Space `gorm:"foreignKey:space_id" json:"space,omitempty"`
-	Media   int64  `gorm:"column:media" json:"media"`
-	Videos  int64  `gorm:"column:videos" json:"videos"`
+	FactCheck bool   `gorm:"column:fact_check" json:"fact_check"`
+	SpaceID   uint   `gorm:"column:space_id" json:"space_id"`
+	Space     *Space `json:"space,omitempty"`
+	Media     int64  `gorm:"column:media" json:"media"`
+	Posts     int64  `gorm:"column:posts" json:"posts"`
+	Podcast   bool   `gorm:"column:podcast" json:"podcast"`
+	Episodes  int64  `gorm:"column:episodes" json:"episodes"`
+	Videos    int64  `gorm:"column:videos" json:"videos"`
 }
 
 var spacePermissionUser ContextKey = "space_perm_user"

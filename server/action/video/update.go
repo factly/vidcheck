@@ -10,8 +10,6 @@ import (
 	"time"
 
 	"github.com/factly/vidcheck/action/author"
-	"github.com/factly/vidcheck/action/claimant"
-	"github.com/factly/vidcheck/action/rating"
 	"github.com/factly/vidcheck/config"
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
@@ -23,6 +21,7 @@ import (
 	"github.com/factly/x/renderx"
 	"github.com/factly/x/validationx"
 	"github.com/go-chi/chi"
+	"github.com/jinzhu/gorm/dialects/postgres"
 )
 
 // update - Update video by id
@@ -108,9 +107,6 @@ func update(w http.ResponseWriter, r *http.Request) {
 		errorx.Render(w, errorx.Parser(errorx.RecordNotFound()))
 		return
 	}
-
-	ratingMap := make(map[uint]model.Rating)
-	claimantMap := make(map[uint]model.Claimant)
 
 	tx := model.DB.Begin()
 
@@ -279,63 +275,6 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	var updatedOrCreatedVideoBlock []uint
 
-	ratingIds := make([]uint, 0)
-	claimantIds := make([]uint, 0)
-	rMap := make(map[uint]uint)
-	cMap := make(map[uint]uint)
-
-	for _, each := range videoData.Claims {
-
-		rMap[each.RatingID] = each.RatingID
-		cMap[each.ClaimantID] = each.ClaimantID
-
-	}
-	for _, rid := range rMap {
-		ratingIds = append(ratingIds, rid)
-	}
-	for _, cid := range cMap {
-		claimantIds = append(claimantIds, cid)
-	}
-
-	if config.DegaIntegrated() {
-		ratingMap, err = rating.GetDegaRatings(uID, sID, ratingIds)
-		if err != nil {
-			tx.Rollback()
-			loggerx.Error(err)
-			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-			return
-		}
-		claimantMap, err = claimant.GetDegaClaimants(uID, sID, claimantIds)
-		if err != nil {
-			tx.Rollback()
-			loggerx.Error(err)
-			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-			return
-		}
-	} else {
-
-		ratings := make([]model.Rating, 0)
-		claimants := make([]model.Claimant, 0)
-
-		model.DB.Model(model.Rating{}).Where(ratingIds).Find(&ratings)
-
-		model.DB.Model(model.Claimant{}).Where(claimantIds).Find(&claimants)
-
-		for _, rating := range ratings {
-			ratingMap[rating.ID] = rating
-		}
-		for _, claimant := range claimants {
-			claimantMap[claimant.ID] = claimant
-		}
-	}
-
-	if !(len(ratingIds) == len(ratingMap) && len(claimantIds) == len(claimantMap)) {
-		tx.Rollback()
-		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.GetMessage("Invalid rating or claimant id", http.StatusUnprocessableEntity)))
-		return
-	}
-
 	meiliVideoObj := map[string]interface{}{
 		"id":                 videoObj.ID,
 		"kind":               "video",
@@ -351,17 +290,26 @@ func update(w http.ResponseWriter, r *http.Request) {
 		"tag_ids":            videoData.Video.TagIDs,
 		"category_ids":       videoData.Video.CategoryIDs,
 		"author_ids":         videoData.Video.AuthorIDs,
-		"rating_ids":         ratingIds,
-		"claimant_ids":       claimantIds,
 	}
 
-	err = meilisearchx.UpdateDocument("vidcheck", meiliVideoObj)
+	err = meilisearchx.UpdateDocument(config.AppName, meiliVideoObj)
 	if err != nil {
 		tx.Rollback()
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
 		return
 	}
+
+	claimByte, err := util.ClaimSource(videoData.Video.URL, videoData.Video.Title)
+
+	if err != nil {
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot parse claim sources", http.StatusUnprocessableEntity)))
+		return
+	}
+
+	claimSources := postgres.Jsonb{}
+	claimSources.RawMessage = claimByte
 
 	for _, claimBlock := range videoData.Claims {
 		if claimBlock.ID != uint(0) {
@@ -389,10 +337,11 @@ func update(w http.ResponseWriter, r *http.Request) {
 				Description:     claimBlock.Description,
 				ReviewSources:   claimBlock.ReviewSources,
 				ClaimantID:      claimBlock.ClaimantID,
-				ClaimSources:    claimBlock.ClaimSources,
+				ClaimSources:    claimSources,
 				StartTime:       claimBlock.StartTime,
 				EndTime:         claimBlock.EndTime,
 				HTMLDescription: description,
+				SpaceID:         uint(sID),
 			})
 
 			err = updateAnalysisObjIntoMeili(*claimBlockObj)
@@ -418,16 +367,18 @@ func update(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 			claimBlockObj = model.Claim{
-				VideoID:         videoObj.ID,
+				VideoID:         &videoObj.ID,
 				RatingID:        claimBlock.RatingID,
 				ClaimantID:      claimBlock.ClaimantID,
 				Claim:           claimBlock.Claim,
 				Fact:            claimBlock.Fact,
 				Description:     claimBlock.Description,
 				ReviewSources:   claimBlock.ReviewSources,
+				ClaimSources:    claimSources,
 				StartTime:       claimBlock.StartTime,
 				EndTime:         claimBlock.EndTime,
 				HTMLDescription: description,
+				SpaceID:         uint(sID),
 			}
 			err = tx.Model(&model.Claim{}).Create(&claimBlockObj).Error
 			if err != nil {
@@ -453,7 +404,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 		tx.Model(&model.Claim{}).Not(updatedOrCreatedVideoBlock).Where("video_id = ?", uint(id)).Delete(&claims)
 
 		for _, claim := range claims {
-			err = meilisearchx.DeleteDocument("vidcheck", claim.ID, "claim")
+			err = meilisearchx.DeleteDocument(config.AppName, claim.ID, "claim")
 			if err != nil {
 				tx.Rollback()
 				loggerx.Error(err)
@@ -465,11 +416,9 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	tx.Commit()
 
-	// Get all video claimBlocks.
-	claimList := []model.Claim{}
-	model.DB.Model(&model.Claim{}).Order("start_time").Where("video_id = ?", uint(id)).Find(&claimList)
+	claimBlocks := make([]model.Claim, 0)
 
-	claimBlocks := AddEntities(uID, sID, claimList, ratingMap, claimantMap)
+	model.DB.Model(&model.Claim{}).Order("start_time").Where("video_id = ?", uint(id)).Preload("Rating").Preload("Claimant").Find(&claimBlocks)
 
 	result.Claims = claimBlocks
 
@@ -502,5 +451,5 @@ func updateAnalysisObjIntoMeili(claim model.Claim) error {
 		"space_id":       claim.SpaceID,
 	}
 
-	return meilisearchx.UpdateDocument("vidcheck", meiliObj)
+	return meilisearchx.UpdateDocument(config.AppName, meiliObj)
 }

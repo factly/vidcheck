@@ -102,6 +102,10 @@ func my(w http.ResponseWriter, r *http.Request) {
 	// Fetched all the spaces related to all the organisations
 	var allSpaces = make([]model.Space, 0)
 
+	space := model.Space{}
+
+	model.DB.First(&space)
+
 	model.DB.Model(model.Space{}).Where("organisation_id IN (?)", allOrgIDs).Preload("Logo").Preload("LogoMobile").Preload("FavIcon").Preload("MobileIcon").Find(&allSpaces)
 
 	// fetch all the keto policies

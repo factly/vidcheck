@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"reflect"
 
+	"github.com/factly/vidcheck/config"
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
@@ -117,7 +118,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		"meta_fields": result.MetaFields,
 	}
 
-	err = meilisearchx.AddDocument("vidcheck", meiliObj)
+	err = meilisearchx.AddDocument(config.AppName, meiliObj)
 	if err != nil {
 		tx.Rollback()
 		loggerx.Error(err)

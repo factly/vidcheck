@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/factly/vidcheck/config"
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
@@ -55,7 +56,7 @@ func list(w http.ResponseWriter, r *http.Request) {
 		filters := fmt.Sprint("space_id=", sID)
 		var hits []interface{}
 
-		hits, err = meilisearchx.SearchWithQuery("vidcheck", searchQuery, filters, "category")
+		hits, err = meilisearchx.SearchWithQuery(config.AppName, searchQuery, filters, "category")
 
 		if err != nil {
 			loggerx.Error(err)

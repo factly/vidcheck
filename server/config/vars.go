@@ -6,6 +6,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+var AppName string = "vidcheck"
+
 // SetupVars setups all the config variables to run application
 func SetupVars() {
 	viper.AddConfigPath(".")
@@ -63,5 +65,10 @@ func SetupVars() {
 
 // DegaIntegrated checks if dega integration is on
 func DegaIntegrated() bool {
-	return viper.IsSet("dega_integration") && viper.GetBool("dega_integration")
+
+	isDegaIntegrated := viper.IsSet("dega_integration") && viper.GetBool("dega_integration")
+	if isDegaIntegrated {
+		AppName = "dega"
+	}
+	return isDegaIntegrated
 }

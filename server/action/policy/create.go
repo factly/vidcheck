@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/factly/vidcheck/action/author"
+	"github.com/factly/vidcheck/config"
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
@@ -81,5 +82,5 @@ func insertIntoMeili(result model.Policy) error {
 		"description": result.Description,
 	}
 
-	return meilisearchx.AddDocument("vidcheck", meiliObj)
+	return meilisearchx.AddDocument(config.AppName, meiliObj)
 }

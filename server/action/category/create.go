@@ -10,6 +10,7 @@ import (
 	"github.com/factly/x/loggerx"
 	"gorm.io/gorm"
 
+	"github.com/factly/vidcheck/config"
 	"github.com/factly/vidcheck/model"
 
 	"github.com/factly/vidcheck/util"
@@ -155,7 +156,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		"meta_fields": result.MetaFields,
 	}
 
-	err = meilisearchx.AddDocument("vidcheck", meiliObj)
+	err = meilisearchx.AddDocument(config.AppName, meiliObj)
 	if err != nil {
 		tx.Rollback()
 		loggerx.Error(err)

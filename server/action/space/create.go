@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/factly/vidcheck/config"
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
@@ -69,7 +70,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 
 	var superOrgID int
 	if viper.GetBool("create_super_organisation") {
-		superOrgID, err = middlewarex.GetSuperOrganisationID("vidcheck")
+		superOrgID, err = middlewarex.GetSuperOrganisationID(config.AppName)
 		if err != nil {
 			loggerx.Error(err)
 			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
@@ -179,7 +180,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		"meta_fields":     result.MetaFields,
 	}
 
-	err = meilisearchx.AddDocument("vidcheck", meiliObj)
+	err = meilisearchx.AddDocument(config.AppName, meiliObj)
 	if err != nil {
 		tx.Rollback()
 		loggerx.Error(err)

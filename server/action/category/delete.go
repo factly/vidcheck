@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/factly/vidcheck/config"
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
@@ -91,7 +92,7 @@ func delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = meilisearchx.DeleteDocument("vidcheck", result.ID, "category")
+	err = meilisearchx.DeleteDocument(config.AppName, result.ID, "category")
 	if err != nil {
 		tx.Rollback()
 		loggerx.Error(err)

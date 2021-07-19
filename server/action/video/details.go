@@ -6,17 +6,12 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/factly/vidcheck/config"
-
 	"github.com/factly/vidcheck/action/author"
-	"github.com/factly/vidcheck/action/claimant"
-	"github.com/factly/vidcheck/action/rating"
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/editorx"
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
-	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/renderx"
 	"github.com/go-chi/chi"
 )
@@ -41,13 +36,6 @@ func details(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uID, err := middlewarex.GetUser(r.Context())
-	if err != nil {
-		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-		return
-	}
-
 	videoID := chi.URLParam(r, "video_id")
 	id, err := strconv.Atoi(videoID)
 	if err != nil {
@@ -62,8 +50,7 @@ func details(w http.ResponseWriter, r *http.Request) {
 	videoObj.Tags = make([]model.Tag, 0)
 	videoObj.Categories = make([]model.Category, 0)
 	videoObj.ID = uint(id)
-	claimBlocks := make([]model.ClaimData, 0)
-	claimList := make([]model.Claim, 0)
+	claimBlocks := make([]model.Claim, 0)
 	videoAuthors := []model.VideoAuthor{}
 
 	err = model.DB.Model(&model.Video{}).Where(&model.Video{
@@ -77,9 +64,6 @@ func details(w http.ResponseWriter, r *http.Request) {
 
 	result.Video.Video = *videoObj
 	result.Video.Authors = make([]model.Author, 0)
-
-	var ratingMap map[uint]model.Rating
-	var claimantMap map[uint]model.Claimant
 
 	// fetch all authors
 	model.DB.Model(&model.VideoAuthor{}).Where(&model.VideoAuthor{
@@ -100,43 +84,7 @@ func details(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	model.DB.Model(&model.Claim{}).Order("start_time").Where("video_id = ?", uint(id)).Find(&claimList)
-
-	ratingIDs, claimantIDs := getRatingAndClaimantIDs(claimList)
-
-	if config.DegaIntegrated() {
-		ratingMap, err := rating.GetDegaRatings(uID, sID, ratingIDs)
-		if err != nil {
-			loggerx.Error(err)
-			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-			return
-		}
-
-		claimantMap, err := claimant.GetDegaClaimants(uID, sID, claimantIDs)
-		if err != nil {
-			loggerx.Error(err)
-			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-			return
-		}
-
-		claimBlocks = AddEntities(uID, sID, claimList, ratingMap, claimantMap)
-	} else {
-
-		ratings := make([]model.Rating, 0)
-		claimants := make([]model.Claimant, 0)
-
-		model.DB.Model(model.Rating{}).Where(ratingIDs).Find(&ratings)
-
-		model.DB.Model(model.Claimant{}).Where(claimantIDs).Find(&claimants)
-
-		for _, rating := range ratings {
-			ratingMap[rating.ID] = rating
-		}
-		for _, claimant := range claimants {
-			claimantMap[claimant.ID] = claimant
-		}
-
-	}
+	model.DB.Model(&model.Claim{}).Order("start_time").Where("video_id = ?", uint(id)).Preload("Rating").Preload("Claimant").Find(&claimBlocks)
 
 	for index, each := range claimBlocks {
 
@@ -155,19 +103,4 @@ func details(w http.ResponseWriter, r *http.Request) {
 	result.Claims = claimBlocks
 
 	renderx.JSON(w, http.StatusOK, result)
-}
-
-// AddEntities added ratings and claimants from dega server in claim list
-func AddEntities(uID, sID int, claimList []model.Claim, ratingMap map[uint]model.Rating, claimantMap map[uint]model.Claimant) []model.ClaimData {
-	claimBlocks := make([]model.ClaimData, 0)
-	for _, claim := range claimList {
-		claimObj := model.ClaimData{
-			Claim:    claim,
-			Rating:   ratingMap[claim.RatingID],
-			Claimant: claimantMap[claim.ClaimantID],
-		}
-		claimBlocks = append(claimBlocks, claimObj)
-
-	}
-	return claimBlocks
 }
