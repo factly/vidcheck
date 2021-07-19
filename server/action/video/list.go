@@ -6,8 +6,6 @@ import (
 	"net/url"
 
 	"github.com/factly/vidcheck/action/author"
-	"github.com/factly/vidcheck/action/claimant"
-	"github.com/factly/vidcheck/action/rating"
 	"github.com/factly/vidcheck/config"
 
 	"github.com/factly/vidcheck/model"
@@ -15,7 +13,6 @@ import (
 	"github.com/factly/x/errorx"
 	"github.com/factly/x/loggerx"
 	"github.com/factly/x/meilisearchx"
-	"github.com/factly/x/middlewarex"
 	"github.com/factly/x/paginationx"
 	"github.com/factly/x/renderx"
 )
@@ -40,13 +37,6 @@ type paging struct {
 // @Router /videos [get]
 func list(w http.ResponseWriter, r *http.Request) {
 	sID, err := util.GetSpace(r.Context())
-	if err != nil {
-		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-		return
-	}
-
-	uID, err := middlewarex.GetUser(r.Context())
 	if err != nil {
 		loggerx.Error(err)
 		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
@@ -79,9 +69,9 @@ func list(w http.ResponseWriter, r *http.Request) {
 		var res map[string]interface{}
 
 		if searchQuery != "" {
-			hits, err = meilisearchx.SearchWithQuery("vidcheck", searchQuery, filters, "video")
+			hits, err = meilisearchx.SearchWithQuery(config.AppName, searchQuery, filters, "video")
 		} else {
-			res, err = meilisearchx.SearchWithoutQuery("vidcheck", filters, "video")
+			res, err = meilisearchx.SearchWithoutQuery(config.AppName, filters, "video")
 			if _, found := res["hits"]; found {
 				hits = res["hits"].([]interface{})
 			}
@@ -114,9 +104,6 @@ func list(w http.ResponseWriter, r *http.Request) {
 		err = tx.Count(&result.Total).Offset(offset).Limit(limit).Find(&videos).Error
 	}
 
-	var ratingMap map[uint]model.Rating
-	var claimantMap map[uint]model.Claimant
-
 	var videoIDs []uint
 	for _, p := range videos {
 		videoIDs = append(videoIDs, p.ID)
@@ -141,18 +128,14 @@ func list(w http.ResponseWriter, r *http.Request) {
 		}
 		videoAuthorMap[videoAuthor.VideoID] = append(videoAuthorMap[videoAuthor.VideoID], videoAuthor.AuthorID)
 	}
-	claimsList := make([]model.Claim, 0)
-
-	videoClaimList := make(map[uint][]model.Claim, 0)
 
 	for _, video := range videos {
 		var claimData videoResData
 		claimData.Video.Video = video
 		claimData.Video.Authors = make([]model.Author, 0)
+		claimData.Claims = make([]model.Claim, 0)
 
 		videoAuthors, hasEle := videoAuthorMap[video.ID]
-
-		claims := make([]model.Claim, 0)
 
 		if hasEle {
 			for _, videoAuthor := range videoAuthors {
@@ -162,59 +145,9 @@ func list(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		}
-		model.DB.Model(&model.Claim{}).Order("start_time").Where("video_id = ?", video.ID).Find(&claims)
-
-		claimsList = append(claimsList, claims...)
-
-		videoClaimList[video.ID] = claims
-
-		if config.DegaIntegrated() {
-			claimData.Claims = AddEntities(uID, sID, claimsList, ratingMap, claimantMap)
-		}
+		model.DB.Model(&model.Claim{}).Order("start_time").Where("video_id = ?", video.ID).Preload("Rating").Preload("Claimant").Find(&claimData.Claims)
 
 		result.Nodes = append(result.Nodes, claimData)
-	}
-
-	ratingIDs, claimantIDs := getRatingAndClaimantIDs(claimsList)
-
-	if config.DegaIntegrated() {
-		ratingMap, err = rating.GetDegaRatings(uID, sID, ratingIDs)
-		if err != nil {
-			tx.Rollback()
-			loggerx.Error(err)
-			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-			return
-		}
-		claimantMap, err = claimant.GetDegaClaimants(uID, sID, claimantIDs)
-		if err != nil {
-			tx.Rollback()
-			loggerx.Error(err)
-			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-			return
-		}
-	} else {
-
-		ratings := make([]model.Rating, 0)
-		claimants := make([]model.Claimant, 0)
-
-		model.DB.Model(model.Rating{}).Where(ratingIDs).Find(&ratings)
-
-		model.DB.Model(model.Claimant{}).Where(claimantIDs).Find(&claimants)
-
-		for _, rating := range ratings {
-			ratingMap[rating.ID] = rating
-		}
-		for _, claimant := range claimants {
-			claimantMap[claimant.ID] = claimant
-		}
-	}
-
-	for index, video := range result.Nodes {
-		videoData := video
-		if config.DegaIntegrated() {
-			videoData.Claims = AddEntities(uID, sID, videoClaimList[video.Video.ID], ratingMap, claimantMap)
-		}
-		result.Nodes[index] = videoData
 	}
 
 	renderx.JSON(w, http.StatusOK, result)

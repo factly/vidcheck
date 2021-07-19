@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-chi/chi"
 
+	"github.com/factly/vidcheck/config"
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
 	"github.com/factly/x/errorx"
@@ -79,7 +80,7 @@ func delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = meilisearchx.DeleteDocument("vidcheck", result.ID, "video")
+	err = meilisearchx.DeleteDocument(config.AppName, result.ID, "video")
 	if err != nil {
 		tx.Rollback()
 		loggerx.Error(err)
@@ -97,7 +98,7 @@ func delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, claim := range claimBlocks {
-		err = meilisearchx.DeleteDocument("vidcheck", claim.ID, "claim")
+		err = meilisearchx.DeleteDocument(config.AppName, claim.ID, "claim")
 		if err != nil {
 			tx.Rollback()
 			loggerx.Error(err)

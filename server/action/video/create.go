@@ -10,11 +10,8 @@ import (
 	"time"
 
 	"github.com/factly/vidcheck/action/author"
-	"github.com/factly/vidcheck/action/claimant"
-	"github.com/factly/vidcheck/action/rating"
-	"github.com/spf13/viper"
-
 	"github.com/factly/vidcheck/config"
+	"github.com/spf13/viper"
 
 	"github.com/factly/vidcheck/model"
 	"github.com/factly/vidcheck/util"
@@ -195,10 +192,8 @@ func create(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	claimBlocks := make([]model.ClaimData, 0)
+	claimBlocks := make([]model.Claim, 0)
 	claimList := []model.Claim{}
-	var ratingMap map[uint]model.Rating
-	var claimantMap map[uint]model.Claimant
 
 	for _, claimBlock := range videoData.Claims {
 		// Store HTML description
@@ -213,7 +208,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		}
 
 		claimBlockObj := &model.Claim{
-			VideoID:         videoObj.ID,
+			VideoID:         &videoObj.ID,
 			RatingID:        claimBlock.RatingID,
 			Claim:           claimBlock.Claim,
 			ClaimDate:       claimBlock.ClaimDate,
@@ -232,49 +227,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		claimList = append(claimList, *claimBlockObj)
 	}
 
-	ratingIDs, claimantIDs := getRatingAndClaimantIDs(claimList)
-
-	if config.DegaIntegrated() {
-		ratingMap, err = rating.GetDegaRatings(uID, sID, ratingIDs)
-		if err != nil {
-			tx.Rollback()
-			loggerx.Error(err)
-			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-			return
-		}
-		claimantMap, err = claimant.GetDegaClaimants(uID, sID, claimantIDs)
-
-		if err != nil {
-			tx.Rollback()
-			loggerx.Error(err)
-			errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
-			return
-		}
-	} else {
-
-		ratings := make([]model.Rating, 0)
-		claimants := make([]model.Claimant, 0)
-
-		model.DB.Model(model.Rating{}).Where(ratingIDs).Find(&ratings)
-
-		model.DB.Model(model.Claimant{}).Where(claimantIDs).Find(&claimants)
-
-		for _, rating := range ratings {
-			ratingMap[rating.ID] = rating
-		}
-		for _, claimant := range claimants {
-			claimantMap[claimant.ID] = claimant
-		}
-	}
-
-	if !(len(ratingIDs) == len(ratingMap) && len(claimantIDs) == len(claimantMap)) {
-		tx.Rollback()
-		loggerx.Error(err)
-		errorx.Render(w, errorx.Parser(errorx.GetMessage("Invalid rating or claimant id", http.StatusUnprocessableEntity)))
-		return
-	}
-
-	err = insertVideoIntoMeili(videoObj, ratingIDs, claimantIDs, videoData.Video.TagIDs, videoData.Video.CategoryIDs)
+	err = insertVideoIntoMeili(videoObj, videoData.Video.TagIDs, videoData.Video.CategoryIDs)
 	if err != nil {
 		tx.Rollback()
 		loggerx.Error(err)
@@ -282,7 +235,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = tx.Create(&claimList).Error
+	err = tx.Preload("Rating").Preload("Claimant").Create(&claimList).Error
 	if err != nil {
 		tx.Rollback()
 		loggerx.Error(err)
@@ -310,23 +263,12 @@ func create(w http.ResponseWriter, r *http.Request) {
 
 	tx.Commit()
 
-	for _, claim := range claimList {
-		claimData := model.ClaimData{
-			Claim: claim,
-		}
-		claimData.Rating = ratingMap[claim.RatingID]
-		claimData.Claimant = claimantMap[claim.ClaimantID]
-
-		claimBlocks = append(claimBlocks, claimData)
-
-	}
-
 	result.Claims = claimBlocks
 
 	renderx.JSON(w, http.StatusCreated, result)
 }
 
-func insertVideoIntoMeili(video model.Video, ratingIDs []uint, claimantIDs []uint, tagIds []uint, categoryIds []uint) error {
+func insertVideoIntoMeili(video model.Video, tagIds []uint, categoryIds []uint) error {
 	meiliObj := map[string]interface{}{
 		"id":             video.ID,
 		"kind":           "video",
@@ -338,13 +280,11 @@ func insertVideoIntoMeili(video model.Video, ratingIDs []uint, claimantIDs []uin
 		"status":         video.Status,
 		"total_duration": video.TotalDuration,
 		"space_id":       video.SpaceID,
-		"rating_ids":     ratingIDs,
-		"claimant_ids":   claimantIDs,
 		"tag_ids":        tagIds,
 		"category_ids":   categoryIds,
 	}
 
-	return meilisearchx.AddDocument("vidcheck", meiliObj)
+	return meilisearchx.AddDocument(config.AppName, meiliObj)
 }
 
 func insertClaimIntoMeili(claim model.Claim, claimMeiliDate int64, checkedMeiliDate int64) error {
@@ -365,11 +305,12 @@ func insertClaimIntoMeili(claim model.Claim, claimMeiliDate int64, checkedMeiliD
 		"space_id":       claim.SpaceID,
 	}
 
-	return meilisearchx.AddDocument("vidcheck", meiliObj)
+	return meilisearchx.AddDocument(config.AppName, meiliObj)
 }
 
 func getPublishPermissions(oID, sID, uID int) (int, error) {
-	commonString := fmt.Sprint(":org:", oID, ":app:vidcheck:space:", sID, ":")
+
+	commonString := fmt.Sprint(":org:", oID, ":app:", config.AppName, ":space:", sID, ":")
 
 	kresource := fmt.Sprint("resources", commonString, "fact-checks")
 	kaction := fmt.Sprint("actions", commonString, "fact-checks:publish")
