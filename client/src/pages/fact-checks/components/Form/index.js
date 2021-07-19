@@ -166,7 +166,7 @@ function Analysis({ onSubmit }) {
         form={claimform}
         initialValues={{
           ...video, published_date: video.published_date
-            ? moment(video.published_date).format("YYYY-MM-DDTHH:mm:ssZ")
+            ? moment(video.published_date)
             : null
         }}
         style={{ maxWidth: "100%", width: "100%" }}
@@ -543,9 +543,9 @@ function Analysis({ onSubmit }) {
                 >
                   <Input />
                 </Form.Item>
-                {/* <Form.Item name="published_date" label="Published Date">
+                <Form.Item name="published_date" label="Published Date">
                   <DatePicker />
-                </Form.Item> */}
+                </Form.Item>
                 <Form.Item name="categories" label="Categories">
                   <Selector
                     mode="multiple"
