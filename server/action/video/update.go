@@ -339,7 +339,6 @@ func update(w http.ResponseWriter, r *http.Request) {
 				errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
 				return
 			}
-			tx.Preload("Rating").Preload("Claimant").First(&claimBlockObj)
 			updatedOrCreatedVideoBlock = append(updatedOrCreatedVideoBlock, claimBlockObj.ID)
 		} else {
 
@@ -368,15 +367,13 @@ func update(w http.ResponseWriter, r *http.Request) {
 				HTMLDescription: description,
 				SpaceID:         uint(sID),
 			}
-			err = tx.Model(&model.Claim{}).Preload("Rating").Preload("Claimant").Create(&claimBlockObj).Error
+			err = tx.Model(&model.Claim{}).Create(&claimBlockObj).Error
 			if err != nil {
 				tx.Rollback()
 				loggerx.Error(err)
 				errorx.Render(w, errorx.Parser(errorx.DBError()))
 				return
 			}
-
-			tx.Preload("Rating").Preload("Claimant").First(&claimBlockObj)
 
 			err = updateAnalysisObjIntoMeili(claimBlockObj)
 			if err != nil {
@@ -408,7 +405,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 
 	claimBlocks := make([]model.Claim, 0)
 
-	model.DB.Model(&model.Claim{}).Order("start_time").Where("video_id = ?", uint(id)).Find(&claimBlocks)
+	model.DB.Model(&model.Claim{}).Order("start_time").Where("video_id = ?", uint(id)).Preload("Rating").Preload("Claimant").Find(&claimBlocks)
 
 	result.Claims = claimBlocks
 
