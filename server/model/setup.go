@@ -10,7 +10,6 @@ import (
 
 	"github.com/factly/x/loggerx"
 	"github.com/spf13/viper"
-	"gorm.io/gorm/schema"
 
 	"gorm.io/gorm"
 )
@@ -30,9 +29,6 @@ func SetupDB() {
 		"sslmode=", viper.GetString("database_ssl_mode"))
 
 	DB, err = gorm.Open(postgres.Open(dbString), &gorm.Config{
-		NamingStrategy: schema.NamingStrategy{
-			SingularTable: true,
-		},
 		Logger: loggerx.NewGormLogger(logger.Config{
 			SlowThreshold: 200 * time.Millisecond,
 			LogLevel:      logger.Info,
