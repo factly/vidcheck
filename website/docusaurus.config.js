@@ -5,7 +5,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 module.exports = {
   title: 'VidCheck',
   tagline: 'Open Source platform for publishing video fact-checks',
-  url: 'https://vidcheck.factly.org',
+  url: 'https://vidcheck.factlylabs.com',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
