@@ -111,10 +111,6 @@ module.exports = {
               label: 'Contributors',
               to: 'docs/contributors/introduction'
             }
-            // {
-            //   label: 'Dega Themes',
-            //   href: 'https://github.com/factly/dega-themes',
-            // },
           ],
         },
         {
@@ -150,13 +146,13 @@ module.exports = {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           editUrl:
-            'https://github.com/facebook/docusaurus/edit/master/website/',
+            'https://github.com/factly/vidcheck/edit/develop/website/',
         },
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
           editUrl:
-            'https://github.com/facebook/docusaurus/edit/master/website/blog/',
+            'https://github.com/factly/vidcheck/edit/develop/website/blog/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -165,7 +161,6 @@ module.exports = {
     ],
   ],
   customFields: {
-    // hero: 'Open Source. Simple. Written in React & Go.',
     hero: 'VidCheck makes video fact-checking more standardized for fact-checkers, easy to read and understand for audiences, and scalable for platforms & fact-checkers.',
   },
 
