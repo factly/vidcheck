@@ -17,7 +17,7 @@ We use the following phases to define the projects maturity:
 
 ## Dega
 
-Dega is a lightweight, scalable & high performant open-source publishing platform for small and medium scale news media organisations. The platform has various features built-in for fact-checking organisations. Dega supports managing multiple organisations and sites from the same portal. It is developed for modern web features with all the publishing best practices built-in. The tool is written in Go & React.
+Dega is a lightweight, scalable & high performant open-source publishing platform for media organisations of all sizes. The platform has various features built-in for fact-checking organisations. Dega supports managing multiple organisations and sites from the same portal. It is developed for modern web features with all the publishing best practices built-in. The tool is written in Go & React.
 
 **GitHub Repositories:**
 - https://github.com/factly/dega-server
