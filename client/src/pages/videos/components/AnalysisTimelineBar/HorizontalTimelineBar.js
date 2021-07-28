@@ -9,11 +9,11 @@ import { convertSecondsToTimeString } from "../../../../utils/analysis";
 
 function HorizontalTimelineBar({
   factCheckReview,
-  currentFormdata = {},
-  setCurrentFormData = () => {},
+  currentClaimIndex,
   height,
   totalDuration,
   visible = false,
+  player,
 }) {
   let start_time = 0;
   let end_time = 0;
@@ -44,29 +44,25 @@ function HorizontalTimelineBar({
                 >
                   <VideoLengthPart
                     height={height}
-                    width={`${
-                      ((review.end_time - review.start_time) / totalDuration) *
+                    width={`${((review.end_time - review.start_time) / totalDuration) *
                       100
-                    }%`}
+                      }%`}
                     showBorder={
-                      currentFormdata.id && currentFormdata.id === review.id
+                      currentClaimIndex && factCheckReview[currentClaimIndex].id === review.id
                     }
                     backgroundColor={
                       review.colour || review.rating.background_colour.hex
                     }
-                    onClick={() => {
-                      setCurrentFormData(review);
-                    }}
+                    onClick={() => player.current.seekTo(review.start_time)}
                   ></VideoLengthPart>
                 </Tooltip>
                 {index + 1 === factCheckReview.length &&
-                review.end_time < totalDuration ? (
+                  review.end_time < totalDuration ? (
                   <VideoLengthPart
                     height={height}
-                    width={`${
-                      ((totalDuration - review.end_time + 1) / totalDuration) *
+                    width={`${((totalDuration - review.end_time + 1) / totalDuration) *
                       100
-                    }%`}
+                      }%`}
                     backgroundColor={"#d9d9d9"}
                   ></VideoLengthPart>
                 ) : null}
@@ -87,29 +83,25 @@ function HorizontalTimelineBar({
                 >
                   <VideoLengthPart
                     height={height}
-                    width={`${
-                      ((review.end_time - review.start_time) / totalDuration) *
+                    width={`${((review.end_time - review.start_time) / totalDuration) *
                       100
-                    }%`}
+                      }%`}
                     showBorder={
-                      currentFormdata.id && currentFormdata.id === review.id
+                      currentClaimIndex && factCheckReview[currentClaimIndex].id === review.id
                     }
                     backgroundColor={
                       review.colour || review.rating.background_colour.hex
                     }
-                    onClick={() => {
-                      setCurrentFormData(review);
-                    }}
+                    onClick={() => player.current.seekTo(review.start_time)}
                   ></VideoLengthPart>
                 </Tooltip>
                 {index + 1 === factCheckReview.length &&
-                review.end_time < totalDuration ? (
+                  review.end_time < totalDuration ? (
                   <VideoLengthPart
                     height={height}
-                    width={`${
-                      ((totalDuration - review.end_time + 1) / totalDuration) *
+                    width={`${((totalDuration - review.end_time + 1) / totalDuration) *
                       100
-                    }%`}
+                      }%`}
                     backgroundColor={"#d9d9d9"}
                   ></VideoLengthPart>
                 ) : null}

@@ -10,7 +10,6 @@ export function transformVideoAnalysisdetails(resp) {
       id: analysisData.id,
       claimed: analysisData.claim,
       factCheckDetail: analysisData.fact,
-      end_time_fraction: analysisData.end_time_fraction,
       start_time: analysisData.start_time,
       end_time: analysisData.end_time,
       description: analysisData.description,
@@ -50,7 +49,6 @@ export function convertSecondsToTimeString(totalSecond) {
   const minutes = Math.floor(totalSecond / 60);
   const seconds = Math.floor(totalSecond % 60);
 
-  return `${minutes > 9 ? minutes : "0" + minutes}:${
-    seconds > 9 ? seconds : "0" + seconds
-  }`;
+  return `${minutes > 9 ? minutes : "0" + minutes}:${seconds > 9 ? seconds : "0" + seconds
+    }`;
 }

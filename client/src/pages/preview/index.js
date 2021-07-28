@@ -8,35 +8,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { getVideo } from "../../actions/videos";
 
-function Preview({ vid }) {
+function Preview() {
   const { id } = useParams();
-  let videoID = id;
-  if (vid > 0) {
-    videoID = vid;
-  }
-
   const dispatch = useDispatch();
-  const ratingColor = {
-    1: "#108040",
-    2: "#A5C239",
-    3: "#ECA124",
-    4: "#749990",
-    5: "#E82728",
-    6: "#f9f9fa",
-  };
-
-  const [currentStartTime, setCurrentStartTime] = React.useState(null);
   const player = React.useRef(null);
-  const [playing, setPlaying] = React.useState(false);
-  const [played, setPlayed] = React.useState(0);
-  const [currentFormdata, setCurrentFormData] = React.useState({});
   const [currentClaimIndex, setCurrentClaimIndex] = React.useState(0);
-  const [totalDuration, setTotalDuration] = React.useState(0);
-  const [loopDetails, setLoopDetails] = React.useState({
-    loopEnabled: false,
-    startFraction: 0,
-    endFraction: 1,
-  });
 
   const { videoData, loading } = useSelector((state) => {
     return {
@@ -46,8 +22,8 @@ function Preview({ vid }) {
   });
 
   React.useEffect(() => {
-    if (videoID > 0) dispatch(getVideo(videoID));
-  }, [videoID]);
+    if (!videoData) dispatch(getVideo(id));
+  }, [dispatch]);
 
   if (loading) {
     return <Skeleton />;
@@ -57,15 +33,6 @@ function Preview({ vid }) {
     return <Result />;
   }
 
-  const updateFormState = (data) => {
-    setPlayed(data.end_time_fraction);
-    player.current.seekTo(data.start_time, "seconds");
-    setCurrentFormData(data);
-    const claimIndex = videoData.claims.findIndex(
-      (item) => item.id === data.id
-    );
-    setCurrentClaimIndex(claimIndex);
-  };
   const factCheckReview =
     videoData && videoData.claims && videoData.claims.length > 0
       ? videoData.claims
@@ -73,41 +40,21 @@ function Preview({ vid }) {
 
   const handleProgress = () => {
     const currentPlayedTime = player.current.getCurrentTime();
-    const currentPlayed = currentPlayedTime / totalDuration;
-    if (
-      loopDetails.loopEnabled &&
-      (currentPlayed < loopDetails.startFraction ||
-        currentPlayed > loopDetails.endFraction)
-    ) {
-      player.current.seekTo(loopDetails.startFraction, "fraction");
-      setPlaying(false);
-    }
     let index;
-    let currentFormStartTime;
+
     for (index = 0; index < factCheckReview.length; ++index) {
-      if (currentPlayed < factCheckReview[index].end_time_fraction) {
-        currentFormStartTime =
-          index > 0 ? factCheckReview[index - 1].end_time : "00:00";
+      if (currentPlayedTime < factCheckReview[index].end_time) {
         break;
       }
     }
-    if (typeof currentFormStartTime == "undefined") {
-      if (factCheckReview.length === 0) {
-        currentFormStartTime = "00:00";
-      } else {
-        currentFormStartTime =
-          factCheckReview[factCheckReview.length - 1].end_time;
-      }
-    }
-    setCurrentStartTime(currentFormStartTime);
-    setPlayed(currentPlayed);
+    setCurrentClaimIndex(index !== factCheckReview.length ? index : index - 1);
   };
 
   const ratingCount = videoData.claims.reduce((acc, claim) => {
     if (!acc[claim.rating.name]) {
       acc[claim.rating.name] = {
         count: 0,
-        color: ratingColor[claim.rating.id],
+        color: claim.rating.background_colour.hex,
       };
     }
     acc[claim.rating.name].count += 1;
@@ -140,19 +87,19 @@ function Preview({ vid }) {
           <div style={{ marginBottom: 20 }}>
             <ReactPlayer
               url={videoData.video.url}
-              playing={playing}
+              playing={true}
               controls={true}
               ref={player}
               volume={0}
               onProgress={handleProgress}
-              onDuration={setTotalDuration}
             />
           </div>
           <HorizontalTimelineBar
+            player={player}
             totalDuration={videoData.video.total_duration}
-            factCheckReview={factCheckReview}
-            setCurrentFormData={updateFormState}
-            currentFormdata={currentFormdata}
+            currentClaimIndex={currentClaimIndex}
+            factCheckReview={videoData.claims}
+            setCurrentClaimIndex={setCurrentClaimIndex}
           />
         </div>
         <div
@@ -217,7 +164,6 @@ function Preview({ vid }) {
           justifyContent: "space-around",
           width: "70%",
           height: "450px",
-          marginTop: "20px",
           marginLeft: "auto",
           marginRight: "auto",
           backgroundColor: "#e9ecec",
@@ -239,7 +185,7 @@ function Preview({ vid }) {
               onClick={() =>
                 currentClaimIndex === 0
                   ? null
-                  : updateFormState(factCheckReview[currentClaimIndex - 1])
+                  : player.current.seekTo(videoData.claims[currentClaimIndex - 1].start_time)
               }
             >
               <LeftCircleFilled
@@ -258,7 +204,7 @@ function Preview({ vid }) {
                 borderStyle: "solid",
                 borderWidth: "2px",
                 borderRadius: "6px",
-                borderColor: ratingColor[currentClaim.rating.id],
+                borderColor: currentClaim.rating.background_colour.hex,
                 backgroundColor: "#fff",
                 padding: "20px",
                 minHeight: "240px",
@@ -280,7 +226,7 @@ function Preview({ vid }) {
                   style={{
                     fontSize: "14px",
                     textTransform: "uppercase",
-                    color: ratingColor[currentClaim.rating.id],
+                    color: currentClaim.rating.background_colour.hex,
                   }}
                 >
                   {currentClaim.rating.name}
@@ -295,7 +241,7 @@ function Preview({ vid }) {
                 <h4>Fact:</h4>
                 <div
                   style={{
-                    color: ratingColor[currentClaim.rating.id],
+                    color: currentClaim.rating.background_colour.hex,
                   }}
                 >
                   {videoData.claims[currentClaimIndex].fact}
@@ -307,7 +253,7 @@ function Preview({ vid }) {
               onClick={() =>
                 currentClaimIndex === videoData.claims.length - 1
                   ? null
-                  : updateFormState(factCheckReview[currentClaimIndex + 1])
+                  : player.current.seekTo(videoData.claims[currentClaimIndex + 1].start_time)
               }
             >
               <RightCircleFilled
