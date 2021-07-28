@@ -10,7 +10,6 @@ export function transformVideoAnalysisdetails(resp) {
       id: analysisData.id,
       claimed: analysisData.claim,
       factCheckDetail: analysisData.fact,
-      end_time_fraction: analysisData.end_time_fraction,
       start_time: analysisData.start_time,
       end_time: analysisData.end_time,
       description: analysisData.description,

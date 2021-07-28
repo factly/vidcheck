@@ -264,7 +264,7 @@ function Claim({ onCreate, claim, setClaim }) {
               type="primary"
               style={{ "margin-right": "15px" }}
             >
-              {claim.index > -1 ? "Update Claim" : "Add Claim"}
+              {claim.index >= 0 ? "Update Claim" : "Add Claim"}
             </Button>
             <Button onClick={onReset}>Reset Claim</Button>
           </div>

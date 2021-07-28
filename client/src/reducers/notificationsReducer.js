@@ -20,6 +20,7 @@ export default function notificationsReducer(
         type: action.payload.type,
         message: action.payload.title,
         description: action.payload.message,
+        time: action.payload.time,
       };
     default:
       return state;

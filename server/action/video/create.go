@@ -76,7 +76,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 	if videoData.Video.Status == "publish" {
 
 		if len(videoData.Video.AuthorIDs) == 0 {
-			errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot publish post without author", http.StatusUnprocessableEntity)))
+			errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot publish vid check without author", http.StatusUnprocessableEntity)))
 			return
 		}
 

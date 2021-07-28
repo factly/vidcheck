@@ -11,6 +11,7 @@ import { addErrorNotification, addSuccessNotification } from "./notifications";
 import { addCategories } from "./categories";
 import { addAuthors } from "./authors";
 import { addTags } from "./tags";
+import getError from "../utils/getError";
 
 export const getVideos = (query = {}) => {
   return (dispatch) => {
@@ -102,7 +103,7 @@ export const getVideos = (query = {}) => {
         dispatch(stopVideosLoading());
       })
       .catch((error) => {
-        dispatch(addErrorNotification(error.message));
+        dispatch(addErrorNotification(getError(error)));
       });
   };
 };
@@ -132,7 +133,7 @@ export const getVideo = (id) => {
         return videoObj;
       })
       .catch((error) => {
-        dispatch(addErrorNotification(error.message));
+        dispatch(addErrorNotification(getError(error)));
       });
   };
 };
@@ -148,7 +149,7 @@ export const addVideo = (data) => {
         return res.data;
       })
       .catch((error) => {
-        dispatch(addErrorNotification(error.message));
+        dispatch(addErrorNotification(getError(error)));
       });
   };
 };
@@ -179,7 +180,7 @@ export const updateVideo = (data) => {
         return response.data;
       })
       .catch((error) => {
-        dispatch(addErrorNotification(error.message));
+        dispatch(addErrorNotification(getError(error)));
       });
   };
 };
@@ -194,7 +195,7 @@ export const deleteVideo = (id) => {
         dispatch(addSuccessNotification("Video deleted"));
       })
       .catch((error) => {
-        dispatch(addErrorNotification(error.message));
+        dispatch(addErrorNotification(getError(error)));
       });
   };
 };

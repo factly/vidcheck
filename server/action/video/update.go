@@ -139,7 +139,7 @@ func update(w http.ResponseWriter, r *http.Request) {
 	var videoStatus string = videoObj.Status
 	var publishDate time.Time
 
-	// Check if post status is changed back to draft from published
+	// Check if video status is changed back to draft from published
 	if videoObj.Status == "publish" && videoData.Video.Status == "draft" {
 		status, err := getPublishPermissions(oID, sID, uID)
 		if err != nil {
@@ -158,9 +158,9 @@ func update(w http.ResponseWriter, r *http.Request) {
 		}
 
 	} else if videoData.Video.Status == "publish" {
-		// Check if authors are not added while publishing post
+		// Check if authors are not added while publishing video
 		if len(videoData.Video.AuthorIDs) == 0 {
-			errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot publish post without author", http.StatusUnprocessableEntity)))
+			errorx.Render(w, errorx.Parser(errorx.GetMessage("cannot publish vid check without author", http.StatusUnprocessableEntity)))
 			return
 		}
 

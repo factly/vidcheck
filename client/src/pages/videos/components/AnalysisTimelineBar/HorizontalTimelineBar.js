@@ -9,11 +9,11 @@ import { convertSecondsToTimeString } from "../../../../utils/analysis";
 
 function HorizontalTimelineBar({
   factCheckReview,
-  currentFormdata = {},
-  setCurrentFormData = () => {},
+  currentClaimIndex,
   height,
   totalDuration,
   visible = false,
+  player,
 }) {
   let start_time = 0;
   let end_time = 0;
@@ -49,14 +49,13 @@ function HorizontalTimelineBar({
                       100
                     }%`}
                     showBorder={
-                      currentFormdata.id && currentFormdata.id === review.id
+                      currentClaimIndex &&
+                      factCheckReview[currentClaimIndex].id === review.id
                     }
                     backgroundColor={
                       review.colour || review.rating.background_colour.hex
                     }
-                    onClick={() => {
-                      setCurrentFormData(review);
-                    }}
+                    onClick={() => player.current.seekTo(review.start_time)}
                   ></VideoLengthPart>
                 </Tooltip>
                 {index + 1 === factCheckReview.length &&
@@ -92,14 +91,13 @@ function HorizontalTimelineBar({
                       100
                     }%`}
                     showBorder={
-                      currentFormdata.id && currentFormdata.id === review.id
+                      currentClaimIndex &&
+                      factCheckReview[currentClaimIndex].id === review.id
                     }
                     backgroundColor={
                       review.colour || review.rating.background_colour.hex
                     }
-                    onClick={() => {
-                      setCurrentFormData(review);
-                    }}
+                    onClick={() => player.current.seekTo(review.start_time)}
                   ></VideoLengthPart>
                 </Tooltip>
                 {index + 1 === factCheckReview.length &&
