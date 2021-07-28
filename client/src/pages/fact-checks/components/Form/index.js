@@ -77,11 +77,9 @@ function Analysis({ onSubmit }) {
   }, []);
 
   const onTitleChange = (string) => {
-    if (status !== "publish") {
-      claimform.setFieldsValue({
-        slug: maker(string),
-      });
-    }
+    claimform.setFieldsValue({
+      slug: maker(string),
+    });
   };
 
   const checkSelectedTime = (selectedTime) => {
@@ -111,7 +109,7 @@ function Analysis({ onSubmit }) {
   const timeValidation = (startTime, endTime) => {
     return (
       claims.filter(
-        (each) => startTime < each.start_time && each.end_time < endTime
+        (each) => (startTime < each.start_time && each.end_time < endTime) || (each.start_time <= startTime && endTime <= each.end_time) || (each.start_time <= startTime && startTime <= each.end_time) || (each.start_time <= endTime && endTime <= each.end_time)
       ).length > 0
     );
   };
@@ -121,13 +119,13 @@ function Analysis({ onSubmit }) {
       alert("end time can not exceed total duration");
       return;
     }
-    if (startTime >= endTime) {
-      alert("start time should be greater than or equal to end time");
+    if (!(endTime > startTime)) {
+      alert("end time should be greater than to start time");
       return;
     }
 
     if (timeValidation(startTime, endTime)) {
-      alert("select time includes one or more claims");
+      alert("selected time is part of other claims");
       return;
     }
 
@@ -560,12 +558,6 @@ function Analysis({ onSubmit }) {
                 <Form.Item
                   name="authors"
                   label="Authors"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Atleast one author is required!",
-                    },
-                  ]}
                 >
                   <Selector
                     mode="multiple"
