@@ -44,11 +44,13 @@ function HorizontalTimelineBar({
                 >
                   <VideoLengthPart
                     height={height}
-                    width={`${((review.end_time - review.start_time) / totalDuration) *
+                    width={`${
+                      ((review.end_time - review.start_time) / totalDuration) *
                       100
-                      }%`}
+                    }%`}
                     showBorder={
-                      currentClaimIndex && factCheckReview[currentClaimIndex].id === review.id
+                      currentClaimIndex &&
+                      factCheckReview[currentClaimIndex].id === review.id
                     }
                     backgroundColor={
                       review.colour || review.rating.background_colour.hex
@@ -57,12 +59,13 @@ function HorizontalTimelineBar({
                   ></VideoLengthPart>
                 </Tooltip>
                 {index + 1 === factCheckReview.length &&
-                  review.end_time < totalDuration ? (
+                review.end_time < totalDuration ? (
                   <VideoLengthPart
                     height={height}
-                    width={`${((totalDuration - review.end_time + 1) / totalDuration) *
+                    width={`${
+                      ((totalDuration - review.end_time + 1) / totalDuration) *
                       100
-                      }%`}
+                    }%`}
                     backgroundColor={"#d9d9d9"}
                   ></VideoLengthPart>
                 ) : null}
@@ -83,11 +86,13 @@ function HorizontalTimelineBar({
                 >
                   <VideoLengthPart
                     height={height}
-                    width={`${((review.end_time - review.start_time) / totalDuration) *
+                    width={`${
+                      ((review.end_time - review.start_time) / totalDuration) *
                       100
-                      }%`}
+                    }%`}
                     showBorder={
-                      currentClaimIndex && factCheckReview[currentClaimIndex].id === review.id
+                      currentClaimIndex &&
+                      factCheckReview[currentClaimIndex].id === review.id
                     }
                     backgroundColor={
                       review.colour || review.rating.background_colour.hex
@@ -96,12 +101,13 @@ function HorizontalTimelineBar({
                   ></VideoLengthPart>
                 </Tooltip>
                 {index + 1 === factCheckReview.length &&
-                  review.end_time < totalDuration ? (
+                review.end_time < totalDuration ? (
                   <VideoLengthPart
                     height={height}
-                    width={`${((totalDuration - review.end_time + 1) / totalDuration) *
+                    width={`${
+                      ((totalDuration - review.end_time + 1) / totalDuration) *
                       100
-                      }%`}
+                    }%`}
                     backgroundColor={"#d9d9d9"}
                   ></VideoLengthPart>
                 ) : null}

@@ -185,7 +185,9 @@ function Preview() {
               onClick={() =>
                 currentClaimIndex === 0
                   ? null
-                  : player.current.seekTo(videoData.claims[currentClaimIndex - 1].start_time)
+                  : player.current.seekTo(
+                      videoData.claims[currentClaimIndex - 1].start_time
+                    )
               }
             >
               <LeftCircleFilled
@@ -253,7 +255,9 @@ function Preview() {
               onClick={() =>
                 currentClaimIndex === videoData.claims.length - 1
                   ? null
-                  : player.current.seekTo(videoData.claims[currentClaimIndex + 1].start_time)
+                  : player.current.seekTo(
+                      videoData.claims[currentClaimIndex + 1].start_time
+                    )
               }
             >
               <RightCircleFilled
