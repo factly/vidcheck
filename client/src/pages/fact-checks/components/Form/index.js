@@ -37,6 +37,7 @@ import Selector from "../../../../components/Selector";
 import Claim from "../Claim";
 
 import { setCollapse } from "../../../../actions/sidebar";
+import { addSuccessNotification } from "../../../../actions/notifications";
 
 function Analysis({ onSubmit }) {
   const [form] = Form.useForm();
@@ -140,9 +141,10 @@ function Analysis({ onSubmit }) {
   };
 
   const onSubmitClaim = (values) => {
-    dispatch(addClaim(values));
+    dispatch(addClaim(values))
+    dispatch(addSuccessNotification(claim.index >= 0 ? "Claim updated" : "Claim added"))
+    setClaim({ data: {}, drawerVisible: false, index: -1 })
     form.resetFields();
-    setClaim({ data: {}, drawerVisible: false, index: -1 });
   };
 
   const setReadyFlag = () => {
@@ -460,7 +462,10 @@ function Analysis({ onSubmit }) {
                         />,
                         <Popconfirm
                           title="Sure to Delete?"
-                          onConfirm={() => dispatch(deleteVideo(index))}
+                          onConfirm={() => {
+                            dispatch(deleteVideo(index))
+                            dispatch(addSuccessNotification("Claim deleted"))
+                          }}
                         >
                           <DeleteOutlined key="delete" />
                         </Popconfirm>,
