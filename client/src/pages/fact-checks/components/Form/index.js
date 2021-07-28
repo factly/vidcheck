@@ -445,7 +445,7 @@ function Analysis({ onSubmit }) {
                             )
                           );
                         }}
-                        style={{ alignSelf: "flex-end" }}
+                        style={{ marginTop: "30px" }}
                       >
                         Add Claim
                       </Button>
