@@ -3,7 +3,6 @@ import { Space, Button, Row, Col, Form, Input, Select } from "antd";
 import { Link } from "react-router-dom";
 import VideoList from "./components/VideoList";
 import { useDispatch, useSelector } from "react-redux";
-import Selector from "../../components/Selector";
 import { deleteVideo, getVideos } from "../../actions/videos";
 import deepEqual from "deep-equal";
 
@@ -46,11 +45,8 @@ function Videos({ permission }) {
 
   const onSave = (values) => {
     let filterValue = {
-      tag: values.tags,
-      category: values.categories,
       sort: values.sort,
       q: values.q,
-      status: values.status !== "all" ? values.status : null,
     };
 
     setFilters({ ...filters, ...filterValue });
@@ -84,7 +80,7 @@ function Videos({ permission }) {
           <Col key={2} span={9} offset={10}>
             <Space direction="horizontal">
               <Form.Item name="q">
-                <Input placeholder="search post" />
+                <Input placeholder="search fact check" />
               </Form.Item>
               <Form.Item>
                 <Button htmlType="submit">Search</Button>
@@ -96,36 +92,6 @@ function Videos({ permission }) {
                 </Select>
               </Form.Item>
             </Space>
-          </Col>
-        </Row>
-        <Row gutter={24}>
-          <Col span={4}>
-            <Form.Item name="tags" label="Tags">
-              <Selector
-                mode="multiple"
-                action="Tags"
-                placeholder="Filter Tags"
-              />
-            </Form.Item>
-          </Col>
-          <Col span={4} offset={1}>
-            <Form.Item name="categories" label="Categories">
-              <Selector
-                mode="multiple"
-                action="Categories"
-                placeholder="Filter Categories"
-              />
-            </Form.Item>
-          </Col>
-          <Col span={4} key={4} offset={1}>
-            <Form.Item name="status" label="Status">
-              <Select defaultValue="all">
-                <Option value="all">All</Option>
-                <Option value="draft">Draft</Option>
-                <Option value="publish">Publish</Option>
-                <Option value="ready">Ready to Publish</Option>
-              </Select>
-            </Form.Item>
           </Col>
         </Row>
       </Form>
