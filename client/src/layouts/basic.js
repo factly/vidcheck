@@ -80,10 +80,10 @@ function BasicLayout(props) {
             {children}
           </Card>
         </Content>
-        <Footer style={{ textAlign: "center" }}>
+        {/* <Footer style={{ textAlign: "center" }}>
           {" "}
           ©2014-2020 Factly Media & Research
-        </Footer>
+        </Footer> */}
       </Layout>
     </Layout>
   );
