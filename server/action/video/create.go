@@ -272,6 +272,29 @@ func create(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	space := model.Space{}
+	space.ID = uint(sID)
+
+	tx.First(&space)
+
+	schemas := util.GetFactCheckSchema(claimBlocks, result.Video.CreatedAt, result.Video.Slug, space)
+
+	byteArr, err := json.Marshal(schemas)
+	if err != nil {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	video := &result.Video.Video
+
+	tx.Model(&video).Select("Schemas").Updates(&model.Video{
+		Schemas: postgres.Jsonb{RawMessage: byteArr},
+	})
+
+	result.Video.Schemas = postgres.Jsonb{RawMessage: byteArr}
+
 	tx.Commit()
 
 	result.Claims = claimBlocks

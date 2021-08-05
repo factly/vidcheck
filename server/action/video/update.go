@@ -414,13 +414,35 @@ func update(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	tx.Commit()
-
 	claimBlocks := make([]model.Claim, 0)
 
 	model.DB.Model(&model.Claim{}).Order("start_time").Where("video_id = ?", uint(id)).Preload("Rating").Preload("Claimant").Find(&claimBlocks)
 
 	result.Claims = claimBlocks
+
+	space := model.Space{}
+	space.ID = uint(sID)
+
+	tx.First(&space)
+
+	schemas := util.GetFactCheckSchema(claimBlocks, result.Video.CreatedAt, result.Video.Slug, space)
+
+	byteArr, err := json.Marshal(schemas)
+	if err != nil {
+		tx.Rollback()
+		loggerx.Error(err)
+		errorx.Render(w, errorx.Parser(errorx.InternalServerError()))
+		return
+	}
+
+	video := &result.Video.Video
+	tx.Model(&video).Select("Schemas").Updates(&model.Video{
+		Schemas: postgres.Jsonb{RawMessage: byteArr},
+	})
+
+	result.Video.Schemas = postgres.Jsonb{RawMessage: byteArr}
+
+	tx.Commit()
 
 	renderx.JSON(w, http.StatusOK, result)
 }

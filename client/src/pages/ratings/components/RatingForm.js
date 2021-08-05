@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Form, Input, Space, InputNumber, Row, Col } from "antd";
 import { maker, checker } from "../../../utils/sluger";
 import { ChromePicker } from "react-color";
@@ -6,6 +6,7 @@ import Editor from "../../../components/Editor";
 import MediaSelector from "../../../components/MediaSelector";
 import MonacoEditor from "../../../components/MonacoEditor";
 import getJsonValue from "../../../utils/getJsonValue";
+import { Prompt } from "react-router-dom";
 
 const layout = {
   labelCol: {
@@ -37,6 +38,8 @@ const RatingForm = ({ onCreate, data = {} }) => {
   );
 
   const [name, setName] = useState("");
+  const [shouldBlockNavigation, setShouldBlockNavigation] = useState(false);
+  const [valueChange, setValueChange] = React.useState(false);
 
   const onReset = () => {
     form.resetFields();
@@ -49,126 +52,151 @@ const RatingForm = ({ onCreate, data = {} }) => {
     });
   };
 
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (shouldBlockNavigation) {
+        window.onbeforeunload = () => true;
+      } else {
+        window.onbeforeunload = undefined;
+      }
+    };
+    handleBeforeUnload();
+    return () => {
+      window.removeEventListener('onbeforeunload', handleBeforeUnload);
+    };
+  }, [shouldBlockNavigation]);
+
   return (
-    <Form
-      {...layout}
-      form={form}
-      initialValues={{ ...data }}
-      name="creat-rating"
-      onFinish={(values) => {
-        if (values.meta_fields) {
-          values.meta_fields = getJsonValue(values.meta_fields);
-        }
-        onCreate(values);
-        onReset();
-      }}
-    >
-      <Form.Item
-        name="name"
-        label="Rating Name"
-        rules={[
-          {
-            required: true,
-            message: "Please enter the name!",
-          },
-          { min: 3, message: "Name must be minimum 3 characters." },
-          { max: 50, message: "Name must be maximum 50 characters." },
-        ]}
+    <>
+      <Prompt
+        when={shouldBlockNavigation}
+        message="You have unsaved changes, are you sure you want to leave?"
+      />
+      <Form
+        {...layout}
+        form={form}
+        initialValues={{ ...data }}
+        name="creat-rating"
+        onFinish={(values) => {
+          setShouldBlockNavigation(false);
+          if (values.meta_fields) {
+            values.meta_fields = getJsonValue(values.meta_fields);
+          }
+          onCreate(values);
+          onReset();
+        }}
+        onValuesChange={() => {
+          setValueChange(true);
+          setShouldBlockNavigation(true);
+        }}
       >
-        <Input onChange={(e) => onTitleChange(e.target.value)} />
-      </Form.Item>
-      <Form.Item
-        name="slug"
-        label="Slug"
-        rules={[
-          {
-            required: true,
-            message: "Please input the slug!",
-          },
-          {
-            pattern: checker,
-            message: "Please enter valid slug!",
-          },
-        ]}
-      >
-        <Input />
-      </Form.Item>
-      <Form.Item
-        name="numeric_value"
-        label="Numeric value"
-        rules={[
-          {
-            required: true,
-            message: "Please enter the numeric value!",
-          },
-        ]}
-      >
-        <InputNumber min={1} max={100} />
-      </Form.Item>
-      <Form.Item label="Featured Image" name="medium_id">
-        <MediaSelector />
-      </Form.Item>
-
-      <Form.Item name="background_colour" label="Background Colour">
-        <ChromePicker
-          color={backgroundColour !== null && backgroundColour.hex}
-          onChange={(e) => setBackgroundColour(e)}
-          disableAlpha
-        />
-      </Form.Item>
-      <Form.Item name="text_colour" label="Text Colour">
-        <ChromePicker
-          color={textColour !== null && textColour.hex}
-          onChange={(e) => setTextColour(e)}
-          disableAlpha
-        />
-      </Form.Item>
-
-      {name ? (
-        <Row
-          className="preview-container"
-          gutter={16}
-          style={{ marginBottom: "1rem" }}
+        <Form.Item
+          name="name"
+          label="Rating Name"
+          rules={[
+            {
+              required: true,
+              message: "Please enter the name!",
+            },
+            { min: 3, message: "Name must be minimum 3 characters." },
+            { max: 50, message: "Name must be maximum 50 characters." },
+          ]}
         >
-          <Col span={10} style={{ textAlign: "right" }}>
-            Preview:
-          </Col>
-          <Col span={8}>
-            <div
-              className="preview"
-              style={{
-                textAlign: "center",
-                color: textColour?.hex,
-                background: backgroundColour?.hex,
-                width: "100px",
-                padding: "0.5rem 1rem",
-                border: "1px solid black",
-              }}
-            >
-              {name}
-            </div>
-          </Col>
-        </Row>
-      ) : null}
+          <Input onChange={(e) => onTitleChange(e.target.value)} />
+        </Form.Item>
+        <Form.Item
+          name="slug"
+          label="Slug"
+          rules={[
+            {
+              required: true,
+              message: "Please input the slug!",
+            },
+            {
+              pattern: checker,
+              message: "Please enter valid slug!",
+            },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          name="numeric_value"
+          label="Numeric value"
+          rules={[
+            {
+              required: true,
+              message: "Please enter the numeric value!",
+            },
+          ]}
+        >
+          <InputNumber min={1} max={100} />
+        </Form.Item>
+        <Form.Item label="Featured Image" name="medium_id">
+          <MediaSelector />
+        </Form.Item>
 
-      <Form.Item name="description" label="Description">
-        <Editor style={{ width: "600px" }} basic={true} />
-      </Form.Item>
-      <Form.Item name="meta_fields" label="Metafields">
-        <MonacoEditor language="json" />
-      </Form.Item>
+        <Form.Item name="background_colour" label="Background Colour">
+          <ChromePicker
+            color={backgroundColour !== null && backgroundColour.hex}
+            onChange={(e) => setBackgroundColour(e)}
+            disableAlpha
+          />
+        </Form.Item>
+        <Form.Item name="text_colour" label="Text Colour">
+          <ChromePicker
+            color={textColour !== null && textColour.hex}
+            onChange={(e) => setTextColour(e)}
+            disableAlpha
+          />
+        </Form.Item>
 
-      <Form.Item {...tailLayout}>
-        <Space>
-          <Button type="primary" htmlType="submit">
-            Submit
-          </Button>
-          <Button htmlType="button" onClick={onReset}>
-            Reset
-          </Button>
-        </Space>
-      </Form.Item>
-    </Form>
+        {name ? (
+          <Row
+            className="preview-container"
+            gutter={16}
+            style={{ marginBottom: "1rem" }}
+          >
+            <Col span={10} style={{ textAlign: "right" }}>
+              Preview:
+            </Col>
+            <Col span={8}>
+              <div
+                className="preview"
+                style={{
+                  textAlign: "center",
+                  color: textColour?.hex,
+                  background: backgroundColour?.hex,
+                  width: "100px",
+                  padding: "0.5rem 1rem",
+                  border: "1px solid black",
+                }}
+              >
+                {name}
+              </div>
+            </Col>
+          </Row>
+        ) : null}
+
+        <Form.Item name="description" label="Description">
+          <Editor style={{ width: "600px" }} basic={true} />
+        </Form.Item>
+        <Form.Item name="meta_fields" label="Metafields">
+          <MonacoEditor language="json" />
+        </Form.Item>
+
+        <Form.Item {...tailLayout}>
+          <Space>
+            <Button disabled={!valueChange} type="primary" htmlType="submit">
+              Submit
+            </Button>
+            <Button htmlType="button" onClick={onReset}>
+              Reset
+            </Button>
+          </Space>
+        </Form.Item>
+      </Form>
+    </>
   );
 };
 
