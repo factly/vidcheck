@@ -15,6 +15,7 @@ import {
   Dropdown,
   Row,
   Col,
+  Typography,
 } from "antd";
 import ReactPlayer from "react-player";
 import { useDispatch, useSelector } from "react-redux";
@@ -38,6 +39,7 @@ import Claim from "../Claim";
 
 import { setCollapse } from "../../../../actions/sidebar";
 import { addSuccessNotification } from "../../../../actions/notifications";
+import Modal from "antd/lib/modal/Modal";
 
 function Analysis({ onSubmit }) {
   const [form] = Form.useForm();
@@ -49,6 +51,43 @@ function Analysis({ onSubmit }) {
     data: {},
     drawerVisible: false,
   });
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showSchemaModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleSchemaModalOk = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleSchemaModalCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  const copySchema = (textToCopy) => {
+    // navigator clipboard api needs a secure context (https)
+    if (navigator.clipboard && window.isSecureContext) {
+      // navigator clipboard api method'
+      return navigator.clipboard.writeText(textToCopy);
+    } else {
+      // text area method
+      let textArea = document.createElement('textarea');
+      textArea.value = textToCopy;
+      // make the textarea out of viewport
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      return new Promise((res, rej) => {
+        // here the magic happens
+        document.execCommand('copy') ? res() : rej();
+        textArea.remove();
+      });
+    }
+  };
 
   const showSettings = () => {
     setSettingsDrawerVisible(true);
@@ -184,8 +223,8 @@ function Analysis({ onSubmit }) {
           values.status = status;
           values.status === "publish"
             ? (values.published_date = values.published_date
-                ? moment(values.published_date).format("YYYY-MM-DDTHH:mm:ssZ")
-                : moment(Date.now()).format("YYYY-MM-DDTHH:mm:ssZ"))
+              ? moment(values.published_date).format("YYYY-MM-DDTHH:mm:ssZ")
+              : moment(Date.now()).format("YYYY-MM-DDTHH:mm:ssZ"))
             : (values.published_date = null);
           onSubmit({
             video: {
@@ -219,20 +258,17 @@ function Analysis({ onSubmit }) {
                   </Button>
                 </Dropdown>
               </Form.Item>
-              {/* {actions.includes('admin') || actions.includes('publish') ? ( */}
-              {true ? (
-                <Form.Item name="submit">
-                  <Button
-                    type="secondary"
-                    htmlType="submit"
-                    onClick={() => {
-                      setStatus("publish");
-                    }}
-                  >
-                    {video.id && status === "publish" ? "Update" : "Publish"}
-                  </Button>
-                </Form.Item>
-              ) : null}
+              <Form.Item name="submit">
+                <Button
+                  type="secondary"
+                  htmlType="submit"
+                  onClick={() => {
+                    setStatus("publish");
+                  }}
+                >
+                  {video.id && status === "publish" ? "Update" : "Publish"}
+                </Button>
+              </Form.Item>
               <Form.Item name="drawerOpen">
                 <Button type="secondary" onClick={showSettings}>
                   <SettingFilled />
@@ -574,6 +610,46 @@ function Analysis({ onSubmit }) {
                     action="Authors"
                   />
                 </Form.Item>
+                {video.id ? <Form.Item>
+                  <Button onClick={() => showSchemaModal()} style={{ width: '100%' }}>
+                    View Schemas
+                  </Button>
+                </Form.Item> : null}
+                <Modal
+                  title="View Schemas"
+                  visible={isModalVisible}
+                  onOk={handleSchemaModalOk}
+                  onCancel={handleSchemaModalCancel}
+                  footer={[
+                    <Button
+                      onClick={() => {
+                        const copyText = video.schemas.map(
+                          (schema) =>
+                            `<script type="application/ld+json">${JSON.stringify(schema)}</script>`,
+                        );
+                        copySchema(copyText);
+                      }}
+                    >
+                      Copy
+                    </Button>,
+
+                    <a
+                      href="https://search.google.com/test/rich-results"
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="ant-btn ant-btn-secondary"
+                    >
+                      Test in Google Rich Results Text
+                    </a>,
+                  ]}
+                >
+                  <div id="schemas-container">
+                    {video.schemas &&
+                      video.schemas.map((schema) => (
+                        <Typography.Text code>{JSON.stringify(schema)}</Typography.Text>
+                      ))}
+                  </div>
+                </Modal>
               </Drawer>
             </Col>
           </Row>
