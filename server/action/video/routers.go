@@ -9,17 +9,21 @@ import (
 )
 
 type video struct {
-	URL           string     `json:"url" validate:"required"`
-	Title         string     `json:"title" validate:"required"`
-	Slug          string     `json:"slug" validate:"required"`
-	Summary       string     `json:"summary"`
-	VideoType     string     `json:"video_type" validate:"required"`
-	Status        string     `json:"status"`
-	TotalDuration int        `json:"total_duration" validate:"required"`
-	CategoryIDs   []uint     `json:"category_ids"`
-	TagIDs        []uint     `json:"tag_ids"`
-	AuthorIDs     []uint     `json:"author_ids"`
-	PublishedDate *time.Time `json:"published_date"`
+	URL           string         `json:"url" validate:"required"`
+	Title         string         `json:"title" validate:"required"`
+	Slug          string         `json:"slug" validate:"required"`
+	Summary       string         `json:"summary"`
+	VideoType     string         `json:"video_type" validate:"required"`
+	Status        string         `json:"status"`
+	TotalDuration int            `json:"total_duration" validate:"required"`
+	CategoryIDs   []uint         `json:"category_ids"`
+	TagIDs        []uint         `json:"tag_ids"`
+	AuthorIDs     []uint         `json:"author_ids"`
+	PublishedDate *time.Time     `json:"published_date"`
+	MetaFields    postgres.Jsonb `json:"meta_fields" swaggertype:"primitive,string"`
+	Meta          postgres.Jsonb `json:"meta" swaggertype:"primitive,string"`
+	HeaderCode    string         `json:"header_code"`
+	FooterCode    string         `json:"footer_code"`
 }
 
 type videoanalysis struct {
@@ -35,6 +39,10 @@ type videoanalysis struct {
 	Description   postgres.Jsonb `json:"description" swaggertype:"primitive,string"`
 	StartTime     int            `json:"start_time"`
 	EndTime       int            `json:"end_time" validate:"required"`
+	MetaFields    postgres.Jsonb `json:"meta_fields" swaggertype:"primitive,string"`
+	Meta          postgres.Jsonb `json:"meta" swaggertype:"primitive,string"`
+	HeaderCode    string         `json:"header_code"`
+	FooterCode    string         `json:"footer_code"`
 }
 
 type VideoData struct {

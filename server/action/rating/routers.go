@@ -17,6 +17,9 @@ type rating struct {
 	TextColour       postgres.Jsonb `json:"text_colour" validate:"required" swaggertype:"primitive,string"`
 	MediumID         uint           `json:"medium_id"`
 	MetaFields       postgres.Jsonb `json:"meta_fields" swaggertype:"primitive,string"`
+	Meta             postgres.Jsonb `json:"meta" swaggertype:"primitive,string"`
+	HeaderCode       string         `json:"header_code"`
+	FooterCode       string         `json:"footer_code"`
 }
 
 var userContext model.ContextKey = "rating_user"

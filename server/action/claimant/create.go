@@ -90,6 +90,9 @@ func create(w http.ResponseWriter, r *http.Request) {
 		MediumID:        mediumID,
 		HTMLDescription: description,
 		MetaFields:      claimant.MetaFields,
+		Meta:            claimant.Meta,
+		HeaderCode:      claimant.HeaderCode,
+		FooterCode:      claimant.FooterCode,
 	}
 
 	tx := model.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
