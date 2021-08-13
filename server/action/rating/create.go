@@ -117,6 +117,9 @@ func create(w http.ResponseWriter, r *http.Request) {
 		MediumID:         mediumID,
 		HTMLDescription:  description,
 		MetaFields:       rating.MetaFields,
+		Meta:             rating.Meta,
+		HeaderCode:       rating.HeaderCode,
+		FooterCode:       rating.FooterCode,
 	}
 
 	tx := model.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()

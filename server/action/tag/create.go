@@ -104,6 +104,10 @@ func create(w http.ResponseWriter, r *http.Request) {
 		HTMLDescription: description,
 		SpaceID:         uint(sID),
 		IsFeatured:      tag.IsFeatured,
+		MetaFields:      tag.MetaFields,
+		Meta:            tag.Meta,
+		HeaderCode:      tag.HeaderCode,
+		FooterCode:      tag.FooterCode,
 	}
 
 	tx := model.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()

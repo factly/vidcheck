@@ -132,6 +132,10 @@ func update(w http.ResponseWriter, r *http.Request) {
 		Slug:            tagSlug,
 		Description:     tag.Description,
 		HTMLDescription: description,
+		MetaFields:      tag.MetaFields,
+		Meta:            tag.Meta,
+		HeaderCode:      tag.HeaderCode,
+		FooterCode:      tag.FooterCode,
 	}).First(&result).Error
 
 	if err != nil {
