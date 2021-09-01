@@ -1,6 +1,8 @@
 package model
 
 import (
+	"errors"
+
 	"github.com/jinzhu/gorm/dialects/postgres"
 	"gorm.io/gorm"
 )
@@ -16,6 +18,8 @@ type Tag struct {
 	SpaceID         uint           `gorm:"column:space_id" json:"space_id"`
 	Space           *Space         `json:"space,omitempty"`
 	Videos          []*Video       `gorm:"many2many:video_tags;" json:"videos"`
+	MediumID        *uint          `gorm:"column:medium_id;default:NULL" json:"medium_id"`
+	Medium          *Medium        `json:"medium"`
 	MetaFields      postgres.Jsonb `gorm:"column:meta_fields" json:"meta_fields" swaggertype:"primitive,string"`
 	Meta            postgres.Jsonb `gorm:"column:meta" json:"meta" swaggertype:"primitive,string"`
 	HeaderCode      string         `gorm:"column:header_code" json:"header_code"`
@@ -36,5 +40,23 @@ func (tag *Tag) BeforeCreate(tx *gorm.DB) error {
 
 	tag.CreatedByID = uint(uID)
 	tag.UpdatedByID = uint(uID)
+	return nil
+}
+
+// BeforeSave - validation for medium
+func (tag *Tag) BeforeSave(tx *gorm.DB) (e error) {
+	if tag.MediumID != nil && *tag.MediumID > 0 {
+		medium := Medium{}
+		medium.ID = *tag.MediumID
+
+		err := tx.Model(&Medium{}).Where(Medium{
+			SpaceID: tag.SpaceID,
+		}).First(&medium).Error
+
+		if err != nil {
+			return errors.New("medium do not belong to same space")
+		}
+	}
+
 	return nil
 }
