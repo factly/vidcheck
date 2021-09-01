@@ -76,11 +76,7 @@ function BasicLayout(props) {
 			<Layout>
 				<Header applications={applications} />
 				<Content className="layout-content">
-					<Card
-						key={selected.toString()}
-						className="wrap-children-content"
-						bodyStyle={{ display: "flex", justifyContent: "center" }}
-					>
+					<Card key={selected.toString()} className="wrap-children-content">
 						{children}
 					</Card>
 				</Content>
