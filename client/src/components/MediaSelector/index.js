@@ -1,15 +1,22 @@
-import React from "react";
-import { Modal, Button, Radio, Space } from "antd";
-import { useDispatch, useSelector } from "react-redux";
-import MediaUploader from "./UploadMedium";
-import MediaList from "./MediaList";
-import { getMedium, getMedia } from "../../actions/media";
-import ImagePlaceholder from "../ErrorsAndImage/PlaceholderImage";
+import React from 'react';
+import { Modal, Button, Radio, Space } from 'antd';
+import { useDispatch, useSelector } from 'react-redux';
+import MediaUploader from './UploadMedium';
+import MediaList from './MediaList';
+import { getMedium, getMedia } from '../../actions/media';
+import ImagePlaceholder from '../ErrorsAndImage/PlaceholderImage';
+import { DeleteOutlined } from '@ant-design/icons';
 
-function MediaSelector({ value = null, onChange }) {
+function MediaSelector({
+  value = null,
+  onChange,
+  maxWidth,
+  containerStyles = {},
+  profile = false,
+}) {
   const [show, setShow] = React.useState(false);
   const [selected, setSelected] = React.useState(null);
-  const [tab, setTab] = React.useState("list");
+  const [tab, setTab] = React.useState('list');
   const dispatch = useDispatch();
 
   const [mediumFetch, setMediumFetch] = React.useState(false);
@@ -24,14 +31,16 @@ function MediaSelector({ value = null, onChange }) {
   const setValue = () => {
     value = null;
   };
-
+  if (!selected && value && medium) {
+    setSelected(medium);
+  }
   React.useEffect(() => {
     if (value) {
-      dispatch(getMedium(value));
+      dispatch(getMedium(value, profile));
       setSelected(medium);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [value]);
 
   if (!loading && mediumFetch && uploadedMedium) {
     const fetchedId = media.req[0].data[0];
@@ -62,10 +71,10 @@ function MediaSelector({ value = null, onChange }) {
         visible={show}
         onCancel={() => setShow(false)}
         closable={false}
-        width={"800px"}
+        width={'800px'}
         footer={[
           <Button key="back" onClick={() => setShow(false)}>
-            Return
+            Cancel
           </Button>,
           <Button
             key="submit"
@@ -75,37 +84,65 @@ function MediaSelector({ value = null, onChange }) {
               selected ? onChange(selected.id) : onChange(null);
             }}
           >
-            Ok
+            Confirm
           </Button>,
         ]}
       >
         <Space direction="vertical">
-          <Radio.Group
-            buttonStyle="solid"
-            value={tab}
-            onChange={(e) => setTab(e.target.value)}
-          >
+          <Radio.Group buttonStyle="solid" value={tab} onChange={(e) => setTab(e.target.value)}>
             <Radio.Button value="list">List</Radio.Button>
             <Radio.Button value="upload">Upload</Radio.Button>
           </Radio.Group>
-          {tab === "list" ? (
+          {tab === 'list' ? (
             <MediaList
               onSelect={setSelected}
               selected={selected}
               onUnselect={setValue}
+              profile={profile}
             />
-          ) : tab === "upload" ? (
-            <MediaUploader onMediaUpload={onUpload} />
+          ) : tab === 'upload' ? (
+            <MediaUploader onMediaUpload={onUpload} profile={profile} />
           ) : null}
         </Space>
       </Modal>
       <Space direction="vertical">
-        {medium ? (
-          <img src={medium.url?.proxy} alt={medium.alt_text} width="100%" />
-        ) : (
-          <ImagePlaceholder />
-        )}
-        <Button onClick={() => setShow(true)}>Select</Button>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            ...containerStyles,
+          }}
+        >
+          <div style={{ position: 'relative' }}>
+            <Button
+              style={{
+                background: 'transparent',
+                borderStyle: 'dashed',
+                height: 'auto',
+                display: 'block',
+              }}
+              onClick={() => setShow(true)}
+            >
+              {medium ? (
+                <img src={medium.url?.proxy} alt={medium.alt_text} width="100%" />
+              ) : (
+                <ImagePlaceholder maxWidth={maxWidth} />
+              )}
+            </Button>
+            {medium && (
+              <Button
+                style={{ position: 'absolute', bottom: 0, left: 0 }}
+                onClick={() => {
+                  onChange(null);
+                  setSelected(null);
+                }}
+              >
+                <DeleteOutlined />
+              </Button>
+            )}
+          </div>
+        </div>
       </Space>
     </>
   );

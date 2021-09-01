@@ -1,7 +1,15 @@
 import React, { useEffect } from "react";
-import { Button, Row, Col, Typography, Popconfirm } from "antd";
+import { Button, Row, Col, Typography, Popconfirm, Tag } from "antd";
 import { Link, useHistory } from "react-router-dom";
-
+import {
+  EditOutlined,
+  DeleteOutlined,
+  CheckCircleOutlined,
+  ExceptionOutlined,
+  ClockCircleOutlined,
+  CloseOutlined,
+  FormOutlined,
+} from '@ant-design/icons';
 import { useDispatch } from "react-redux";
 import { deleteVideo, getVideos } from "../../../actions/videos";
 import HorizontalTimelineBar from "../components/AnalysisTimelineBar/HorizontalTimelineBar";
@@ -34,8 +42,25 @@ function VideoAnalysisCard({ data, filters }) {
     draft: "Draft",
     publish: "Published",
   };
-
-  useEffect(() => {}, [dispatch]);
+  const getTag = (status) => {
+    switch (status) {
+      case 'publish':
+        return <Tag icon={<CheckCircleOutlined />} color="green">
+          Published
+        </Tag>
+      case 'draft':
+        return <Tag color="red" icon={<ExceptionOutlined />}>
+          Draft
+        </Tag>
+      case 'ready':
+        return <Tag color="gold" icon={<ClockCircleOutlined />}>
+          Ready to Publish
+        </Tag>
+      default:
+        return null;
+    }
+  }
+  useEffect(() => { }, [dispatch]);
 
   return (
     <React.Fragment key={data.video.id}>
@@ -107,9 +132,7 @@ function VideoAnalysisCard({ data, filters }) {
               <Button style={{ margin: 3 }}>Delete</Button>
             </Popconfirm>
             {statuses[data.video.status] ? (
-              <Button style={{ margin: 3, cursor: "initial" }} type="primary">
-                {statuses[data.video.status]}{" "}
-              </Button>
+              getTag(data.video.status)
             ) : null}
           </div>
         </Col>

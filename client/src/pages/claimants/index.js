@@ -41,47 +41,47 @@ function Claimants({ permission }) {
   };
   return (
     <Space direction="vertical">
-      <Row>
-        <Col span={8}>
-          <Link key="1" to="/claimants/create">
-            <Button
-              disabled={
-                !(actions.includes("admin") || actions.includes("create"))
-              }
-            >
-              Create New
-            </Button>
-          </Link>
-        </Col>
-        <Col span={8} offset={8}>
-          <Form
-            initialValues={filters}
-            form={form}
-            name="filters"
-            layout="inline"
-            onFinish={(values) => setFilters({ ...filters, ...values })}
-            style={{ width: "100%" }}
-            onValuesChange={(changedValues, allValues) => {
-              if (!changedValues.q) {
-                setFilters({ ...filters, ...changedValues });
-              }
-            }}
-          >
+      <Form
+        initialValues={filters}
+        form={form}
+        name="filters"
+        onFinish={(values) =>
+          setFilters({
+            ...filters,
+            sort_by: values.sort,
+            q: values.q,
+          })
+        }
+        style={{ maxWidth: "100%" }}
+      >
+        <Row justify="end" gutter={16}>
+          <Col style={{ display: 'flex', justifyContent: 'end' }}>
             <Form.Item name="q">
-              <Input placeholder="Search claimants" />
+              <Input placeholder="Search claimant" />
             </Form.Item>
             <Form.Item>
               <Button htmlType="submit">Search</Button>
             </Form.Item>
-            <Form.Item name="sort" label="Sort" style={{ width: "30%" }}>
-              <Select>
-                <Option value="desc">Latest</Option>
-                <Option value="asc">Old</Option>
+          </Col>
+          <Col>
+            <Form.Item name="sort">
+              <Select defaultValue="desc">
+                <Option value="desc">Sort By: Latest</Option>
+                <Option value="asc">Sort By: Old</Option>
               </Select>
             </Form.Item>
-          </Form>
-        </Col>
-      </Row>
+          </Col>
+          <Col>
+            <Link to="/claimants/create">
+              <Button
+                type="primary"
+              >
+                New Claimant
+              </Button>
+            </Link>
+          </Col>
+        </Row>
+      </Form>
       <ClaimantList
         actions={actions}
         data={{ claimants: claimants, total: total, loading: loading }}
