@@ -125,6 +125,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		HeaderCode:        space.HeaderCode,
 		FooterCode:        space.FooterCode,
 		MetaFields:        space.MetaFields,
+		Meta:              space.Meta,
 	}
 
 	tx := model.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
@@ -178,6 +179,7 @@ func create(w http.ResponseWriter, r *http.Request) {
 		"header_code":     result.HeaderCode,
 		"footer_code":     result.FooterCode,
 		"meta_fields":     result.MetaFields,
+		"meta":            result.Meta,
 	}
 
 	err = meilisearchx.AddDocument(config.AppName, meiliObj)
