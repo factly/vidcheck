@@ -9,6 +9,7 @@ import {
 } from "../../../actions/ratings";
 import { Link } from "react-router-dom";
 import deepEqual from "deep-equal";
+import { DeleteOutlined } from '@ant-design/icons'
 
 function RatingList() {
   const dispatch = useDispatch();
@@ -41,21 +42,38 @@ function RatingList() {
   };
 
   const columns = [
-    { title: "Name", dataIndex: "name", key: "name" },
-    { title: "Slug", dataIndex: "slug", key: "slug" },
-    { title: "Rating Value", dataIndex: "numeric_value", key: "numeric_value" },
     {
-      title: "Preview",
-      dataIndex: "preview",
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+      render: (_, record) => {
+        return (
+          <Link
+            className="ant-dropdown-link"
+            style={{
+              marginRight: 8,
+            }}
+            to={`/ratings/${record.id}/edit`}
+          >
+            {record.name}
+          </Link>
+        );
+      },
+    },
+    { title: 'Slug', dataIndex: 'slug', key: 'slug' },
+    { title: 'Rating Value', dataIndex: 'numeric_value', key: 'numeric_value' },
+    {
+      title: 'Preview',
+      dataIndex: 'preview',
       render: (_, record) => (
         <div
           style={{
             color: record.text_colour?.hex,
             backgroundColor: record.background_colour?.hex,
-            width: "100px",
-            border: "1px solid black",
-            padding: "0.5rem",
-            textAlign: "center",
+            width: '100px',
+            border: '1px solid black',
+            padding: '0.5rem',
+            textAlign: 'center',
           }}
         >
           {record.name}
@@ -63,31 +81,24 @@ function RatingList() {
       ),
     },
     {
-      title: "Action",
-      dataIndex: "operation",
+      title: 'Action',
+      dataIndex: 'operation',
+      fixed: 'right',
+      align: 'center',
+      width: 150,
       render: (_, record) => {
         return (
-          <span>
-            <Link
-              className="ant-dropdown-link"
-              style={{
-                marginRight: 8,
-              }}
-              to={`/ratings/${record.id}/edit`}
-            >
-              <Button>Edit</Button>
+          <Popconfirm
+            title="Are you sure you want to delete this?"
+            onConfirm={() => dispatch(deleteRating(record.id)).then(() => fetchRatings())}
+          >
+            <Link to="" className="ant-dropdown-link">
+              <Button
+                icon={<DeleteOutlined />}
+                type="danger"
+              />
             </Link>
-            <Popconfirm
-              title="Sure to cancel?"
-              onConfirm={() =>
-                dispatch(deleteRating(record.id)).then(() => fetchRatings())
-              }
-            >
-              <Link to="" className="ant-dropdown-link">
-                <Button>Delete</Button>
-              </Link>
-            </Popconfirm>
-          </span>
+          </Popconfirm>
         );
       },
     },

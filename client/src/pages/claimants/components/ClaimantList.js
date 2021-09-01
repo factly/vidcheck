@@ -11,51 +11,73 @@ import { useDispatch } from "react-redux";
 import { deleteClaimant } from "../../../actions/claimants";
 import { Link } from "react-router-dom";
 
+import { DeleteOutlined } from '@ant-design/icons';
+
+
 function ClaimantList({ data, filters, setFilters, fetchClaimants }) {
   const dispatch = useDispatch();
 
   const columns = [
-    { title: "Name", dataIndex: "name", key: "name" },
-    { title: "Slug", dataIndex: "slug", key: "slug" },
     {
-      title: "Tag Line",
-      dataIndex: "tag_line",
-      key: "tag_line",
-      width: "20%",
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
       render: (_, record) => {
         return (
-          <Typography.Paragraph ellipsis={{ rows: 2 }}>
-            {record.tag_line}
-          </Typography.Paragraph>
+          <Link
+            className="ant-dropdown-link"
+            style={{
+              marginRight: 8,
+            }}
+            to={`/claimants/${record.id}/edit`}
+          >
+            {record.name}
+          </Link>
+        );
+      },
+    },
+    { title: 'Slug', dataIndex: 'slug', key: 'slug' },
+    {
+      title: 'Tag Line',
+      dataIndex: 'tag_line',
+      key: 'tag_line',
+      width: '20%',
+      render: (_, record) => {
+        return (
+          <Typography.Paragraph ellipsis={{ rows: 2 }}>{record.tag_line}</Typography.Paragraph>
         );
       },
     },
     {
-      title: "Action",
-      dataIndex: "operation",
+      title: 'Description',
+      dataIndex: 'description',
+      key: 'description',
+      width: '30%',
       render: (_, record) => {
         return (
-          <span>
-            <Link
-              className="ant-dropdown-link"
-              style={{
-                marginRight: 8,
-              }}
-              to={`/claimants/${record.id}/edit`}
-            >
-              <Button>Edit</Button>
+          <Typography.Paragraph ellipsis={{ rows: 2 }}>{record.description}</Typography.Paragraph>
+        );
+      },
+    },
+    {
+      title: 'Action',
+      dataIndex: 'operation',
+      fixed: 'right',
+      align: 'center',
+      width: 150,
+      render: (_, record) => {
+        return (
+          <Popconfirm
+            title="Are you sure you want to delete this?"
+            onConfirm={() => dispatch(deleteClaimant(record.id)).then(() => fetchClaimants())}
+          >
+            <Link to="" className="ant-dropdown-link">
+              <Button
+                icon={<DeleteOutlined />}
+                type="danger"
+              />
             </Link>
-            <Popconfirm
-              title="Sure to cancel?"
-              onConfirm={() =>
-                dispatch(deleteClaimant(record.id)).then(() => fetchClaimants())
-              }
-            >
-              <Link to="" className="ant-dropdown-link">
-                <Button>Delete</Button>
-              </Link>
-            </Popconfirm>
-          </span>
+          </Popconfirm>
         );
       },
     },

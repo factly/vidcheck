@@ -97,6 +97,11 @@ func create(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	mediumID := &tag.MediumID
+	if tag.MediumID == 0 {
+		mediumID = nil
+	}
+
 	result := &model.Tag{
 		Name:            tag.Name,
 		Slug:            slugx.Approve(&model.DB, tagSlug, sID, tableName),
@@ -108,10 +113,11 @@ func create(w http.ResponseWriter, r *http.Request) {
 		Meta:            tag.Meta,
 		HeaderCode:      tag.HeaderCode,
 		FooterCode:      tag.FooterCode,
+		MediumID:        mediumID,
 	}
 
 	tx := model.DB.WithContext(context.WithValue(r.Context(), userContext, uID)).Begin()
-	err = tx.Model(&model.Tag{}).Create(&result).Error
+	err = tx.Model(&model.Tag{}).Preload("Medium").Create(&result).Error
 
 	if err != nil {
 		tx.Rollback()

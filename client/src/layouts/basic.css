@@ -52,3 +52,6 @@
 .ant-form {
   max-width: 1200px;
 }
+.ant-collapse > .ant-collapse-item > .ant-collapse-header .ant-collapse-arrow {
+  padding: 4px 15px;
+}

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Button, Form, Input, Space, Switch } from "antd";
+import { Button, Form, Input, Space, Switch, Row, Col, Collapse } from "antd";
 import { maker, checker } from "../../../utils/sluger";
 import MediaSelector from "../../../components/MediaSelector";
 import Editor from "../../../components/Editor";
@@ -8,20 +8,6 @@ import MonacoEditor from "../../../components/MonacoEditor";
 import getJsonValue from "../../../utils/getJsonValue";
 import { Prompt } from "react-router-dom";
 
-const layout = {
-  labelCol: {
-    span: 8,
-  },
-  wrapperCol: {
-    span: 8,
-  },
-};
-const tailLayout = {
-  wrapperCol: {
-    offset: 10,
-    span: 14,
-  },
-};
 
 const CategoryForm = ({ onCreate, data = {} }) => {
   if (data && data.meta_fields) {
@@ -64,11 +50,12 @@ const CategoryForm = ({ onCreate, data = {} }) => {
         when={shouldBlockNavigation}
         message="You have unsaved changes, are you sure you want to leave?"
       />
+
       <Form
-        {...layout}
         form={form}
         initialValues={{ ...data }}
         name="create-category"
+        layout="vertical"
         onFinish={(values) => {
           setShouldBlockNavigation(false);
           if (values.meta_fields) {
@@ -82,65 +69,152 @@ const CategoryForm = ({ onCreate, data = {} }) => {
           setShouldBlockNavigation(true);
         }}
       >
-        <Form.Item name="parent_id" label="Parent Category">
-          <Selector action="Categories" />
-        </Form.Item>
-        <Form.Item
-          name="name"
-          label="Category"
-          rules={[
-            {
-              required: true,
-              message: "Please enter the name!",
-            },
-            { min: 3, message: "Name must be minimum 3 characters." },
-            { max: 50, message: "Name must be maximum 50 characters." },
-          ]}
-        >
-          <Input onChange={(e) => onTitleChange(e.target.value)} />
-        </Form.Item>
-        <Form.Item
-          name="slug"
-          label="Slug"
-          rules={[
-            {
-              required: true,
-              message: "Please input the slug!",
-            },
-            {
-              pattern: checker,
-              message: "Please enter valid slug!",
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item label="Featured Image" name="medium_id">
-          <MediaSelector />
-        </Form.Item>
-        <Form.Item label="Featured" name="is_featured" valuePropName="checked">
-          <Switch />
-        </Form.Item>
-        <Form.Item name="description" label="Description">
-          <Editor
-            style={{ width: "600px" }}
-            placeholder="Enter Description..."
-            basic={true}
-          />
-        </Form.Item>
-        <Form.Item name="meta_fields" label="Metafields">
-          <MonacoEditor />
-        </Form.Item>
-        <Form.Item {...tailLayout}>
-          <Space>
-            <Button disabled={!valueChange} type="primary" htmlType="submit">
-              {data && data.id ? "Update" : "Submit"}
-            </Button>
-            <Button htmlType="button" onClick={onReset}>
-              Reset
-            </Button>
-          </Space>
-        </Form.Item>
+        <Row justify="center" style={{ maxWidth: '1200px', width: '100%', margin: '0 auto' }}>
+          <Col span={24}>
+            <Row justify="end" gutter={40}>
+              <Form.Item>
+                <Space>
+                  <Button htmlType="button" onClick={onReset}>
+                    Reset
+                  </Button>
+                  <Button disabled={!valueChange} type="primary" htmlType="submit">
+                    {data && data.id ? 'Update' : 'Submit'}
+                  </Button>
+                </Space>
+              </Form.Item>
+            </Row>
+          </Col>
+          <Col span={24}>
+            <Row
+              gutter={40}
+              justify="space-around"
+              style={{ background: '#f0f2f5', padding: '1.25rem', marginBottom: '1rem' }}
+            >
+              <Col span={12}>
+                <Form.Item
+                  name="name"
+                  label="Category Name"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please enter the name!',
+                    },
+                    { min: 3, message: 'Name must be minimum 3 characters.' },
+                    { max: 50, message: 'Name must be maximum 50 characters.' },
+                  ]}
+                >
+                  <Input onChange={(e) => onTitleChange(e.target.value)} />
+                </Form.Item>
+                <Row gutter={40}>
+                  <Col md={{ span: 16 }}>
+                    <Form.Item name="parent_id" label="Parent Category">
+                      <Selector action="Categories" />
+                    </Form.Item>
+                  </Col>
+                  <Col md={{ span: 5 }}>
+                    <Form.Item label="Featured" name="is_featured" valuePropName="checked">
+                      <Switch />
+                    </Form.Item>
+                  </Col>
+                </Row>
+                <Form.Item
+                  name="slug"
+                  label="Slug"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please input the slug!',
+                    },
+                    {
+                      pattern: checker,
+                      message: 'Please enter valid slug!',
+                    },
+                  ]}
+                >
+                  <Input
+                    onChange={(e) =>
+                      form.setFieldsValue({
+                        meta: {
+                          facebook: {
+                            canonical_URL: e.target.value,
+                          },
+                          google: {
+                            canonical_URL: e.target.value,
+                          },
+                          twitter: {
+                            canonical_URL: e.target.value,
+                          },
+                        },
+                      })
+                    }
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={10}>
+                <Form.Item label="Featured Image" name="medium_id">
+                  <MediaSelector maxWidth={'350px'} containerStyles={{ justifyContent: 'start' }} />
+                </Form.Item>
+              </Col>
+              <Col span={12} style={{ marginRight: 'auto', marginLeft: '20px' }}>
+                <Form.Item name="description" label="Description">
+                  <Editor
+                    style={{ width: '600px', background: '#fff', padding: '0.5rem 0.75rem' }}
+                    placeholder="Enter Description..."
+                    basic={true}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Col>
+          <Col span={24}>
+            <Row gutter={40} style={{ background: '#f0f2f5' }}>
+              <Collapse
+                expandIconPosition="right"
+                expandIcon={({ isActive }) => <Button>{isActive ? 'Close' : 'Expand'}</Button>}
+                style={{ width: '100%' }}
+              >
+                <Collapse.Panel header="Meta Data">
+                  <Form.Item name={['meta', 'title']} label="Meta Title">
+                    <Input />
+                  </Form.Item>
+                  <Form.Item name={['meta', 'description']} label="Meta Description">
+                    <Input.TextArea />
+                  </Form.Item>
+                  <Form.Item name={['meta', 'canonical_URL']} label="Canonical URL">
+                    <Input />
+                  </Form.Item>
+                </Collapse.Panel>
+              </Collapse>
+              <Collapse
+                expandIconPosition="right"
+                expandIcon={({ isActive }) => <Button>{isActive ? 'Close' : 'Expand'}</Button>}
+                style={{ width: '100%' }}
+              >
+                <Collapse.Panel header="Code Injection">
+                  <Form.Item name="header_code" label="Header Code">
+                    <MonacoEditor language="html" width="100%" />
+                  </Form.Item>
+                  <Form.Item name="footer_code" label="Footer Code">
+                    <MonacoEditor language="html" width="100%" />
+                  </Form.Item>
+                </Collapse.Panel>
+              </Collapse>
+
+              <Collapse
+                expandIconPosition="right"
+                expandIcon={({ isActive }) => <Button>{isActive ? 'Close' : 'Expand'}</Button>}
+                style={{ width: '100%' }}
+              >
+                <Collapse.Panel header="Meta Fields">
+                  <Form.Item name="meta_fields">
+                    <MonacoEditor language="json" width="100%" />
+                  </Form.Item>
+                </Collapse.Panel>
+              </Collapse>
+
+            </Row>
+          </Col>
+        </Row>
       </Form>
     </>
   );

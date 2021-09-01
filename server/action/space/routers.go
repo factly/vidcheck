@@ -25,6 +25,7 @@ type space struct {
 	HeaderCode        string         `json:"header_code"`
 	FooterCode        string         `json:"footer_code"`
 	MetaFields        postgres.Jsonb `json:"meta_fields" swaggertype:"primitive,string"`
+	Meta              postgres.Jsonb `json:"meta" swaggertype:"primitive,string"`
 	OrganisationID    int            `json:"organisation_id" validate:"required"`
 }
 
