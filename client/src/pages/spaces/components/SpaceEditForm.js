@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { Button, Form, Input, Select, Collapse } from "antd";
+import { Button, Form, Input, Select, Collapse, Row } from "antd";
 import MediaSelector from "../../../components/MediaSelector";
 import { checker } from "../../../utils/sluger";
 import MonacoEditor from "../../../components/MonacoEditor";
@@ -67,8 +67,18 @@ const SpaceEditForm = ({ onCreate, data = {} }) => {
           paddingTop: "24px",
         }}
       >
+        <Row justify="end">
+          <Form.Item>
+            <Button disabled={!valueChange} type="primary" htmlType="submit">
+              Update
+            </Button>
+          </Form.Item>
+        </Row>
+
         <Collapse
-          style={{ width: "95%", marginBottom: "15px" }}
+          expandIconPosition="right"
+          expandIcon={({ isActive }) => <Button>{isActive ? 'Close' : 'Expand'}</Button>}
+          style={{ width: '100%', marginBottom: '15px' }}
           activeKey={basicPanel}
           onChange={handleBasicCollapse}
         >
@@ -139,7 +149,9 @@ const SpaceEditForm = ({ onCreate, data = {} }) => {
             </Form.Item>
           </Panel>
         </Collapse>
-        <Collapse style={{ width: "95%", marginBottom: "15px" }}>
+        <Collapse expandIconPosition="right"
+          expandIcon={({ isActive }) => <Button>{isActive ? 'Close' : 'Expand'}</Button>}
+          style={{ width: '100%', marginBottom: '15px' }}>
           <Panel header="Media" key="2">
             <Form.Item label="Logo" name="logo_id">
               <MediaSelector />
@@ -155,7 +167,9 @@ const SpaceEditForm = ({ onCreate, data = {} }) => {
             </Form.Item>
           </Panel>
         </Collapse>
-        <Collapse style={{ width: "95%", marginBottom: "15px" }}>
+        <Collapse expandIconPosition="right"
+          expandIcon={({ isActive }) => <Button>{isActive ? 'Close' : 'Expand'}</Button>}
+          style={{ width: '100%', marginBottom: '15px' }}>
           <Panel header="Contact" key="3">
             <Form.Item
               name={["social_media_urls", "facebook"]}
@@ -180,7 +194,9 @@ const SpaceEditForm = ({ onCreate, data = {} }) => {
             </Form.Item>
           </Panel>
         </Collapse>
-        <Collapse style={{ width: "95%", marginBottom: "15px" }}>
+        <Collapse expandIconPosition="right"
+          expandIcon={({ isActive }) => <Button>{isActive ? 'Close' : 'Expand'}</Button>}
+          style={{ width: '100%', marginBottom: '15px' }}>
           <Panel header="Analytics" key="4">
             <Form.Item
               name={["analytics", "plausible", "server_url"]}
@@ -202,7 +218,9 @@ const SpaceEditForm = ({ onCreate, data = {} }) => {
             </Form.Item>
           </Panel>
         </Collapse>
-        <Collapse style={{ width: "95%", marginBottom: "15px" }}>
+        <Collapse expandIconPosition="right"
+          expandIcon={({ isActive }) => <Button>{isActive ? 'Close' : 'Expand'}</Button>}
+          style={{ width: '100%', marginBottom: '15px' }}>
           <Panel header="Code Injection" key="5">
             <Form.Item name="header_code" label="Header Code">
               <MonacoEditor language="html" width={650} />
@@ -212,11 +230,6 @@ const SpaceEditForm = ({ onCreate, data = {} }) => {
             </Form.Item>
           </Panel>
         </Collapse>
-        <Form.Item>
-          <Button disabled={!valueChange} type="primary" htmlType="submit">
-            Update
-          </Button>
-        </Form.Item>
       </Form>
     </div>
   );
