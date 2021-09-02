@@ -19,4 +19,4 @@ jobs:
         push: true
         tags: factly/vidcheck-server:${{ env.RELEASE_VERSION }}
         context: server
-        file: client/Dockerfile.prod
+        file: server/Dockerfile.prod
