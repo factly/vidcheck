@@ -73,12 +73,12 @@ function BasicLayout(props) {
 				loading={loading}
 				superOrg={superOrg}
 			/>
-			<Layout>
+			<Layout style={{ background: '#fff' }}>
 				<Header applications={applications} />
 				<Content className="layout-content">
-					<Card key={selected.toString()} className="wrap-children-content">
+					<div key={selected.toString()} className="wrap-children-content">
 						{children}
-					</Card>
+					</div>
 				</Content>
 				{/* <Footer style={{ textAlign: "center" }}>
           {" "}
